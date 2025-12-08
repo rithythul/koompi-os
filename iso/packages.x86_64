@@ -1,84 +1,29 @@
-# KOOMPI OS Package List
-# Base system
+# KOOMPI OS Package List (Minimal Rust Shell)
 base
-linux-lts
-linux-lts-headers
+linux
 linux-firmware
 btrfs-progs
-grub
-efibootmgr
-os-prober
-
-# System utilities
 sudo
 networkmanager
-bluez
-bluez-utils
-pipewire
-pipewire-pulse
-pipewire-alsa
-wireplumber
-
-# Filesystem
-dosfstools
-ntfs-3g
-exfatprogs
-
-# Hardware support
+git
+rust
 mesa
 vulkan-intel
 vulkan-radeon
 xf86-video-amdgpu
 xf86-video-intel
 xf86-video-nouveau
-
-# Desktop - KDE Plasma
-plasma-meta
-plasma-wayland-session
-kde-applications-meta
-sddm
-konsole
-dolphin
-kate
-ark
-spectacle
-gwenview
-okular
-
-# Fonts
-noto-fonts
-noto-fonts-cjk
-noto-fonts-emoji
+wayland
+wayland-protocols
+xorg-xwayland
+polkit
 ttf-dejavu
-ttf-liberation
 
-# Khmer fonts
-# TODO: Add custom Khmer font packages
-
-# Development tools
-git
-base-devel
-rustup
-python
-python-pip
-
-# Networking
-openssh
-curl
-wget
-rsync
-
-# Installer
-calamares
-calamares-extensions
-
-# Flatpak
-flatpak
-
-# Syncthing for classroom mesh
-syncthing
-
-# KOOMPI packages (from local repo)
-# koompi-core
-# koompi-branding
-# koompi-settings
+syslinux
+grub
+efibootmgr
+dosfstools
+mtools
+archiso
+mkinitcpio-archiso
+koompi-iso-config

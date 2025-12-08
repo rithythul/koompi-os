@@ -42,7 +42,7 @@ async fn main() -> anyhow::Result<()> {
     tracing::info!("Starting KOOMPI OS daemon");
 
     // Reset boot counter on successful start
-    if let Err(e) = koompi_snapshots::rollback::RollbackManager::reset_boot_counter() {
+    if let Err(e) = koompi_snapshots::RollbackManager::reset_boot_counter() {
         tracing::warn!("Failed to reset boot counter: {}", e);
     }
 

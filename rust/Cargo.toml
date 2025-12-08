@@ -40,10 +40,10 @@ clap = { version = "4.4", features = ["derive"] }
 zbus = "4.0"
 
 # Python bindings
-pyo3 = { version = "0.20", features = ["extension-module"] }
+pyo3 = { version = "0.23", features = ["extension-module"] }
 
 # UI & Compositor
-smithay = { version = "0.3", features = ["backend_winit", "backend_drm", "backend_libinput", "renderer_gl"] }
+smithay = { version = "0.7", features = ["backend_winit", "backend_drm", "backend_libinput", "renderer_gl"] }
 iced = { version = "0.12", features = ["tokio", "debug"] }
 wayland-server = "0.31"
 wayland-protocols = { version = "0.31", features = ["client", "server"] }

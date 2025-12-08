@@ -73,10 +73,10 @@ impl KoompiService {
 
         connection
             .object_server()
-            .at(&self.config.dbus.object_path, interface)
+            .at(self.config.dbus.object_path.as_str(), interface)
             .await?;
 
-        connection.request_name(&self.config.dbus.bus_name).await?;
+        connection.request_name(self.config.dbus.bus_name.as_str()).await?;
 
         tracing::info!("KOOMPI daemon ready");
 

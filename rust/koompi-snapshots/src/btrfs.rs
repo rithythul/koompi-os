@@ -58,12 +58,11 @@ impl BtrfsOperations {
         let id = now.format("%Y%m%d-%H%M%S").to_string();
         let snapshot_path = self.snapshots_dir.join(&id);
 
-        // Create snapshot using btrfs command
+        // Create snapshot using btrfs command (RW first to write metadata)
         let output = Command::new("btrfs")
             .args([
                 "subvolume",
                 "snapshot",
-                "-r", // Read-only
                 self.root_subvol.to_str().unwrap(),
                 snapshot_path.to_str().unwrap(),
             ])
@@ -89,6 +88,25 @@ impl BtrfsOperations {
 
         // Save metadata
         self.save_metadata(&snapshot)?;
+
+        // Make read-only
+        let output = Command::new("btrfs")
+            .args([
+                "property",
+                "set",
+                snapshot_path.to_str().unwrap(),
+                "ro",
+                "true",
+            ])
+            .output()?;
+
+        if !output.status.success() {
+            // Try to cleanup if setting RO fails
+            let _ = std::fs::remove_dir_all(&snapshot_path);
+            return Err(SnapshotError::BtrfsError(
+                String::from_utf8_lossy(&output.stderr).to_string(),
+            ));
+        }
 
         Ok(snapshot)
     }

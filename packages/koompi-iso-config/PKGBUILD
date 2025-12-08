@@ -1,0 +1,13 @@
+pkgname=koompi-iso-config
+pkgver=1.0
+pkgrel=1
+pkgdesc="Custom mkinitcpio configuration for KOOMPI OS ISO"
+arch=('any')
+license=('GPL')
+depends=('mkinitcpio' 'mkinitcpio-archiso')
+source=('mkinitcpio.conf')
+sha256sums=('SKIP')
+
+package() {
+  install -Dm644 mkinitcpio.conf "$pkgdir/etc/mkinitcpio.conf"
+}

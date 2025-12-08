@@ -29,7 +29,7 @@ check_root() {
 check_deps() {
     log "Checking dependencies..."
     
-    local deps=(archiso mkarchiso mksquashfs)
+    local deps=(mkarchiso mksquashfs)
     for dep in "${deps[@]}"; do
         if ! command -v "$dep" &> /dev/null; then
             error "Missing dependency: $dep. Install with: pacman -S archiso"
@@ -108,6 +108,33 @@ build_iso() {
     
     # Copy ISO profile
     cp -r "$ISO_DIR" "$BUILD_DIR/profile"
+
+    # Copy Rust binaries to airootfs
+    log "Copying Rust binaries to ISO..."
+    local bin_dir="$BUILD_DIR/profile/airootfs/usr/local/bin"
+    mkdir -p "$bin_dir"
+    
+    for binary in koompi-shell koompi-daemon; do
+        if [[ -f "$PROJECT_ROOT/rust/target/release/$binary" ]]; then
+            cp "$PROJECT_ROOT/rust/target/release/$binary" "$bin_dir/"
+            chmod +x "$bin_dir/$binary"
+            log "Copied $binary"
+        else
+            warn "$binary binary not found. Did you run 'build_rust'?"
+        fi
+    done
+
+    # Copy Python wheels
+    log "Copying Python wheels to ISO..."
+    local wheel_dir="$BUILD_DIR/profile/airootfs/usr/share/koompi/wheels"
+    mkdir -p "$wheel_dir"
+    
+    if ls "$PROJECT_ROOT/python"/*/dist/*.whl 1> /dev/null 2>&1; then
+        cp "$PROJECT_ROOT/python"/*/dist/*.whl "$wheel_dir/"
+        log "Copied Python wheels"
+    else
+        warn "No Python wheels found. Did you run 'build_python'?"
+    fi
     
     # Build with mkarchiso
     mkarchiso -v -w "$BUILD_DIR/work" -o "$OUT_DIR" "$BUILD_DIR/profile"
@@ -116,7 +143,9 @@ build_iso() {
     local iso_file=$(ls "$OUT_DIR"/*.iso 2>/dev/null | head -1)
     if [[ -n "$iso_file" ]]; then
         local new_name="koompi-os-$(date +%Y.%m)-x86_64.iso"
-        mv "$iso_file" "$OUT_DIR/$new_name"
+        if [[ "$(basename "$iso_file")" != "$new_name" ]]; then
+            mv "$iso_file" "$OUT_DIR/$new_name"
+        fi
         log "ISO created: $OUT_DIR/$new_name"
     fi
 }

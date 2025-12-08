@@ -21,22 +21,40 @@ echo "Testing: $ISO_FILE"
 DISK_IMG=$(mktemp /tmp/koompi-test-XXXXXX.qcow2)
 qemu-img create -f qcow2 "$DISK_IMG" 20G
 
+# Find OVMF (UEFI Firmware)
+OVMF_PATH=""
+for path in /usr/share/edk2/x64/OVMF.4m.fd /usr/share/ovmf/x64/OVMF.fd /usr/share/edk2-ovmf/x64/OVMF.fd /usr/share/OVMF/OVMF_CODE.fd; do
+    if [[ -f "$path" ]]; then
+        OVMF_PATH="$path"
+        break
+    fi
+done
+
+QEMU_ARGS=(
+    -enable-kvm
+    -m 4G
+    -smp 4
+    -cpu host
+    -drive file="$DISK_IMG",format=qcow2
+    -cdrom "$ISO_FILE"
+    -boot d
+    -vga virtio
+    -display gtk,gl=on
+    -usb
+    -device usb-tablet
+    -netdev user,id=net0
+    -device virtio-net-pci,netdev=net0
+)
+
+if [[ -n "$OVMF_PATH" ]]; then
+    echo "Using UEFI: $OVMF_PATH"
+    QEMU_ARGS+=(-bios "$OVMF_PATH")
+else
+    echo "WARNING: OVMF not found, falling back to BIOS legacy boot"
+fi
+
 # Run QEMU
-qemu-system-x86_64 \
-    -enable-kvm \
-    -m 4G \
-    -smp 4 \
-    -cpu host \
-    -drive file="$DISK_IMG",format=qcow2 \
-    -cdrom "$ISO_FILE" \
-    -boot d \
-    -vga virtio \
-    -display gtk \
-    -usb \
-    -device usb-tablet \
-    -netdev user,id=net0 \
-    -device virtio-net-pci,netdev=net0 \
-    -bios /usr/share/ovmf/x64/OVMF.fd
+qemu-system-x86_64 "${QEMU_ARGS[@]}"
 
 # Cleanup
 rm -f "$DISK_IMG"
