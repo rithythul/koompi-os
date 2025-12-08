@@ -1,0 +1,19 @@
+[package]
+name = "koompi-ffi"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Python bindings for KOOMPI OS core"
+
+[lib]
+name = "koompi_core"
+crate-type = ["cdylib"]
+
+[dependencies]
+koompi-snapshots = { path = "../koompi-snapshots" }
+koompi-packages = { path = "../koompi-packages" }
+koompi-mesh = { path = "../koompi-mesh" }
+
+pyo3.workspace = true
+tokio.workspace = true
+serde_json.workspace = true

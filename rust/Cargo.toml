@@ -1,0 +1,58 @@
+[workspace]
+resolver = "2"
+members = [
+    "koompi-daemon",
+    "koompi-shell",
+    "koompi-snapshots",
+    "koompi-packages",
+    "koompi-mesh",
+    "koompi-ffi",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/koompi/koompi-os"
+authors = ["KOOMPI Team <dev@koompi.org>"]
+
+[workspace.dependencies]
+# Async runtime
+tokio = { version = "1.35", features = ["full"] }
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# CLI
+clap = { version = "4.4", features = ["derive"] }
+
+# D-Bus
+zbus = "4.0"
+
+# Python bindings
+pyo3 = { version = "0.20", features = ["extension-module"] }
+
+# UI & Compositor
+smithay = { version = "0.3", features = ["backend_winit", "backend_drm", "backend_libinput", "renderer_gl"] }
+iced = { version = "0.12", features = ["tokio", "debug"] }
+wayland-server = "0.31"
+wayland-protocols = { version = "0.31", features = ["client", "server"] }
+xkbcommon = "0.7"
+
+# Testing
+tempfile = "3.9"
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
