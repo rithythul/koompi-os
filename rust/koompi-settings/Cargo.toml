@@ -1,0 +1,40 @@
+[package]
+name = "koompi-settings"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "KOOMPI OS Settings Application"
+
+[[bin]]
+name = "koompi-settings"
+path = "src/main.rs"
+
+[dependencies]
+# UI Framework
+iced = { workspace = true }
+
+# Async
+tokio = { workspace = true }
+
+# Error handling
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+
+# Logging
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+# System info
+sysinfo = "0.30"
+battery = "0.7"
+
+# Config
+serde = { workspace = true }
+toml = { workspace = true }
+dirs = "5.0"
+
+# Network (for WiFi settings)
+# network-manager = "0.5"  # Optional, requires NetworkManager
+
+# Audio (for sound settings)
+# libpulse-binding = "2.0"  # Optional, requires PulseAudio

@@ -19,6 +19,10 @@ xorg-xwayland
 polkit
 ttf-dejavu
 
+# Login manager
+greetd
+greetd-tuigreet
+
 syslinux
 grub
 efibootmgr
@@ -27,3 +31,4 @@ mtools
 archiso
 mkinitcpio-archiso
 koompi-iso-config
+alacritty

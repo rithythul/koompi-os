@@ -1,0 +1,35 @@
+[package]
+name = "koompi-files"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "KOOMPI OS File Manager"
+
+[[bin]]
+name = "koompi-files"
+path = "src/main.rs"
+
+[dependencies]
+# UI Framework
+iced = { workspace = true }
+
+# Async
+tokio = { workspace = true }
+
+# Error handling
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+
+# Logging
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+# File operations
+walkdir = "2.4"
+open = "5.0"
+dirs = "5.0"
+humansize = "2.1"
+chrono = "0.4"
+
+# Icons (for file type detection)
+mime_guess = "2.0"

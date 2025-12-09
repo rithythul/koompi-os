@@ -1,12 +1,14 @@
 [workspace]
 resolver = "2"
 members = [
-    "koompi-daemon",
-    "koompi-shell",
-    "koompi-snapshots",
-    "koompi-packages",
-    "koompi-mesh",
-    "koompi-ffi",
+    "daemon",
+    "shell",
+    "snapshots",
+    "packages",
+    "mesh",
+    "ffi",
+    "koompi-files",
+    "koompi-settings",
 ]
 
 [workspace.package]
@@ -43,7 +45,7 @@ zbus = "4.0"
 pyo3 = { version = "0.23", features = ["extension-module"] }
 
 # UI & Compositor
-smithay = { version = "0.7", features = ["backend_winit", "backend_drm", "backend_libinput", "renderer_gl"] }
+smithay = { version = "0.7", features = ["backend_winit", "backend_drm", "backend_libinput", "renderer_gl", "desktop"] }
 iced = { version = "0.12", features = ["tokio", "debug"] }
 wayland-server = "0.31"
 wayland-protocols = { version = "0.31", features = ["client", "server"] }
