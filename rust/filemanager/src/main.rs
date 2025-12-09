@@ -1,4 +1,4 @@
-//! KOOMPI Files - File Manager for KOOMPI OS
+//! File Manager Application
 //!
 //! A simple, fast file manager built with Iced.
 
@@ -17,7 +17,7 @@ fn main() -> iced::Result {
         .with(tracing_subscriber::EnvFilter::from_default_env())
         .init();
 
-    tracing::info!("Starting KOOMPI Files");
+    tracing::info!("Starting File Manager");
 
     FilesApp::run(Settings {
         window: iced::window::Settings {

@@ -1,12 +1,12 @@
 [package]
-name = "koompi-settings"
+name = "system-settings"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "KOOMPI OS Settings Application"
+description = "System Settings Application"
 
 [[bin]]
-name = "koompi-settings"
+name = "system-settings"
 path = "src/main.rs"
 
 [dependencies]

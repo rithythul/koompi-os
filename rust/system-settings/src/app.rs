@@ -1,4 +1,4 @@
-//! Main application logic for KOOMPI Settings
+//! Main application logic for System Settings
 
 use crate::pages::{
     about::{AboutMessage, AboutSettings},

@@ -1,12 +1,12 @@
 [package]
-name = "koompi-files"
+name = "filemanager"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "KOOMPI OS File Manager"
+description = "File Manager Application"
 
 [[bin]]
-name = "koompi-files"
+name = "filemanager"
 path = "src/main.rs"
 
 [dependencies]

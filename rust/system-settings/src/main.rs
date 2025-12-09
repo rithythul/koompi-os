@@ -1,4 +1,4 @@
-//! KOOMPI Settings - System Settings for KOOMPI OS
+//! System Settings Application
 //!
 //! A comprehensive settings application built with Iced.
 
@@ -16,7 +16,7 @@ fn main() -> iced::Result {
         .with(tracing_subscriber::EnvFilter::from_default_env())
         .init();
 
-    tracing::info!("Starting KOOMPI Settings");
+    tracing::info!("Starting System Settings");
 
     SettingsApp::run(Settings {
         window: iced::window::Settings {

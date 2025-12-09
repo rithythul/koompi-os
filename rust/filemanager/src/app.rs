@@ -1,4 +1,4 @@
-//! Main application logic for KOOMPI Files
+//! Main application logic for File Manager
 
 use crate::file_item::FileItem;
 use crate::icons;

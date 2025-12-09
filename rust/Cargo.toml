@@ -7,8 +7,8 @@ members = [
     "packages",
     "mesh",
     "ffi",
-    "koompi-files",
-    "koompi-settings",
+    "filemanager",
+    "system-settings",
 ]
 
 [workspace.package]
