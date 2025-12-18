@@ -18,6 +18,9 @@ class Intent(Enum):
     UPDATE_SYSTEM = "update_system"
     SEARCH_PACKAGE = "search_package"
 
+    # Desktop environment
+    INSTALL_DESKTOP = "install_desktop"
+
     # Snapshot management
     CREATE_SNAPSHOT = "create_snapshot"
     LIST_SNAPSHOTS = "list_snapshots"
@@ -59,44 +62,59 @@ class ClassifiedIntent:
 class IntentClassifier:
     """Rule-based intent classifier with AI fallback."""
 
-    # Pattern definitions
+    # Pattern definitions - supports natural language like "help me install xyz"
     PATTERNS = {
         Intent.INSTALL_PACKAGE: [
-            r"install\s+(.+)",
+            r"(?:help\s+me\s+)?install\s+(.+)",
+            r"(?:can\s+you\s+)?(?:please\s+)?install\s+(.+)",
+            r"(?:i\s+want\s+to\s+)?install\s+(.+)",
+            r"(?:i\s+need\s+)?(.+)\s+installed",
             r"add\s+(.+)",
-            r"get\s+(.+)",
+            r"get\s+(?:me\s+)?(.+)",
+            r"setup\s+(.+)",
             r"ដំឡើង\s+(.+)",  # Khmer: install
+            r"ជួយ\s*ដំឡើង\s+(.+)",  # Khmer: help install
         ],
         Intent.REMOVE_PACKAGE: [
-            r"remove\s+(.+)",
-            r"uninstall\s+(.+)",
-            r"delete\s+(.+)",
+            r"(?:help\s+me\s+)?remove\s+(.+)",
+            r"(?:can\s+you\s+)?(?:please\s+)?(?:remove|uninstall|delete)\s+(.+)",
+            r"(?:i\s+want\s+to\s+)?(?:remove|uninstall|delete)\s+(.+)",
+            r"get\s+rid\s+of\s+(.+)",
             r"លុប\s+(.+)",  # Khmer: delete
         ],
         Intent.UPDATE_SYSTEM: [
-            r"update(\s+system)?",
-            r"upgrade(\s+system)?",
+            r"(?:help\s+me\s+)?update(?:\s+(?:my\s+)?system)?",
+            r"(?:can\s+you\s+)?(?:please\s+)?update(?:\s+everything)?",
+            r"upgrade(?:\s+(?:my\s+)?system)?",
+            r"(?:keep|make)\s+(?:my\s+)?system\s+up\s+to\s+date",
             r"ធ្វើបច្ចុប្បន្នភាព",  # Khmer: update
         ],
         Intent.SEARCH_PACKAGE: [
-            r"search\s+(.+)",
-            r"find\s+package\s+(.+)",
-            r"look\s+for\s+(.+)",
+            r"(?:help\s+me\s+)?search(?:\s+for)?\s+(.+)",
+            r"find\s+(?:a\s+)?package\s+(?:called\s+)?(.+)",
+            r"(?:is\s+there\s+a\s+)?package\s+(?:for\s+)?(.+)",
+            r"look\s+(?:up|for)\s+(.+)",
+            r"what\s+package\s+(?:provides|has)\s+(.+)",
         ],
         Intent.CREATE_SNAPSHOT: [
-            r"create\s+snapshot",
-            r"make\s+snapshot",
-            r"backup\s+system",
+            r"(?:help\s+me\s+)?create\s+(?:a\s+)?snapshot",
+            r"(?:can\s+you\s+)?make\s+(?:a\s+)?snapshot",
+            r"(?:please\s+)?backup\s+(?:my\s+)?system",
+            r"save\s+(?:the\s+)?(?:current\s+)?system\s+state",
+            r"take\s+(?:a\s+)?snapshot",
         ],
         Intent.LIST_SNAPSHOTS: [
-            r"list\s+snapshots",
-            r"show\s+snapshots",
-            r"snapshots",
+            r"(?:help\s+me\s+)?list\s+(?:all\s+)?snapshots",
+            r"show\s+(?:me\s+)?(?:all\s+)?snapshots",
+            r"what\s+snapshots\s+(?:do\s+i\s+have|exist)",
+            r"^snapshots$",
         ],
         Intent.ROLLBACK: [
-            r"rollback(\s+to\s+(.+))?",
-            r"restore(\s+to\s+(.+))?",
-            r"revert(\s+to\s+(.+))?",
+            r"(?:help\s+me\s+)?rollback(?:\s+to\s+(.+))?",
+            r"(?:can\s+you\s+)?restore(?:\s+to\s+(.+))?",
+            r"(?:please\s+)?revert(?:\s+to\s+(.+))?",
+            r"go\s+back\s+to\s+(?:snapshot\s+)?(.+)",
+            r"undo\s+(?:recent\s+)?changes",
         ],
         Intent.SYSTEM_INFO: [
             r"system\s+info",
@@ -127,9 +145,17 @@ class IntentClassifier:
             r"good\s+(morning|afternoon|evening)",
         ],
         Intent.HELP: [
-            r"help(\s+me)?",
+            r"^help$",
             r"what\s+can\s+you\s+do",
+            r"how\s+do\s+i\s+use\s+(?:this|koompi)",
             r"ជួយ",  # Khmer: help
+        ],
+        Intent.INSTALL_DESKTOP: [
+            r"(?:help\s+me\s+)?install\s+(kde|plasma|gnome|xfce|cinnamon|mate|i3|sway|hyprland)",
+            r"(?:i\s+want\s+)?(?:to\s+use\s+)?(kde|plasma|gnome|xfce|cinnamon|mate|i3|sway|hyprland)",
+            r"setup\s+(kde|plasma|gnome|xfce|cinnamon|mate|i3|sway|hyprland)",
+            r"switch\s+to\s+(kde|plasma|gnome|xfce|cinnamon|mate|i3|sway|hyprland)",
+            r"(?:give\s+me\s+)?(?:a\s+)?(kde|plasma|gnome|xfce|cinnamon|mate|i3|sway|hyprland)\s+desktop",
         ],
     }
 
@@ -173,15 +199,28 @@ class IntentClassifier:
 
         if intent in (Intent.INSTALL_PACKAGE, Intent.REMOVE_PACKAGE, Intent.SEARCH_PACKAGE):
             if groups:
-                entities["package_name"] = groups[0].strip()
+                # Clean up the package name
+                pkg = groups[0].strip()
+                # Remove common filler words
+                pkg = re.sub(r'^(the|a|an|package|app|application|program)\s+', '', pkg, flags=re.IGNORECASE)
+                pkg = re.sub(r'\s+(package|app|application|program)$', '', pkg, flags=re.IGNORECASE)
+                entities["package_name"] = pkg.strip()
 
         elif intent == Intent.ROLLBACK:
-            if len(groups) >= 2 and groups[1]:
-                entities["snapshot_id"] = groups[1].strip()
+            if len(groups) >= 1 and groups[0]:
+                entities["snapshot_id"] = groups[0].strip()
 
         elif intent == Intent.SHARE_FILES:
             if groups:
                 entities["files"] = groups[0].strip()
+
+        elif intent == Intent.INSTALL_DESKTOP:
+            if groups:
+                de = groups[0].lower().strip()
+                # Normalize desktop names
+                if de == "plasma":
+                    de = "kde"
+                entities["desktop"] = de
 
         return entities
 

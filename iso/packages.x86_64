@@ -1,34 +1,91 @@
-# KOOMPI OS Package List (Minimal Rust Shell)
+# KOOMPI OS Base - Minimal Immutable Arch Linux
+# This is a bare-minimum system. Users choose their own DE.
+#
+# Branches:
+#   main         - This base system (no DE)
+#   koompi-kde   - Base + KDE Plasma
+#   koompi-gnome - Base + GNOME (future)
+#
+# ═══════════════════════════════════════════════════════════════════════
+
+# Core System
 base
-linux
+linux-lts
 linux-firmware
 btrfs-progs
+
+# Essential Tools
 sudo
 networkmanager
 git
-rust
-mesa
-vulkan-intel
-vulkan-radeon
-xf86-video-amdgpu
-xf86-video-intel
-xf86-video-nouveau
-wayland
-wayland-protocols
-xorg-xwayland
-polkit
-ttf-dejavu
+curl
+wget
 
-# Login manager
-greetd
-greetd-tuigreet
-
-syslinux
+# Boot & System
 grub
 efibootmgr
 dosfstools
 mtools
-archiso
-mkinitcpio-archiso
-koompi-iso-config
-alacritty
+os-prober
+
+# Btrfs / Immutability
+snapper
+grub-btrfs
+
+# Shell
+zsh
+zsh-completions
+zsh-autosuggestions
+zsh-syntax-highlighting
+bash-completion
+
+# AUR Support (yay)
+base-devel
+go
+
+# CLI Essentials
+nano
+vim
+htop
+fastfetch
+rsync
+parted
+reflector
+
+# Filesystem Tools
+ntfs-3g
+exfatprogs
+
+# Network Tools
+openssh
+iwd
+wireless_tools
+wpa_supplicant
+
+# Compression
+unzip
+zip
+p7zip
+
+# Man pages
+man-db
+man-pages
+
+# Audio (base, no GUI)
+pipewire
+pipewire-pulse
+pipewire-alsa
+wireplumber
+
+# Bluetooth (base, no GUI)
+bluez
+bluez-utils
+
+# Flatpak (universal app support)
+flatpak
+
+# KOOMPI Tools are provided in /usr/local/bin:
+# - koompi         : Package manager wrapper (pacman + yay)
+# - koompi-update  : Smart system update with snapshots
+# - koompi-snapshot: Snapshot management
+# - koompi-install : System installer (TUI)

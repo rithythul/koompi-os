@@ -1,0 +1,83 @@
+#!/bin/bash
+# koompi - KOOMPI OS Command Line Interface
+# This is a wrapper that calls the Python koompi-cli package.
+#
+# Supports natural language:
+#   koompi install firefox
+#   koompi help me install firefox
+#   koompi I want to use kde
+#
+# For full help: koompi --help
+
+# Check if Python koompi-cli is available
+if python -c "import koompi_cli" 2>/dev/null; then
+    exec python -m koompi_cli.main "$@"
+fi
+
+# Fallback: Check if installed in /opt/koompi
+if [[ -d /opt/koompi/koompi-cli ]]; then
+    export PYTHONPATH="/opt/koompi:$PYTHONPATH"
+    exec python -m koompi_cli.main "$@"
+fi
+
+# If no Python CLI, show error and basic help
+echo "KOOMPI CLI not fully installed. Basic commands available:"
+echo ""
+
+# Minimal bash fallback for essential commands
+case "$1" in
+    install)
+        shift
+        sudo pacman -S --needed "$@"
+        ;;
+    remove)
+        shift
+        sudo pacman -Rns "$@"
+        ;;
+    update)
+        if command -v yay &>/dev/null; then
+            yay -Syu
+        else
+            sudo pacman -Syu
+        fi
+        ;;
+    search)
+        shift
+        pacman -Ss "$@"
+        ;;
+    desktop)
+        echo "Install a desktop: koompi desktop <kde|gnome|xfce|sway|hyprland>"
+        echo ""
+        echo "Quick install:"
+        echo "  KDE:      sudo pacman -S plasma-desktop sddm konsole dolphin"
+        echo "  GNOME:    sudo pacman -S gnome gdm"
+        echo "  XFCE:     sudo pacman -S xfce4 lightdm"
+        echo "  Sway:     sudo pacman -S sway waybar foot greetd"
+        echo "  Hyprland: sudo pacman -S hyprland waybar foot greetd"
+        ;;
+    setup-yay)
+        if command -v yay &>/dev/null; then
+            echo "yay is already installed"
+        else
+            echo "Installing yay..."
+            cd /tmp
+            git clone https://aur.archlinux.org/yay.git
+            cd yay
+            makepkg -si
+        fi
+        ;;
+    *)
+        echo "Usage: koompi <command> [args]"
+        echo ""
+        echo "Commands:"
+        echo "  install <pkg>    Install packages"
+        echo "  remove <pkg>     Remove packages"
+        echo "  update           Update system"
+        echo "  search <query>   Search packages"
+        echo "  desktop <name>   Install desktop environment"
+        echo "  setup-yay        Install yay (AUR helper)"
+        echo ""
+        echo "For full features, install koompi-cli:"
+        echo "  pip install /opt/koompi/koompi-cli"
+        ;;
+esac
