@@ -4,18 +4,16 @@
 root_subvol = "/@"
 snapshots_dir = "/.snapshots"
 max_snapshots = 10
-min_free_space = 5368709120  # 5 GB
+min_free_space = 5368709120   # 5 GB
 
 [dbus]
 bus_name = "org.koompi.Daemon"
 object_path = "/org/koompi/Daemon"
 
 [ai]
-model_path = "/usr/share/koompi/models/llama-3.3-8b-q4.gguf"
-context_length = 8192
-use_cloud_fallback = true
-
-[classroom]
-enabled = true
-device_name = "KOOMPI"
-role = "student"  # or "teacher"
+# Cloud-first AI (Gemini API)
+# API key is set by user via: koompi ai setup
+provider = "gemini"
+model = "gemini-1.5-flash"
+# Offline knowledge base always available
+knowledge_db = "/var/lib/koompi/knowledge.db"

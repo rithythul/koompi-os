@@ -84,6 +84,12 @@ bluez-utils
 # Flatpak (universal app support)
 flatpak
 
+# Python (for koompi-cli and koompi-ai)
+python
+python-pip
+python-rich
+python-click
+
 # KOOMPI Tools are provided in /usr/local/bin:
 # - koompi         : Package manager wrapper (pacman + yay)
 # - koompi-update  : Smart system update with snapshots

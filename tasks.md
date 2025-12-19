@@ -1,202 +1,167 @@
-# KOOMPI OS Development Tasks
+# KOOMPI OS Development Tasks (Main Branch)
 
-**Goal:** Build a fully functional, immutable Linux OS with a custom Rust-based desktop shell.
-**Priority:** Shell functionality first (like KDE/macOS/Windows), then AI/Mesh features.
-**Strategy:** Build a complete desktop experience before adding advanced features.
-**Reference:** See `papers/` for full architecture and roadmap details.
+**Scope:** Base OS only (headless, CLI, daemon, AI)  
+**Desktop/Apps:** See feature branches
 
 ---
 
-## 🟢 Phase 1: Bootable Foundation (Milestone M1) ✅
-**Objective:** A bootable ISO that runs our custom Rust binary.
+## Branch Structure
+
+| Branch          | Purpose                                       |
+| --------------- | --------------------------------------------- |
+| `main`          | Base OS: daemon, snapshots, packages, AI, CLI |
+| `koompi-shell`  | Custom Rust compositor (Smithay + Iced)       |
+| `koompi-kde`    | KDE Plasma integration                        |
+| `koompi-apps`   | File manager, chat, utilities                 |
+| `koompi-edu`    | Classroom mesh networking, teacher/student    |
+| `koompi-office` | Office suite                                  |
+| `koompi-docs`   | Whitepapers, architecture vision, roadmap     |
+
+---
+
+## 🟢 Phase 1: Bootable Foundation ✅
+
 **Status:** COMPLETE
 
-### Day 1-4: ISO & Boot
-- [x] **Task 1.1**: Fix `rust/koompi-shell/Cargo.toml` dependencies.
-- [x] **Task 1.2**: Write minimal `src/main.rs` with tracing.
-- [x] **Task 2.1**: Configure `scripts/build-iso.sh` with `mkarchiso`.
-- [x] **Task 3.1**: Boot ISO in QEMU, verify login.
-- [x] **Task 4.1**: Create systemd service for auto-start shell.
+- [x] ISO build with archiso
+- [x] Btrfs immutable layout
+- [x] Boot with linux-lts
+- [x] Base packages (no DE)
 
 ---
 
-## 🟢 Phase 2: Wayland Compositor Core (KOOMPI Shell) ✅
-**Objective:** A working Wayland compositor that can run applications.
-**Status:** COMPLETE (winit backend) - Alt+Tab/Workspaces deferred to Phase 7
+## 🟢 Phase 2: Core Daemon ✅
 
-### Day 5-6: Smithay Foundation
-- [x] **Task 5.1**: Initialize Smithay `winit` backend.
-- [x] **Task 5.2**: Handle keyboard/mouse input events.
-- [ ] **Task 5.3**: Switch to DRM/KMS backend for real hardware. (Phase 7)
-
-### Day 7-8: XDG Shell & Window Management
-- [x] **Task 7.1**: Implement `XdgShell` support.
-- [x] **Task 7.2**: Launch terminal as a window.
-- [x] **Task 7.3**: Implement window focus (click-to-focus).
-- [x] **Task 7.4**: Implement window movement (drag title bar).
-- [x] **Task 7.5**: Implement window resizing (drag edges/corners).
-- [x] **Task 7.6**: Implement window minimize/maximize/close.
-- [x] **Task 7.7**: Implement window snapping (half-screen left/right).
-
-### Day 9-10: Multi-Window & Workspaces
-- [x] **Task 9.1**: Support multiple windows simultaneously.
-- [x] **Task 9.2**: Implement window stacking (z-order).
-- [ ] **Task 9.3**: Implement Alt+Tab window switcher. (Phase 7)
-- [ ] **Task 9.4**: Implement virtual workspaces. (Phase 7)
-
----
-
-## 🟢 Phase 3: Desktop Shell UI (Panel + Launcher) ✅
-**Objective:** A complete desktop UI like KDE/GNOME/macOS.
-**Status:** COMPLETE (basic UI) - Search/.desktop launcher deferred to Phase 7
-
-### Day 11-12: Top Panel (macOS Style)
-- [x] **Task 11.1**: Create tiny-skia based panel (top, 40px height).
-- [x] **Task 11.2**: KOOMPI menu button (left side).
-- [ ] **Task 11.3**: Task manager (running apps in panel). (Phase 7)
-- [x] **Task 11.4**: System tray: clock, battery, wifi, volume.
-- [x] **Task 11.5**: Panel always-on-top rendering.
-
-### Day 13-14: Application Launcher
-- [x] **Task 13.1**: Popup app launcher (KOOMPI button click).
-- [ ] **Task 13.2**: Search bar with fuzzy matching. (Phase 7)
-- [ ] **Task 13.5**: Launch apps from `.desktop` files. (Phase 7)
-
-### Day 15-16: Window Decorations
-- [x] **Task 15.1**: Server-side window decorations (title bar).
-- [x] **Task 15.2**: Close/Maximize/Minimize buttons.
-- [x] **Task 15.3**: Resize handles on window edges.
-
----
-
-## 🟢 Phase 4: Wayland Client Protocol ✅
-**Objective:** Real applications can connect and display windows.
 **Status:** COMPLETE
 
-### Day 17-18: Core Protocols
-- [x] **Task 17.1**: wl_compositor protocol.
-- [x] **Task 17.2**: xdg_shell protocol (xdg_wm_base).
-- [x] **Task 17.3**: wl_shm (shared memory buffers).
-- [x] **Task 17.4**: wl_seat (keyboard/pointer input).
-- [x] **Task 17.5**: wl_output (monitor info to clients).
-- [x] **Task 17.6**: Render actual client surface textures.
-- [x] **Task 17.7**: zwp_linux_dmabuf_v1 (GPU buffer sharing).
-- [x] **Task 17.8**: on_commit_buffer_handler for buffer import.
-- [x] **Task 17.9**: Add keyboard + pointer to wl_seat.
-
-### Day 19-20: Client Testing
-- [x] **Task 19.1**: Test with `wayland-info` tool.
-- [x] **Task 19.2**: Run kitty terminal successfully.
+- [x] `koompi-daemon` with D-Bus interface
+- [x] Snapshot manager integration
+- [x] Package manager integration
+- [x] Service configuration (`daemon.toml`)
 
 ---
 
-## 🟢 Phase 5: System Integration ✅
-**Objective:** Core OS functionality for daily use.
+## 🟡 Phase 3: Package Management
+
+**Status:** IN PROGRESS
+
+### Pacman Backend
+
+- [x] Basic pacman wrapper
+- [x] Package search
+- [x] Package install/remove
+- [ ] **Parse pacman output properly** (update count, etc.)
+- [ ] **Pre-install snapshot integration**
+
+### AUR Backend
+
+- [ ] **AUR RPC search implementation**
+- [ ] **yay/paru installation wrapper**
+- [ ] **PKGBUILD safety checks**
+
+### Flatpak Backend
+
+- [x] Basic flatpak wrapper
+- [ ] **Flathub remote configuration**
+
+### Update System
+
+- [ ] **`koompi update` command**
+- [ ] **Auto pre-update snapshot**
+- [ ] **GRUB rollback on failed boot (3 attempts)**
+
+---
+
+## 🟡 Phase 4: Snapshot & Immutability
+
+**Status:** IN PROGRESS
+
+- [x] Snapshot create/list/delete
+- [x] Rollback to snapshot
+- [x] Retention policy (max 10)
+- [ ] **Integration test: create → modify → rollback → verify**
+- [ ] **grub-btrfs integration for boot menu**
+- [ ] **Automatic rollback on 3 failed boots**
+
+---
+
+## � Phase 5: AI Integration ✅
+
 **Status:** COMPLETE
 
-### Day 21-22: Settings & Configuration
-- [x] **Task 21.1**: Settings app (Iced-based koompi-settings).
-- [x] **Task 21.2**: Display settings (resolution, scaling).
-- [x] **Task 21.3**: Appearance (wallpaper, theme, fonts).
-- [x] **Task 21.4**: Sound settings (volume, output device).
-- [x] **Task 21.5**: Network settings (WiFi connection).
-
-### Day 23-24: File Manager
-- [x] **Task 23.1**: Basic file browser (koompi-files).
-- [x] **Task 23.2**: Navigate directories.
-- [x] **Task 23.3**: Open files with default apps.
-
-### Day 25-26: Notifications & Popups
-- [x] **Task 25.1**: Notification daemon (notifications.rs).
-- [x] **Task 25.2**: Toast notifications (top-right).
-- [x] **Task 25.3**: Volume/brightness OSD.
-- [x] **Task 25.4**: Screenshot tool (PrtSc key).
-
-### Day 27-28: Login & Lock Screen
-- [x] **Task 27.1**: Login screen (greetd + tuigreet).
-- [x] **Task 27.2**: Lock screen (Super+L).
-- [x] **Task 27.3**: Power menu (Ctrl+Alt+Del).
+- [x] Gemini API integration
+- [x] Offline knowledge base (FTS5)
+- [x] ArchWiki content ingestion
+- [x] Intent classification
+- [x] Voice recognition (Whisper)
+- [ ] **`koompi ai setup` for API key**
+- [ ] **pytest test suite**
 
 ---
 
-## 🟣 Phase 6: Core System Services
-**Objective:** Immutability, snapshots, and package management.
-**Status:** PARTIAL (code exists, needs UI integration)
+## 🟡 Phase 7: CLI Tool
 
-### Day 29-30: Daemon & D-Bus
-- [x] **Task 29.1**: `koompi-daemon` with D-Bus interface.
-- [x] **Task 29.2**: `GetSystemStats()` method.
-- [ ] **Task 29.3**: Integrate daemon with shell.
+**Status:** IN PROGRESS
 
-### Day 31-32: Btrfs Snapshots
-- [x] **Task 31.1**: `koompi-snapshots` Btrfs wrapper.
-- [x] **Task 31.2**: `create_snapshot()` and `rollback()`.
-- [ ] **Task 31.3**: Snapshot manager UI in Settings.
+### Core Commands
 
-### Day 33-34: Package Manager
-- [x] **Task 33.1**: `koompi-packages` (Pacman/Flatpak wrapper).
-- [x] **Task 33.2**: `install_package()` with pre-install snapshot.
-- [ ] **Task 33.3**: Software Center UI.
+- [x] Basic CLI structure (click)
+- [ ] **`koompi install <pkg>`** - Install with auto-snapshot
+- [ ] **`koompi remove <pkg>`** - Remove package
+- [ ] **`koompi update`** - System update with snapshot
+- [ ] **`koompi search <query>`** - Search packages
+
+### Snapshot Commands
+
+- [ ] **`koompi snapshot create <name>`**
+- [ ] **`koompi snapshot list`**
+- [ ] **`koompi snapshot rollback <id>`**
+- [ ] **`koompi snapshot delete <id>`**
+
+### AI Commands
+
+- [ ] **`koompi ai <question>`** - Ask AI assistant
+- [ ] **`koompi ai setup`** - Configure API key
+- [ ] **`koompi ai offline`** - Query offline only
 
 ---
 
-## ⚫ Phase 7: Polish & Production
-**Objective:** Make it feel like a finished product.
+## 🔴 Phase 8: Testing & Quality
+
 **Status:** NOT STARTED
 
-### Theming & Branding
-- [ ] KOOMPI default theme (dark mode)
-- [ ] Custom cursor (black with white border)
-- [ ] Boot splash animation
-- [ ] Sound theme
+### Rust Tests
 
-### DRM Backend & Real Hardware
-- [ ] Switch from winit to DRM/KMS backend
-- [ ] Multi-monitor support
-- [ ] Hardware cursor
+- [ ] `cargo test` for all crates
+- [ ] D-Bus API integration tests
+- [ ] Snapshot lifecycle tests
 
-### Deferred Features
-- [ ] Alt+Tab window switcher
-- [ ] Virtual workspaces
-- [ ] Task manager in panel
-- [ ] .desktop file launcher
+### Python Tests
+
+- [ ] pytest for koompi-ai
+- [ ] pytest for koompi-cli
+- [ ] Mock Gemini API tests
+
+### CI/CD
+
+- [ ] GitHub Actions workflow
+- [ ] Auto `cargo clippy` + `rustfmt`
+- [ ] Auto `ruff` + `black` for Python
 
 ---
 
-## 📋 Current Focus: Phase 6 - Core System Services
+## 📋 Priority Order
 
-**Phase 5 Completed:**
-- ✅ Settings app (koompi-settings) with Display, Appearance, Sound, Network, About pages
-- ✅ File manager (koompi-files) with navigation, list/grid views, sidebar
-- ✅ Notification daemon with toast notifications
-- ✅ OSD for volume/brightness feedback
-- ✅ Lock screen (Super+L)
-- ✅ Power menu (Ctrl+Alt+Delete)
-- ✅ Screenshot tool foundation
-- ✅ Login screen (greetd + tuigreet)
-
-**New Applications:**
-- `koompi-files` - File manager with sidebar, list/grid views
-- `koompi-settings` - System settings (Display, Appearance, Sound, Network, About)
-
-**Shell Keybindings:**
-- `Super`: Toggle launcher
-- `Super+L`: Lock screen
-- `Super+T`: Open terminal
-- `Super+E`: Open file manager
-- `Super+Q`: Close window
-- `Tab`: Cycle windows
-- `F11`: Toggle fullscreen
-- `Ctrl+Alt+Del`: Power menu
-- `PrtSc`: Screenshot
-
-**Next Steps:**
-1. Integrate daemon with shell
-2. Add Snapshot manager UI to Settings
-3. Create Software Center UI
+1. **P0:** Complete AUR backend (`rust/packages/src/aur.rs`)
+2. **P0:** Complete Pacman parsing (`rust/packages/src/pacman.rs`)
+3. **P1:** CLI commands (`python/koompi-cli/`)
+4. **P2:** Test suites
+5. **P2:** grub-btrfs auto-rollback
 
 ---
 
 ## 📋 Legend
+
 - [ ] Todo
 - [x] Done
+- **Bold** = Current priority

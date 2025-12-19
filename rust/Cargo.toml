@@ -1,15 +1,8 @@
 [workspace]
 resolver = "2"
-members = [
-    "daemon",
-    "shell",
-    "snapshots",
-    "packages",
-    "mesh",
-    "ffi",
-    "filemanager",
-    "system-settings",
-]
+members = ["daemon", "snapshots", "packages", "ffi"]
+# Note: shell, filemanager, system-settings → koompi-shell branch
+# Note: mesh → koompi-edu branch (classroom features)
 
 [workspace.package]
 version = "0.1.0"
@@ -44,12 +37,8 @@ zbus = "4.0"
 # Python bindings
 pyo3 = { version = "0.23", features = ["extension-module"] }
 
-# UI & Compositor
-smithay = { version = "0.7", features = ["backend_winit", "backend_drm", "backend_libinput", "renderer_gl", "desktop"] }
-iced = { version = "0.12", features = ["tokio", "debug"] }
-wayland-server = "0.31"
-wayland-protocols = { version = "0.31", features = ["client", "server"] }
-xkbcommon = "0.7"
+# Time
+chrono = { version = "0.4", features = ["serde"] }
 
 # Testing
 tempfile = "3.9"

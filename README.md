@@ -11,33 +11,48 @@ KOOMPI OS is a Linux distribution built on Arch Linux, designed for education wi
 
 ## 🎯 Branch Strategy
 
-| Branch         | Description                               | Desktop              | Target Users             |
-| -------------- | ----------------------------------------- | -------------------- | ------------------------ |
-| `main`         | **Base Edition** - Minimal Arch + AI CLI  | None (install later) | Advanced users, servers  |
-| `koompi-kde`   | **KDE Edition** - Full desktop experience | KDE Plasma           | General users, education |
-| `koompi-gnome` | GNOME Edition (planned)                   | GNOME                | Coming soon              |
+| Branch          | Purpose                                       |
+| --------------- | --------------------------------------------- |
+| `main`          | Base OS: daemon, snapshots, packages, AI, CLI |
+| `koompi-shell`  | Custom Rust compositor (Smithay + Iced)       |
+| `koompi-kde`    | KDE Plasma integration                        |
+| `koompi-apps`   | File manager, chat, utilities                 |
+| `koompi-edu`    | Classroom mesh networking, teacher/student    |
+| `koompi-office` | Office suite                                  |
+| `koompi-docs`   | Whitepapers, architecture vision, roadmap     |
+
+## 📊 Development Status
+
+| Phase                  | Status       | Progress                                  |
+| ---------------------- | ------------ | ----------------------------------------- |
+| Bootable Foundation    | ✅ Complete  | ISO build, Btrfs, bootloader              |
+| Core Daemon            | ✅ Complete  | D-Bus, snapshot, package integration      |
+| Package Management     | 🟡 In Progress | Pacman ✓, AUR pending, Flatpak partial  |
+| Snapshot & Immutability| 🟡 In Progress | Basic operations ✓, auto-rollback pending|
+| AI Integration         | ✅ Complete  | Gemini API, offline KB, voice recognition |
+| CLI Tool               | 🟡 In Progress | Structure ✓, core commands pending      |
+| Testing & Quality      | 🔴 Not Started| Rust tests, Python tests, CI/CD          |
 
 ## ✨ Features
 
-### All Editions
+### Core System (`main` branch)
 
 - 🔒 **Immutable System** - Btrfs snapshots with automatic rollback
-- 🤖 **AI Assistant** - Powered by Google Gemini API
-- 📦 **Smart Package Management** - Pacman + AUR + Flatpak
-- 🖥️ **Cross-Platform Knowledge** - Learn Linux, Windows, macOS
+- 🤖 **AI Assistant** - Powered by Google Gemini API + offline SQLite knowledge base
+- 📦 **Smart Package Management** - Pacman + AUR + Flatpak with auto-snapshots
+- ⚡ **Minimal Footprint** - Headless base for servers or custom builds
+- �️ **Self-Healing** - Auto-rollback on 3 failed boots (planned)
 
-### Base Edition (main branch)
+### Desktop Environments
 
-- ⚡ **Minimal** - ~500MB ISO, boots to CLI
-- 🛠️ **Build Your Own** - Install only what you need
-- 💬 **AI CLI** - Natural language: `koompi help me install KDE`
+- 🎨 **Custom Shell** (`koompi-shell`) - Rust compositor with Smithay + Iced
+- 🖥️ **KDE Edition** (`koompi-kde`) - Full Plasma desktop experience
 
-### KDE Edition (koompi-kde branch)
+### Applications & Tools
 
-- 🎨 **Full Desktop** - KDE Plasma with KOOMPI theming
-- 📡 **Classroom Mesh** - P2P file sharing for schools
-- 🎤 **Voice Control** - Khmer and English recognition
-- 🖥️ **Calamares Installer** - Graphical installation
+- 📁 **KOOMPI Apps** (`koompi-apps`) - File manager, chat, utilities
+- 📝 **Office Suite** (`koompi-office`) - Productivity applications
+- 🎓 **Education Tools** (`koompi-edu`) - Classroom mesh networking, teacher/student mode
 
 ## 🚀 Quick Start
 
@@ -45,26 +60,29 @@ KOOMPI OS is a Linux distribution built on Arch Linux, designed for education wi
 
 Get the latest release from [Releases](https://github.com/koompi/koompi-os/releases):
 
-- `koompi-os-base-*.iso` - Minimal CLI edition
-- `koompi-os-kde-*.iso` - Full KDE desktop
+- `koompi-os-base-*.iso` - Minimal headless edition (main branch)
+- `koompi-os-kde-*.iso` - KDE Plasma edition (coming soon)
 
-### After Boot (Base Edition)
+### After Boot
 
 ```bash
-# Login: koompi / koompi
+# Default Login: koompi / koompi
 
-# Set up AI (optional but recommended)
-koompi-setup-ai
+# Set up AI assistant
+koompi ai setup
 
-# Ask for help naturally
-koompi help me install firefox
-koompi how do I update the system
-koompi what is the windows equivalent of grep
+# Install packages with auto-snapshot
+koompi install firefox
 
-# Install a desktop (if desired)
-koompi desktop kde    # Full KDE Plasma
-koompi desktop gnome  # GNOME
-koompi desktop xfce   # Lightweight XFCE
+# Update system
+koompi update
+
+# Create manual snapshot
+koompi snapshot create "before-upgrade"
+
+# Ask AI for help
+koompi ai "how do I install KDE desktop?"
+koompi ai "what is the Windows equivalent of grep?"
 ```
 
 ### Build from Source
@@ -74,12 +92,11 @@ koompi desktop xfce   # Lightweight XFCE
 git clone https://github.com/koompi/koompi-os.git
 cd koompi-os
 
-# Build Base Edition (main branch)
+# Build base ISO
 ./scripts/build-iso.sh
 
-# Build KDE Edition
-git checkout koompi-kde
-./scripts/build-iso.sh
+# For feature branches (when available)
+git checkout koompi-kde && ./scripts/build-iso.sh
 ```
 
 ## 🗂️ Project Structure

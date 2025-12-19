@@ -321,7 +321,13 @@ def _ask_ai(text: str):
         async def run():
             response = await query(text)
             console.print(f"{response.text}")
-            console.print(f"\n[dim]Source: {response.source}[/dim]")
+            
+            # Show knowledge sources if used
+            if response.knowledge_used:
+                sources = ", ".join(response.knowledge_used)
+                console.print(f"\n[dim]📚 Knowledge: {sources}[/dim]")
+            
+            console.print(f"[dim]Source: {response.source}[/dim]")
         
         asyncio.run(run())
     except ImportError:
@@ -559,6 +565,14 @@ def ask(prompt: tuple):
     async def run():
         response = await query(text)
         console.print(f"\n{response.text}")
+        
+        # Show knowledge sources if used
+        if response.knowledge_used:
+            sources = ", ".join(response.knowledge_used)
+            console.print(f"\n[bold blue]📚 Knowledge Sources:[/bold blue]")
+            for title in response.knowledge_used:
+                console.print(f"  • {title}")
+        
         console.print(f"\n[dim]Source: {response.source} | Confidence: {response.confidence:.0%}[/dim]")
     
     asyncio.run(run())
