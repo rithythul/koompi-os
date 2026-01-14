@@ -19,6 +19,7 @@ INSTALL_PART_ROOT=""
 INSTALL_MOUNT="/mnt"
 USE_ENCRYPTION=false
 ENCRYPTION_PASSWORD=""
+ROOT_DEV=""
 LOCALE="en_US.UTF-8"
 KEYMAP="us"
 TIMEZONE="UTC"
@@ -262,20 +263,20 @@ format_partitions() {
     mkfs.fat -F32 "$INSTALL_PART_BOOT" &>/dev/null
     
     # Setup encryption if enabled
-    local root_device="$INSTALL_PART_ROOT"
+    ROOT_DEV="$INSTALL_PART_ROOT"
     
     if [[ "$USE_ENCRYPTION" == true ]]; then
         show_dialog --infobox "Setting up encryption..." 3 35
         echo -n "$ENCRYPTION_PASSWORD" | cryptsetup luksFormat --type luks2 "$INSTALL_PART_ROOT" -
         echo -n "$ENCRYPTION_PASSWORD" | cryptsetup open "$INSTALL_PART_ROOT" cryptroot -
-        root_device="/dev/mapper/cryptroot"
+        ROOT_DEV="/dev/mapper/cryptroot"
     fi
     
     # Format root as Btrfs
-    mkfs.btrfs -f "$root_device" &>/dev/null
+    mkfs.btrfs -f "$ROOT_DEV" &>/dev/null
     
     # Mount and create subvolumes
-    mount "$root_device" "$INSTALL_MOUNT"
+    mount "$ROOT_DEV" "$INSTALL_MOUNT"
     
     btrfs subvolume create "$INSTALL_MOUNT/@" 
     btrfs subvolume create "$INSTALL_MOUNT/@home"
@@ -285,11 +286,11 @@ format_partitions() {
     umount "$INSTALL_MOUNT"
     
     # Remount with subvolumes
-    mount -o subvol=@,compress=zstd,noatime "$root_device" "$INSTALL_MOUNT"
+    mount -o subvol=@,compress=zstd,noatime "$ROOT_DEV" "$INSTALL_MOUNT"
     mkdir -p "$INSTALL_MOUNT"/{home,boot,.snapshots,var/log}
-    mount -o subvol=@home,compress=zstd,noatime "$root_device" "$INSTALL_MOUNT/home"
-    mount -o subvol=@snapshots,compress=zstd,noatime "$root_device" "$INSTALL_MOUNT/.snapshots"
-    mount -o subvol=@var_log,compress=zstd,noatime "$root_device" "$INSTALL_MOUNT/var/log"
+    mount -o subvol=@home,compress=zstd,noatime "$ROOT_DEV" "$INSTALL_MOUNT/home"
+    mount -o subvol=@snapshots,compress=zstd,noatime "$ROOT_DEV" "$INSTALL_MOUNT/.snapshots"
+    mount -o subvol=@var_log,compress=zstd,noatime "$ROOT_DEV" "$INSTALL_MOUNT/var/log"
     mount "$INSTALL_PART_BOOT" "$INSTALL_MOUNT/boot"
 }
 
@@ -305,18 +306,32 @@ install_base() {
         microcode="amd-ucode"
     fi
     
-    # Base packages
+    # Base packages + Essential KOOMPI components
     pacstrap -K "$INSTALL_MOUNT" \
         base linux-lts linux-firmware btrfs-progs \
         grub efibootmgr $microcode \
         snapper snap-pac grub-btrfs \
-        networkmanager sudo zsh git \
-        base-devel rust \
-        dialog fastfetch \
+        networkmanager network-manager-applet sudo zsh git \
+        base-devel rust dialog fastfetch jq \
+        plymouth haveged reflector tlp acpid zram-generator \
+        pipewire pipewire-pulse pipewire-alsa wireplumber \
+        bluez bluez-utils openssh iwd \
+        ntfs-3g exfatprogs xdg-user-dirs \
         2>/dev/null
+    
+    # Sync mirrors and keyring to target to ensure first boot works
+    mkdir -p "$INSTALL_MOUNT/etc/pacman.d"
+    cp /etc/pacman.d/mirrorlist "$INSTALL_MOUNT/etc/pacman.d/"
+    cp /etc/pacman.conf "$INSTALL_MOUNT/etc/"
     
     # Generate fstab
     genfstab -U "$INSTALL_MOUNT" >> "$INSTALL_MOUNT/etc/fstab"
+    
+    # CRITICAL: For 'koompi-snapshot rollback' to work via set-default,
+    # the root mount must NOT have subvol=@ in fstab.
+    # It should mount the default subvolume.
+    sed -i "/ \/ /s/subvol=@,//" "$INSTALL_MOUNT/etc/fstab"
+    sed -i "/ \/ /s/subvol=@//" "$INSTALL_MOUNT/etc/fstab"
 }
 
 # Configure system
@@ -352,13 +367,20 @@ EOF
     
     # Enable services
     arch-chroot "$INSTALL_MOUNT" systemctl enable NetworkManager
+    arch-chroot "$INSTALL_MOUNT" systemctl enable bluetooth
+    arch-chroot "$INSTALL_MOUNT" systemctl enable tlp
+    arch-chroot "$INSTALL_MOUNT" systemctl enable haveged
+    arch-chroot "$INSTALL_MOUNT" systemctl enable reflector.timer
+    arch-chroot "$INSTALL_MOUNT" systemctl enable fstrim.timer
+    arch-chroot "$INSTALL_MOUNT" systemctl enable avahi-daemon
+    arch-chroot "$INSTALL_MOUNT" systemctl enable grub-btrfsd
     
-    # Configure mkinitcpio for encryption if needed
-    if [[ "$USE_ENCRYPTION" == true ]]; then
-        sed -i 's/HOOKS=.*/HOOKS=(base systemd autodetect modconf kms keyboard sd-vconsole block sd-encrypt filesystems fsck)/' \
-            "$INSTALL_MOUNT/etc/mkinitcpio.conf"
-        arch-chroot "$INSTALL_MOUNT" mkinitcpio -P
-    fi
+    # Setup zram-generator config
+    cat > "$INSTALL_MOUNT/etc/systemd/zram-generator.conf" <<EOF
+[zram0]
+zram-size = ram / 2
+compression-algorithm = zstd
+EOF
 }
 
 # Install bootloader
@@ -367,12 +389,27 @@ install_bootloader() {
     
     arch-chroot "$INSTALL_MOUNT" grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=KOOMPI
     
-    # Configure GRUB for encryption
+    # Configure GRUB
+    # Note: We do NOT specify rootflags=subvol=@ here to allow 
+    # Btrfs 'set-default' rollbacks to work on reboot.
+    local cmdline="quiet splash"
     if [[ "$USE_ENCRYPTION" == true ]]; then
         local uuid=$(blkid -s UUID -o value "$INSTALL_PART_ROOT")
-        sed -i "s|GRUB_CMDLINE_LINUX=\"\"|GRUB_CMDLINE_LINUX=\"rd.luks.name=$uuid=cryptroot root=/dev/mapper/cryptroot\"|" \
-            "$INSTALL_MOUNT/etc/default/grub"
+        cmdline+=" rd.luks.name=$uuid=cryptroot root=/dev/mapper/cryptroot"
     fi
+    
+    sed -i "s|GRUB_CMDLINE_LINUX_DEFAULT=.*|GRUB_CMDLINE_LINUX_DEFAULT=\"$cmdline\"|" \
+        "$INSTALL_MOUNT/etc/default/grub"
+    echo "GRUB_DISABLE_OS_PROBER=false" >> "$INSTALL_MOUNT/etc/default/grub"
+    
+    # Fix the mkinitcpio hooks for the target system
+    # Using 'sd-plymouth' because we are using the 'systemd' hook
+    local hooks="base systemd autodetect modconf kms keyboard sd-vconsole block"
+    [[ "$USE_ENCRYPTION" == true ]] && hooks+=" sd-encrypt"
+    hooks+=" sd-plymouth filesystems fsck"
+    
+    sed -i "s/HOOKS=.*/HOOKS=($hooks)/" "$INSTALL_MOUNT/etc/mkinitcpio.conf"
+    arch-chroot "$INSTALL_MOUNT" mkinitcpio -P
     
     arch-chroot "$INSTALL_MOUNT" grub-mkconfig -o /boot/grub/grub.cfg
 }
@@ -410,7 +447,19 @@ EOF
 
 # Create recovery snapshot
 create_recovery_snapshot() {
-    show_dialog --infobox "Creating recovery snapshot..." 3 40
+    show_dialog --infobox "Setting up Snapper and creating recovery snapshot..." 3 55
+    
+    # Initialize snapper
+    # We must unmount and remount .snapshots correctly for snapper to work
+    umount "$INSTALL_MOUNT/.snapshots"
+    rmdir "$INSTALL_MOUNT/.snapshots"
+    arch-chroot "$INSTALL_MOUNT" snapper -c root create-config /
+    rmdir "$INSTALL_MOUNT/.snapshots"
+    mkdir "$INSTALL_MOUNT/.snapshots"
+    mount -o subvol=@snapshots,compress=zstd,noatime "$ROOT_DEV" "$INSTALL_MOUNT/.snapshots"
+    
+    # Enable snapper cleanup
+    arch-chroot "$INSTALL_MOUNT" systemctl enable snapper-cleanup.timer
     
     local timestamp=$(date +%Y%m%d)
     btrfs subvolume snapshot -r "$INSTALL_MOUNT" "$INSTALL_MOUNT/.snapshots/factory-$timestamp" 2>/dev/null || true

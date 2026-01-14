@@ -32,9 +32,13 @@ mkdir -p /var/lib/greeter
 chown greeter:greeter /var/lib/greeter
 chmod 755 /var/lib/greeter
 
-# Allow wheel group sudo access (with password)
-echo '%wheel ALL=(ALL:ALL) ALL' > /etc/sudoers.d/wheel
+# Allow wheel group sudo access 
+# Passwordless sudo for Live ISO environment
+echo '%wheel ALL=(ALL:ALL) NOPASSWD: ALL' > /etc/sudoers.d/wheel
 chmod 440 /etc/sudoers.d/wheel
+
+# Copy skeleton files to root too for consistent CLI experience
+cp -rT /etc/skel /root/
 
 # ═══════════════════════════════════════════════════════════════════════
 # Shell Environment (zsh + oh-my-zsh)
@@ -123,6 +127,9 @@ systemctl enable koompi-boot-success.service 2>/dev/null || true
 
 # Enable KOOMPI daemon service (if available)
 systemctl enable koompid.service 2>/dev/null || true
+
+# Enable automatic GRUB menu updates for Btrfs snapshots
+systemctl enable grub-btrfsd.service 2>/dev/null || true
 
 # Create classroom role groups (for polkit rules)
 groupadd -r teachers 2>/dev/null || true
