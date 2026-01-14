@@ -1,0 +1,20 @@
+[Unit]
+Description=KOOMPI OS Boot Watchdog
+Documentation=man:koompi-snapshot(8)
+DefaultDependencies=no
+Before=sysinit.target
+After=systemd-remount-fs.service
+Requires=systemd-remount-fs.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/koompi-watchdog check
+RemainAfterExit=yes
+
+# Critical service - run early in boot
+StandardOutput=journal+console
+StandardError=journal+console
+SyslogIdentifier=koompi-watchdog
+
+[Install]
+WantedBy=sysinit.target

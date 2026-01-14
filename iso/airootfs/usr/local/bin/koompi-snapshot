@@ -1,0 +1,350 @@
+#!/usr/bin/env bash
+# KOOMPI Snapshot Manager
+# Wrapper around the Rust snapshot library
+# Part of KOOMPI OS immutability system
+
+set -euo pipefail
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Script must run as root
+if [[ $EUID -ne 0 ]]; then
+    echo -e "${RED}Error: This script must be run as root${NC}"
+    exit 1
+fi
+
+# Log message with timestamp
+log() {
+    echo -e "${GREEN}[$(date '+%Y-%m-%d %H:%M:%S')]${NC} $1"
+}
+
+warn() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+    exit 1
+}
+
+# Check if Btrfs is being used
+check_btrfs() {
+    if ! findmnt -n -o FSTYPE / | grep -q btrfs; then
+        error "Root filesystem is not Btrfs. Snapshots require Btrfs."
+    fi
+}
+
+# Create a new snapshot
+create_snapshot() {
+    local name="${1:-}"
+    local type="${2:-manual}"
+    local description="${3:-}"
+    
+    if [[ -z "$name" ]]; then
+        error "Snapshot name required. Usage: koompi-snapshot create <name> [type] [description]"
+    fi
+    
+    check_btrfs
+    
+    log "Creating snapshot: $name (type: $type)"
+    
+    # Create snapshot using btrfs command directly
+    # In the future, this could call the Rust daemon via D-Bus
+    local timestamp=$(date +%Y%m%d-%H%M%S)
+    local snapshot_id="$timestamp"
+    local snapshot_path="/.snapshots/$snapshot_id"
+    
+    # Create snapshot
+    if ! btrfs subvolume snapshot -r / "$snapshot_path" &>/dev/null; then
+        error "Failed to create snapshot"
+    fi
+    
+    # Create metadata
+    local metadata_file="$snapshot_path/metadata.json"
+    cat > "$metadata_file" <<EOF
+{
+  "id": "$snapshot_id",
+  "name": "$name",
+  "created_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "snapshot_type": "$type",
+  "description": "$description"
+}
+EOF
+    
+    log "Snapshot created successfully: $snapshot_id"
+    echo "$snapshot_id"
+}
+
+# List all snapshots
+list_snapshots() {
+    check_btrfs
+    
+    if [[ ! -d /.snapshots ]]; then
+        warn "No snapshots directory found"
+        return
+    fi
+    
+    log "Available snapshots:"
+    echo ""
+    printf "%-20s %-30s %-15s %s\n" "ID" "NAME" "TYPE" "CREATED"
+    printf "%-20s %-30s %-15s %s\n" "==================" "============================" "==============" "===================="
+    
+    for snapshot_dir in /.snapshots/*/; do
+        if [[ ! -d "$snapshot_dir" ]]; then
+            continue
+        fi
+        
+        local metadata="$snapshot_dir/metadata.json"
+        if [[ -f "$metadata" ]]; then
+            local id=$(basename "$snapshot_dir")
+            local name=$(jq -r '.name // "N/A"' "$metadata" 2>/dev/null || echo "N/A")
+            local type=$(jq -r '.snapshot_type // "unknown"' "$metadata" 2>/dev/null || echo "unknown")
+            local created=$(jq -r '.created_at // "N/A"' "$metadata" 2>/dev/null || echo "N/A")
+            
+            printf "%-20s %-30s %-15s %s\n" "$id" "$name" "$type" "$created"
+        fi
+    done
+    echo ""
+}
+
+# Get snapshot info
+info_snapshot() {
+    local snapshot_id="${1:-}"
+    
+    if [[ -z "$snapshot_id" ]]; then
+        error "Snapshot ID required. Usage: koompi-snapshot info <snapshot-id>"
+    fi
+    
+    check_btrfs
+    
+    local snapshot_path="/.snapshots/$snapshot_id"
+    local metadata="$snapshot_path/metadata.json"
+    
+    if [[ ! -f "$metadata" ]]; then
+        error "Snapshot not found: $snapshot_id"
+    fi
+    
+    log "Snapshot information:"
+    echo ""
+    cat "$metadata" | jq '.'
+    echo ""
+    
+    # Show size
+    local size=$(du -sh "$snapshot_path" 2>/dev/null | cut -f1)
+    echo "Size: $size"
+}
+
+# Delete a snapshot
+delete_snapshot() {
+    local snapshot_id="${1:-}"
+    
+    if [[ -z "$snapshot_id" ]]; then
+        error "Snapshot ID required. Usage: koompi-snapshot delete <snapshot-id>"
+    fi
+    
+    check_btrfs
+    
+    local snapshot_path="/.snapshots/$snapshot_id"
+    
+    if [[ ! -d "$snapshot_path" ]]; then
+        error "Snapshot not found: $snapshot_id"
+    fi
+    
+    # Confirm deletion
+    if [[ "${2:-}" != "--force" ]]; then
+        read -p "Delete snapshot $snapshot_id? [y/N] " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            log "Cancelled"
+            return
+        fi
+    fi
+    
+    log "Deleting snapshot: $snapshot_id"
+    
+    if ! btrfs subvolume delete "$snapshot_path" &>/dev/null; then
+        error "Failed to delete snapshot"
+    fi
+    
+    log "Snapshot deleted successfully"
+}
+
+# Rollback to a snapshot
+rollback_snapshot() {
+    local snapshot_id="${1:-}"
+    
+    if [[ -z "$snapshot_id" ]]; then
+        error "Snapshot ID required. Usage: koompi-snapshot rollback <snapshot-id>"
+    fi
+    
+    check_btrfs
+    
+    local snapshot_path="/.snapshots/$snapshot_id"
+    
+    if [[ ! -d "$snapshot_path" ]]; then
+        error "Snapshot not found: $snapshot_id"
+    fi
+    
+    warn "This will rollback your system to snapshot: $snapshot_id"
+    warn "A reboot will be required to complete the rollback"
+    
+    read -p "Continue with rollback? [y/N] " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        log "Cancelled"
+        return
+    fi
+    
+    # Create pre-rollback snapshot
+    log "Creating pre-rollback snapshot..."
+    create_snapshot "pre-rollback-$snapshot_id" "PreRollback" "Before rollback to $snapshot_id" >/dev/null
+    
+    log "Configuring rollback..."
+    
+    # Get subvolume ID
+    local subvol_id=$(btrfs subvolume show "$snapshot_path" | grep "Subvolume ID:" | awk '{print $3}')
+    
+    if [[ -z "$subvol_id" ]]; then
+        error "Failed to get subvolume ID"
+    fi
+    
+    # Set as default subvolume
+    if ! btrfs subvolume set-default "$subvol_id" / &>/dev/null; then
+        error "Failed to set default subvolume"
+    fi
+    
+    # Update bootloader
+    log "Updating bootloader..."
+    
+    if [[ -f /boot/grub/grub.cfg ]]; then
+        # GRUB
+        grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
+        log "Updated GRUB configuration"
+    elif [[ -f /boot/loader/loader.conf ]]; then
+        # systemd-boot
+        warn "systemd-boot detected - manual configuration may be needed"
+    fi
+    
+    log "Rollback configured successfully"
+    echo ""
+    echo -e "${GREEN}Reboot now to complete the rollback:${NC}"
+    echo "  sudo reboot"
+    echo ""
+}
+
+# Apply retention policy
+cleanup_snapshots() {
+    local max_snapshots="${1:-10}"
+    
+    check_btrfs
+    
+    log "Applying retention policy (max: $max_snapshots snapshots)..."
+    
+    # Count snapshots
+    local count=$(find /.snapshots -maxdepth 1 -type d | wc -l)
+    count=$((count - 1))  # Subtract /.snapshots itself
+    
+    if [[ $count -le $max_snapshots ]]; then
+        log "Current snapshots ($count) within limit ($max_snapshots)"
+        return
+    fi
+    
+    local to_delete=$((count - max_snapshots))
+    log "Need to delete $to_delete old snapshots"
+    
+    # Find oldest snapshots (exclude Manual and PreRollback types)
+    for snapshot_dir in $(ls -1t /.snapshots/ | tail -n "$to_delete"); do
+        local metadata="/.snapshots/$snapshot_dir/metadata.json"
+        if [[ -f "$metadata" ]]; then
+            local type=$(jq -r '.snapshot_type // "unknown"' "$metadata" 2>/dev/null)
+            
+            # Skip protected types
+            if [[ "$type" == "Manual" || "$type" == "PreRollback" ]]; then
+                log "Skipping protected snapshot: $snapshot_dir ($type)"
+                continue
+            fi
+            
+            log "Deleting old snapshot: $snapshot_dir"
+            delete_snapshot "$snapshot_dir" --force
+        fi
+    done
+    
+    log "Retention policy applied"
+}
+
+# Show usage
+usage() {
+    cat <<EOF
+KOOMPI Snapshot Manager
+
+Usage: koompi-snapshot <command> [options]
+
+Commands:
+  create <name> [type] [description]  Create a new snapshot
+  list                                List all snapshots
+  info <snapshot-id>                  Show snapshot information
+  delete <snapshot-id>                Delete a snapshot
+  rollback <snapshot-id>              Rollback to a snapshot
+  cleanup [max-count]                 Apply retention policy (default: 10)
+
+Examples:
+  koompi-snapshot create "before-update" PreUpdate "Before system update"
+  koompi-snapshot list
+  koompi-snapshot info 20241222-120000
+  koompi-snapshot rollback 20241222-120000
+  koompi-snapshot cleanup 10
+
+Snapshot Types:
+  PreUpdate    - Before system update
+  PreInstall   - Before package installation
+  Manual       - User-created snapshot (protected from auto-deletion)
+  Scheduled    - Automatic daily snapshot
+  PreRollback  - Before rollback (protected from auto-deletion)
+
+EOF
+}
+
+# Main command handler
+main() {
+    local command="${1:-}"
+    
+    case "$command" in
+        create)
+            shift
+            create_snapshot "$@"
+            ;;
+        list|ls)
+            list_snapshots
+            ;;
+        info|show)
+            shift
+            info_snapshot "$@"
+            ;;
+        delete|rm)
+            shift
+            delete_snapshot "$@"
+            ;;
+        rollback|restore)
+            shift
+            rollback_snapshot "$@"
+            ;;
+        cleanup|clean)
+            shift
+            cleanup_snapshots "$@"
+            ;;
+        help|--help|-h)
+            usage
+            ;;
+        *)
+            usage
+            exit 1
+            ;;
+    esac
+}
+
+main "$@"

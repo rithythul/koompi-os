@@ -1,0 +1,21 @@
+[Unit]
+Description=Daily KOOMPI OS Snapshot
+Documentation=man:koompi-snapshot(8)
+After=local-fs.target
+
+[Timer]
+# Run daily at 2:00 AM
+OnCalendar=daily
+OnCalendar=*-*-* 02:00:00
+
+# Also run 10 minutes after boot (in case system was off at 2 AM)
+OnBootSec=10min
+
+# Ensure timer is persistent across reboots
+Persistent=true
+
+# Randomize execution time by up to 30 minutes to avoid load spikes
+RandomizedDelaySec=30min
+
+[Install]
+WantedBy=timers.target

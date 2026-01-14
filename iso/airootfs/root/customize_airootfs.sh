@@ -73,9 +73,6 @@ systemctl disable systemd-firstboot.service 2>/dev/null || true
 # Enable daily snapshot timer (will activate after installation)
 systemctl enable koompi-snapshot-daily.timer 2>/dev/null || true
 
-# Enable initial snapshot service (runs on first boot after install)
-systemctl enable koompi-initial-snapshot.service 2>/dev/null || true
-
 # Enable boot watchdog services (per whitepaper Part 2 §1.4)
 systemctl enable koompi-boot-watchdog.service 2>/dev/null || true
 systemctl enable koompi-boot-success.service 2>/dev/null || true
@@ -87,12 +84,13 @@ systemctl enable koompid.service 2>/dev/null || true
 groupadd -r teachers 2>/dev/null || true
 groupadd -r students 2>/dev/null || true
 
-# Make KOOMPI CLI executable
+# Make KOOMPI CLI executables
 chmod +x /usr/local/bin/koompi 2>/dev/null || true
 chmod +x /usr/local/bin/koompi-install 2>/dev/null || true
 chmod +x /usr/local/bin/koompi-snapshot 2>/dev/null || true
 chmod +x /usr/local/bin/koompi-update 2>/dev/null || true
 chmod +x /usr/local/bin/koompi-watchdog 2>/dev/null || true
+chmod +x /usr/local/bin/koompi-desktop 2>/dev/null || true
 chmod +x /usr/local/bin/koompi-classroom-roles 2>/dev/null || true
 
 # Create snapshots directory structure (for live ISO testing)
@@ -100,6 +98,41 @@ mkdir -p /.snapshots/rootfs 2>/dev/null || true
 
 # Create koompi state directory
 mkdir -p /var/lib/koompi 2>/dev/null || true
+
+# ═══════════════════════════════════════════════════════════════════════
+# Power Management & Performance
+# ═══════════════════════════════════════════════════════════════════════
+
+# Configure zram (compressed swap in RAM)
+cat > /etc/systemd/zram-generator.conf << 'ZRAM_EOF'
+[zram0]
+zram-size = ram / 2
+compression-algorithm = zstd
+ZRAM_EOF
+
+# Enable power management and maintenance services
+systemctl enable tlp.service 2>/dev/null || true
+systemctl enable acpid.service 2>/dev/null || true
+systemctl enable reflector.timer 2>/dev/null || true
+systemctl enable fstrim.timer 2>/dev/null || true
+
+# ═══════════════════════════════════════════════════════════════════════
+# Build paru (AUR helper) - NOT in official repos
+# ═══════════════════════════════════════════════════════════════════════
+
+if ! command -v paru &>/dev/null; then
+    echo "Building paru from AUR..."
+    cd /tmp
+    git clone --depth=1 https://aur.archlinux.org/paru-bin.git 2>/dev/null || true
+    if [[ -d paru-bin ]]; then
+        cd paru-bin
+        # Build as koompi user (makepkg can't run as root)
+        chown -R koompi:koompi /tmp/paru-bin
+        su koompi -c "makepkg -si --noconfirm" 2>/dev/null || true
+        cd /
+        rm -rf /tmp/paru-bin
+    fi
+fi
 
 # ═══════════════════════════════════════════════════════════════════════
 # KOOMPI CLI + AI Setup
@@ -123,28 +156,76 @@ PYTHONPATH_EOF
 # KOOMPI Branding (Terminal-focused for base edition)
 # ═══════════════════════════════════════════════════════════════════════
 
+# Create /etc/os-release for KOOMPI OS identity
+cat > /etc/os-release << 'OSRELEASE_EOF'
+NAME="KOOMPI OS"
+ID=koompi
+ID_LIKE=arch
+VERSION="1.0"
+VERSION_ID="1.0"
+PRETTY_NAME="KOOMPI OS Base Edition"
+HOME_URL="https://koompi.com"
+DOCUMENTATION_URL="https://docs.koompi.com"
+SUPPORT_URL="https://github.com/koompi/koompi-os"
+BUG_REPORT_URL="https://github.com/koompi/koompi-os/issues"
+OSRELEASE_EOF
+
+# Create /etc/issue (login prompt banner)
+cat > /etc/issue << 'ISSUE_EOF'
+
+  \e[1;34mKOOMPI OS\e[0m Base Edition
+  Kernel: \r on \m
+
+  Login: \e[1;32mkoompi\e[0m | Password: \e[1;32mkoompi\e[0m
+
+ISSUE_EOF
+
 # Create KOOMPI branding for fastfetch
 mkdir -p /etc/fastfetch
 cat > /etc/fastfetch/config.jsonc << 'FASTFETCH_EOF'
 {
     "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
     "logo": {
-        "type": "small"
+        "type": "builtin",
+        "source": "arch",
+        "color": {
+            "1": "blue",
+            "2": "white"
+        }
+    },
+    "display": {
+        "separator": " → "
     },
     "modules": [
+        {
+            "type": "custom",
+            "format": "┌──────────────────────────────────────────┐"
+        },
+        {
+            "type": "custom",
+            "format": "│  Welcome to KOOMPI OS                   │"
+        },
+        {
+            "type": "custom",
+            "format": "└──────────────────────────────────────────┘"
+        },
+        "break",
         "title",
         "separator",
         "os",
         "kernel",
+        "uptime",
+        "packages",
         "shell",
         "terminal",
         "cpu",
+        "gpu",
         "memory",
         "disk",
-        "separator",
+        "break",
         {
             "type": "custom",
-            "format": "KOOMPI OS Base - Run 'koompi help' to get started!"
+            "format": "Run 'koompi --help' for commands"
         }
     ]
 }
@@ -162,10 +243,11 @@ cat > /etc/motd << 'MOTD_EOF'
                                    OS Base Edition
 
   Quick Start:
-  • koompi help         - Show all commands
-  • koompi install kde  - Install desktop environment
-  • koompi desktop      - List desktop options
-  • koompi snapshot     - Manage system snapshots
+  • koompi install <pkg> - Install packages (repos + AUR)
+  • koompi upgrade       - Safe system upgrade with snapshot
+  • koompi-desktop       - Install a desktop environment
+  • koompi-snapshot      - Manage system snapshots
+  • koompi-install       - Install KOOMPI OS to disk
 
   Website: https://koompi.com
   

@@ -1,0 +1,365 @@
+#!/usr/bin/env bash
+# KOOMPI Desktop - Desktop Environment Installer
+# TUI-based installer for KOOMPI editions and community desktops
+# Part of KOOMPI OS
+
+set -euo pipefail
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+
+# Check if dialog is available
+if ! command -v dialog &>/dev/null; then
+    echo -e "${RED}Error: dialog is required but not installed${NC}"
+    echo "Install with: sudo pacman -S dialog"
+    exit 1
+fi
+
+# Check network
+check_network() {
+    if ! ping -c1 -W2 archlinux.org &>/dev/null; then
+        dialog --title "Network Error" --msgbox "No network connection detected.\n\nPlease connect to the internet and try again." 8 50
+        exit 1
+    fi
+}
+
+# Get package manager
+get_pm() {
+    if command -v paru &>/dev/null; then
+        echo "paru"
+    elif command -v yay &>/dev/null; then
+        echo "yay"
+    else
+        echo "pacman"
+    fi
+}
+
+# KOOMPI Editions package lists
+declare -A KOOMPI_EDITIONS=(
+    ["tiling"]="hyprland xdg-desktop-portal-hyprland foot waybar fuzzel mako yazi thunar gvfs grim slurp wl-clipboard cliphist brightnessctl playerctl pavucontrol nwg-look qt5ct qt6ct greetd greetd-tuigreet"
+    ["terminal"]="zellij yazi ueberzugpp neovim lazygit btop dust duf fd ripgrep bat eza fzf"
+    ["lite"]="openbox obconf tint2 rofi alacritty pcmanfm gvfs nitrogen picom lxappearance lightdm lightdm-gtk-greeter"
+)
+
+# Community desktop package lists
+declare -A COMMUNITY_DESKTOPS=(
+    ["kde"]="plasma-desktop plasma-pa plasma-nm sddm konsole dolphin kde-applications-meta"
+    ["gnome"]="gnome gnome-tweaks gnome-extra gdm"
+    ["xfce"]="xfce4 xfce4-goodies lightdm lightdm-gtk-greeter"
+    ["cinnamon"]="cinnamon nemo lightdm lightdm-gtk-greeter"
+    ["mate"]="mate mate-extra lightdm lightdm-gtk-greeter"
+    ["i3"]="i3-wm i3status i3lock dmenu alacritty feh picom lightdm lightdm-gtk-greeter"
+    ["sway"]="sway swaylock swayidle waybar wofi foot mako grim slurp wl-clipboard greetd greetd-tuigreet"
+    ["hyprland"]="hyprland xdg-desktop-portal-hyprland waybar wofi foot mako grim slurp wl-clipboard greetd greetd-tuigreet"
+    ["budgie"]="budgie-desktop gnome-terminal nautilus lightdm lightdm-gtk-greeter"
+    ["lxqt"]="lxqt breeze-icons sddm"
+)
+
+# Display managers for each DE
+declare -A DM_SERVICE=(
+    ["kde"]="sddm"
+    ["gnome"]="gdm"
+    ["xfce"]="lightdm"
+    ["cinnamon"]="lightdm"
+    ["mate"]="lightdm"
+    ["i3"]="lightdm"
+    ["sway"]="greetd"
+    ["hyprland"]="greetd"
+    ["budgie"]="lightdm"
+    ["lxqt"]="sddm"
+    ["tiling"]="greetd"
+    ["lite"]="lightdm"
+)
+
+# Apply KOOMPI branding (replace distro icons)
+apply_koompi_branding() {
+    local de_name="$1"
+    
+    echo ""
+    echo -e "${BLUE}Applying KOOMPI branding...${NC}"
+    
+    local koompi_logo="/usr/share/koompi/koompi-icon-b.png"
+    local koompi_logo_svg="/usr/share/koompi/koompi-icon-b.svg"
+    
+    # KDE Plasma branding
+    if [[ "$de_name" == "kde" ]]; then
+        # Replace KDE distro logo
+        if [[ -d /usr/share/plasma/look-and-feel ]]; then
+            for logo in /usr/share/plasma/look-and-feel/*/contents/previews/splash.png; do
+                [[ -f "$logo" ]] && sudo cp "$koompi_logo" "$logo" 2>/dev/null || true
+            done
+        fi
+        # SDDM logo
+        if [[ -d /usr/share/sddm/themes ]]; then
+            for theme_dir in /usr/share/sddm/themes/*/; do
+                [[ -f "${theme_dir}logo.png" ]] && sudo cp "$koompi_logo" "${theme_dir}logo.png" 2>/dev/null || true
+            done
+        fi
+    fi
+    
+    # GNOME branding
+    if [[ "$de_name" == "gnome" ]]; then
+        # GDM logo
+        if [[ -d /usr/share/gnome-shell ]]; then
+            sudo cp "$koompi_logo" /usr/share/gnome-shell/koompi-logo.png 2>/dev/null || true
+        fi
+    fi
+    
+    # LightDM branding (XFCE, Cinnamon, MATE, i3, Openbox)
+    if [[ -f /etc/lightdm/lightdm-gtk-greeter.conf ]]; then
+        if ! grep -q "koompi" /etc/lightdm/lightdm-gtk-greeter.conf 2>/dev/null; then
+            sudo sed -i "s|^#*logo=.*|logo=/usr/share/koompi/koompi-icon-b.png|" /etc/lightdm/lightdm-gtk-greeter.conf 2>/dev/null || true
+        fi
+    fi
+    
+    # Copy logo to common locations
+    sudo mkdir -p /usr/share/pixmaps 2>/dev/null || true
+    sudo cp "$koompi_logo" /usr/share/pixmaps/koompi-logo.png 2>/dev/null || true
+    sudo cp "$koompi_logo_svg" /usr/share/pixmaps/koompi-logo.svg 2>/dev/null || true
+    
+    # Create desktop entry icon
+    sudo cp "$koompi_logo" /usr/share/pixmaps/koompi.png 2>/dev/null || true
+    
+    echo -e "${GREEN}KOOMPI branding applied!${NC}"
+}
+
+# Install packages for a desktop
+install_desktop() {
+    local de_name="$1"
+    local packages="$2"
+    local dm="${DM_SERVICE[$de_name]:-}"
+    local pm=$(get_pm)
+    
+    clear
+    echo -e "${GREEN}Installing $de_name...${NC}"
+    echo ""
+    
+    # Install packages
+    if [[ "$pm" == "pacman" ]]; then
+        sudo pacman -S --needed --noconfirm $packages
+    else
+        $pm -S --needed --noconfirm $packages
+    fi
+    
+    # Enable display manager
+    if [[ -n "$dm" ]]; then
+        echo ""
+        echo -e "${BLUE}Enabling display manager: $dm${NC}"
+        sudo systemctl enable "$dm"
+    fi
+    
+    # Apply KOOMPI branding (replace distro icons)
+    apply_koompi_branding "$de_name"
+    
+    # Apply KOOMPI configs if available
+    if [[ -d /usr/share/koompi/configs/$de_name ]]; then
+        echo ""
+        echo -e "${BLUE}Applying KOOMPI configuration...${NC}"
+        /usr/local/bin/koompi-apply-config "$de_name" 2>/dev/null || true
+    fi
+    
+    echo ""
+    echo -e "${GREEN}$de_name installation complete!${NC}"
+    
+    return 0
+}
+
+# Main menu
+show_main_menu() {
+    local choice
+    
+    choice=$(dialog --clear --title "KOOMPI Desktop Installer" \
+        --menu "Select desktop environment category:" 15 60 4 \
+        1 "KOOMPI Editions (Curated for KOOMPI OS)" \
+        2 "Community Desktops (Popular DEs)" \
+        3 "Minimal (Display Server Only)" \
+        4 "Exit" \
+        2>&1 >/dev/tty)
+    
+    echo "$choice"
+}
+
+# KOOMPI editions menu
+show_koompi_menu() {
+    local choice
+    
+    choice=$(dialog --clear --title "KOOMPI Editions" \
+        --menu "Select a KOOMPI edition:\n\nThese are curated desktop configurations with KOOMPI branding and optimized settings." 18 65 4 \
+        tiling   "KOOMPI Tiling   - Hyprland + modern Wayland tools" \
+        terminal "KOOMPI Terminal - Pure CLI experience (no DE)" \
+        lite     "KOOMPI Lite     - Lightweight Openbox desktop" \
+        back     "← Back to main menu" \
+        2>&1 >/dev/tty)
+    
+    echo "$choice"
+}
+
+# Community desktops menu
+show_community_menu() {
+    local choice
+    
+    choice=$(dialog --clear --title "Community Desktops" \
+        --menu "Select a community desktop environment:" 20 65 10 \
+        kde       "KDE Plasma     - Feature-rich, customizable" \
+        gnome     "GNOME          - Clean, modern, minimal" \
+        xfce      "XFCE           - Lightweight, traditional" \
+        cinnamon  "Cinnamon       - Classic, Windows-like" \
+        mate      "MATE           - GNOME 2 continuation" \
+        i3        "i3             - Tiling WM (X11)" \
+        sway      "Sway           - i3-compatible (Wayland)" \
+        hyprland  "Hyprland       - Dynamic tiling (Wayland)" \
+        budgie    "Budgie         - Simple, elegant" \
+        lxqt      "LXQt           - Qt-based lightweight" \
+        back      "← Back to main menu" \
+        2>&1 >/dev/tty)
+    
+    echo "$choice"
+}
+
+# Minimal install menu
+show_minimal_menu() {
+    local choice
+    
+    choice=$(dialog --clear --title "Minimal Installation" \
+        --menu "Select display server only:\n\nNo desktop environment - just the basics for running graphical apps." 16 65 4 \
+        xorg    "Xorg (X11)  - Traditional display server" \
+        wayland "Wayland     - Modern display protocol base" \
+        back    "← Back to main menu" \
+        2>&1 >/dev/tty)
+    
+    echo "$choice"
+}
+
+# Confirm installation
+confirm_install() {
+    local de_name="$1"
+    local packages="$2"
+    
+    dialog --title "Confirm Installation" \
+        --yesno "Install $de_name?\n\nPackages to install:\n$packages\n\nThis may take a while depending on your internet speed." 14 70
+    
+    return $?
+}
+
+# Installation complete dialog
+show_complete() {
+    local de_name="$1"
+    local dm="${DM_SERVICE[$de_name]:-}"
+    
+    local msg="$de_name has been installed successfully!\n\n"
+    
+    if [[ -n "$dm" ]]; then
+        msg+="Display manager '$dm' has been enabled.\n\n"
+    fi
+    
+    msg+="Reboot your system to start using your new desktop:\n\n"
+    msg+="  sudo reboot"
+    
+    dialog --title "Installation Complete!" --msgbox "$msg" 14 55
+}
+
+# Main loop
+main() {
+    # Check if root is needed
+    if [[ $EUID -ne 0 ]]; then
+        echo -e "${YELLOW}Note: You'll be prompted for sudo password during installation.${NC}"
+    fi
+    
+    check_network
+    
+    while true; do
+        local main_choice=$(show_main_menu)
+        
+        case "$main_choice" in
+            1)  # KOOMPI Editions
+                local koompi_choice=$(show_koompi_menu)
+                
+                if [[ "$koompi_choice" != "back" && -n "$koompi_choice" ]]; then
+                    local packages="${KOOMPI_EDITIONS[$koompi_choice]}"
+                    
+                    if confirm_install "KOOMPI $koompi_choice" "$packages"; then
+                        install_desktop "$koompi_choice" "$packages"
+                        show_complete "KOOMPI $koompi_choice"
+                        exit 0
+                    fi
+                fi
+                ;;
+            2)  # Community Desktops
+                local community_choice=$(show_community_menu)
+                
+                if [[ "$community_choice" != "back" && -n "$community_choice" ]]; then
+                    local packages="${COMMUNITY_DESKTOPS[$community_choice]}"
+                    
+                    if confirm_install "$community_choice" "$packages"; then
+                        install_desktop "$community_choice" "$packages"
+                        show_complete "$community_choice"
+                        exit 0
+                    fi
+                fi
+                ;;
+            3)  # Minimal
+                local minimal_choice=$(show_minimal_menu)
+                
+                case "$minimal_choice" in
+                    xorg)
+                        if confirm_install "Xorg" "xorg-server xorg-xinit xorg-apps"; then
+                            install_desktop "xorg" "xorg-server xorg-xinit xorg-apps"
+                            dialog --msgbox "Xorg installed.\n\nStart X manually with: startx" 8 45
+                            exit 0
+                        fi
+                        ;;
+                    wayland)
+                        if confirm_install "Wayland" "wayland weston"; then
+                            install_desktop "wayland" "wayland weston"
+                            dialog --msgbox "Wayland basics installed.\n\nRun 'weston' in a TTY to test." 8 50
+                            exit 0
+                        fi
+                        ;;
+                esac
+                ;;
+            4|"")  # Exit
+                clear
+                echo -e "${GREEN}Exiting KOOMPI Desktop Installer${NC}"
+                exit 0
+                ;;
+        esac
+    done
+}
+
+# Handle direct command line usage
+if [[ $# -gt 0 ]]; then
+    de="$1"
+    
+    # Check KOOMPI editions
+    if [[ -n "${KOOMPI_EDITIONS[$de]:-}" ]]; then
+        check_network
+        install_desktop "$de" "${KOOMPI_EDITIONS[$de]}"
+        echo ""
+        echo -e "${GREEN}Reboot to start using your desktop: sudo reboot${NC}"
+        exit 0
+    fi
+    
+    # Check community desktops
+    if [[ -n "${COMMUNITY_DESKTOPS[$de]:-}" ]]; then
+        check_network
+        install_desktop "$de" "${COMMUNITY_DESKTOPS[$de]}"
+        echo ""
+        echo -e "${GREEN}Reboot to start using your desktop: sudo reboot${NC}"
+        exit 0
+    fi
+    
+    echo -e "${RED}Unknown desktop: $de${NC}"
+    echo ""
+    echo "Available options:"
+    echo "  KOOMPI: tiling, terminal, lite"
+    echo "  Community: kde, gnome, xfce, cinnamon, mate, i3, sway, hyprland, budgie, lxqt"
+    exit 1
+fi
+
+# Run TUI
+main

@@ -1,18 +1,53 @@
-# KOOMPI OS Base - Minimal Immutable Arch Linux
-# This is a bare-minimum system. Users choose their own DE.
-#
-# Branches:
-#   main         - This base system (no DE)
-#   koompi-kde   - Base + KDE Plasma
-#   koompi-gnome - Base + GNOME (future)
-#
 # ═══════════════════════════════════════════════════════════════════════
+# KOOMPI OS Base - Minimal Immutable Arch Linux
+# ═══════════════════════════════════════════════════════════════════════
+# This is the base system. Users choose their own DE via koompi-desktop.
 
 # Core System
 base
 linux-lts
 linux-firmware
 btrfs-progs
+
+# CPU Microcode (both included, kernel auto-loads correct one)
+intel-ucode
+amd-ucode
+
+# GPU Drivers (covers Intel, AMD, basic NVIDIA via nouveau)
+mesa
+vulkan-intel
+vulkan-radeon
+libva-mesa-driver
+mesa-vdpau
+
+# Boot
+grub
+efibootmgr
+dosfstools
+mtools
+os-prober
+
+# Immutability & Snapshots
+snapper
+snap-pac
+grub-btrfs
+
+# Fonts & Localization
+noto-fonts
+noto-fonts-cjk
+noto-fonts-emoji
+noto-fonts-khmer
+ttf-jetbrains-mono-nerd
+ttf-fira-code
+gnu-free-fonts
+
+# Input Method (Khmer/CJK support)
+fcitx5-im
+fcitx5-m17n
+fcitx5-configtool
+
+# Boot Splash
+plymouth
 
 # Essential Tools
 sudo
@@ -21,17 +56,6 @@ git
 curl
 wget
 
-# Boot & System
-grub
-efibootmgr
-dosfstools
-mtools
-os-prober
-
-# Btrfs / Immutability
-snapper
-grub-btrfs
-
 # Shell
 zsh
 zsh-completions
@@ -39,22 +63,21 @@ zsh-autosuggestions
 zsh-syntax-highlighting
 bash-completion
 
-# AUR Support (yay)
-base-devel
-go
-
 # CLI Essentials
 nano
 vim
 htop
+btop
 fastfetch
 rsync
 parted
 reflector
+jq
 
 # Filesystem Tools
 ntfs-3g
 exfatprogs
+xdg-user-dirs
 
 # Network Tools
 openssh
@@ -71,21 +94,43 @@ p7zip
 man-db
 man-pages
 
-# Audio (base, no GUI)
+# Audio (base)
 pipewire
 pipewire-pulse
 pipewire-alsa
 wireplumber
 
-# Bluetooth (base, no GUI)
+# Bluetooth
 bluez
 bluez-utils
 
 # Flatpak (universal app support)
 flatpak
 
+# AUR Support (paru built during customize_airootfs.sh)
+base-devel
+rust
+
+# Power Management
+tlp
+acpid
+
+# Swap (zram)
+zram-generator
+
+# TUI Tools (for installer/menus)
+dialog
+
+# Python (for koompi-cli from AUR)
+python
+python-pip
+
+# ═══════════════════════════════════════════════════════════════════════
 # KOOMPI Tools are provided in /usr/local/bin:
-# - koompi         : Package manager wrapper (pacman + yay)
-# - koompi-update  : Smart system update with snapshots
-# - koompi-snapshot: Snapshot management
-# - koompi-install : System installer (TUI)
+# - koompi          : Unified package manager (pacman + paru)
+# - koompi-update   : Safe system update with snapshots
+# - koompi-snapshot : Btrfs snapshot management
+# - koompi-watchdog : Boot failure recovery
+# - koompi-install  : System installer (TUI)
+# - koompi-desktop  : Desktop environment installer
+# ═══════════════════════════════════════════════════════════════════════
