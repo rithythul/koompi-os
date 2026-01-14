@@ -4,7 +4,7 @@
 # For KDE edition, see the koompi-kde branch
 
 iso_name="koompi-os-base"
-iso_label="KOOMPI_BASE_$(date +%Y%m)"
+iso_label="KOOMPI_$(date +%Y%m)"
 iso_publisher="KOOMPI <https://koompi.com>"
 iso_application="KOOMPI OS Base - Minimal Arch + AI CLI"
 iso_version="$(date +%Y.%m)"
@@ -26,6 +26,5 @@ file_permissions=(
   ["/usr/local/bin/koompi-watchdog"]="0:0:755"
   ["/usr/local/bin/koompi-setup-btrfs"]="0:0:755"
   ["/usr/local/bin/koompi-security"]="0:0:755"
-  ["/etc/greetd/config.toml"]="0:0:644"
   ["/root/customize_airootfs.sh"]="0:0:755"
 )

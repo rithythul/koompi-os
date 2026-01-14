@@ -74,11 +74,33 @@ systemctl set-default multi-user.target 2>/dev/null || true
 # Disable services that shouldn't run on live ISO
 systemctl disable systemd-firstboot.service 2>/dev/null || true
 
-# Use agetty autologin instead of greetd for live ISO (more reliable)
-# Disable greetd - it has issues in live environment
-systemctl disable greetd.service 2>/dev/null || true
+# Configure greetd (if enabled)
+if systemctl is-enabled greetd.service &>/dev/null; then
+    mkdir -p /etc/greetd
+    cat > /etc/greetd/config.toml << 'GREETD_EOF'
+[terminal]
+vt = 1
 
-# Enable autologin on tty1 for koompi user
+[default_session]
+command = "tuigreet --time --remember --remember-user-session --cmd /usr/bin/zsh"
+user = "greeter"
+
+[initial_session]
+command = "/usr/bin/zsh -l"
+user = "koompi"
+GREETD_EOF
+    chown -R greeter:greeter /etc/greetd
+    chmod 644 /etc/greetd/config.toml
+fi
+
+# Configure mkinitcpio for KOOMPI
+cat > /etc/mkinitcpio.conf << 'MKINIT_EOF'
+HOOKS=(base udev modconf kms memdisk archiso_shutdown archiso_loop_mnt archiso block filesystems fsck)
+COMPRESSION="zstd"
+MKINIT_EOF
+
+# Enable autologin on tty1 for koompi user (Fallback/Live reliability)
+systemctl disable greetd.service 2>/dev/null || true
 mkdir -p /etc/systemd/system/getty@tty1.service.d
 cat > /etc/systemd/system/getty@tty1.service.d/autologin.conf << 'AUTOLOGIN_EOF'
 [Service]

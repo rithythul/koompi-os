@@ -7,7 +7,10 @@
 base
 linux-lts
 linux-firmware
+wireless-regdb
 mkinitcpio-archiso
+mkinitcpio-nfs-utils
+nbd
 btrfs-progs
 
 # CPU Microcode (both included, kernel auto-loads correct one)
@@ -60,6 +63,7 @@ networkmanager
 git
 curl
 wget
+pv
 
 # Shell
 zsh
