@@ -44,6 +44,12 @@ cmd_install() {
     check_network
     local pm=$(get_pm)
     
+    # Check if databases exist, sync if not
+    if [[ ! -d /var/lib/pacman/sync ]] || [[ -z "$(ls -A /var/lib/pacman/sync 2>/dev/null)" ]]; then
+        echo -e "${YELLOW}Package databases missing. Synchronizing...${NC}"
+        sudo pacman -Sy
+    fi
+    
     if [[ "$pm" == "pacman" ]]; then
         echo -e "${YELLOW}Note: Using pacman. For AUR packages, install paru first.${NC}"
         sudo pacman -S --needed "$@"

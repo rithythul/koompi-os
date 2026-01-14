@@ -8,6 +8,8 @@ base
 linux-lts
 linux-firmware
 wireless-regdb
+archlinux-keyring
+haveged
 mkinitcpio-archiso
 mkinitcpio-nfs-utils
 nbd

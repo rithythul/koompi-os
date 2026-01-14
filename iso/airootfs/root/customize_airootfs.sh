@@ -160,6 +160,22 @@ systemctl enable tlp.service 2>/dev/null || true
 systemctl enable acpid.service 2>/dev/null || true
 systemctl enable reflector.timer 2>/dev/null || true
 systemctl enable fstrim.timer 2>/dev/null || true
+systemctl enable haveged.service 2>/dev/null || true
+
+# Ensure mirrorlist has fallback servers immediately
+mkdir -p /etc/pacman.d
+if [[ ! -s /etc/pacman.d/mirrorlist ]]; then
+    cat > /etc/pacman.d/mirrorlist << 'MIRROR_EOF'
+Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch
+Server = https://mirror.rackspace.com/archlinux/$repo/os/$arch
+MIRROR_EOF
+fi
+
+# Try to run reflector once during build if online to get better local mirrors
+if ping -c1 -W2 archlinux.org &>/dev/null; then
+    echo "Running reflector to optimize mirrors..."
+    reflector --latest 20 --protocol https --sort rate --save /etc/pacman.d/mirrorlist || true
+fi
 
 # ═══════════════════════════════════════════════════════════════════════
 # Build paru (AUR helper) - NOT in official repos
@@ -170,10 +186,12 @@ if ! command -v paru &>/dev/null; then
     cd /tmp
     git clone --depth=1 https://aur.archlinux.org/paru-bin.git 2>/dev/null || true
     if [[ -d paru-bin ]]; then
+        chown -R koompi:koompi paru-bin
         cd paru-bin
-        # Build as koompi user (makepkg can't run as root)
-        chown -R koompi:koompi /tmp/paru-bin
-        su koompi -c "makepkg -si --noconfirm" 2>/dev/null || true
+        # Build as koompi user
+        su koompi -c "makepkg --noconfirm" 2>/dev/null || true
+        # Install as root manually to avoid sudo issues
+        pacman -U --noconfirm paru-bin-*.pkg.tar.zst 2>/dev/null || true
         cd /
         rm -rf /tmp/paru-bin
     fi
