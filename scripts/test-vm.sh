@@ -39,12 +39,20 @@ QEMU_ARGS=(
     -cdrom "$ISO_FILE"
     -boot d
     -vga virtio
-    -display gtk,gl=on
     -usb
     -device usb-tablet
     -netdev user,id=net0
     -device virtio-net-pci,netdev=net0
 )
+
+# Try different display backends
+if qemu-system-x86_64 -display help 2>&1 | grep -q "sdl"; then
+    QEMU_ARGS+=(-display sdl,gl=on)
+elif qemu-system-x86_64 -display help 2>&1 | grep -q "gtk"; then
+    QEMU_ARGS+=(-display gtk,gl=on)
+else
+    QEMU_ARGS+=(-display default)
+fi
 
 if [[ -n "$OVMF_PATH" ]]; then
     echo "Using UEFI: $OVMF_PATH"

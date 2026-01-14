@@ -1,21 +1,14 @@
-# KOOMPI OS greetd configuration
-# Uses tuigreet for login, launches koompi-shell as compositor
-
 [terminal]
-# Virtual terminal to use for greeter
+# The VT to run the greeter on. Can be "next", "current" or a number
+# designating the VT.
 vt = 1
 
+# The default session, also known as the greeter.
 [default_session]
-# tuigreet with KOOMPI branding
-# --cmd launches koompi-shell as the Wayland compositor
-# --remember saves last username
-# --greeting shows welcome message
-# --time shows clock
-command = "tuigreet --greeting 'Welcome to KOOMPI OS' --time --remember --cmd koompi-shell"
+command = "tuigreet --time --remember --remember-user-session --cmd /usr/bin/zsh"
 user = "greeter"
 
-# Optional: Allow automatic login (disabled by default)
-# Uncomment for kiosk/classroom mode
-# [initial_session]
-# command = "koompi-shell"
-# user = "student"
+# Auto-login for live ISO - boots directly to koompi user
+[initial_session]
+command = "/usr/bin/zsh -l"
+user = "koompi"

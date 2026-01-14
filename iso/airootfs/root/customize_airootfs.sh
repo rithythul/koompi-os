@@ -21,8 +21,16 @@ echo "koompi-live" > /etc/hostname
 
 # Create live user for ISO
 # Username: koompi, Password: koompi
-useradd -m -G wheel,video,audio,input -s /usr/bin/zsh koompi 2>/dev/null || true
-echo "koompi:koompi" | chpasswd
+# Using pre-hashed password (SHA-512) for reliability in chroot
+KOOMPI_PASS='$6$e4jiGQsT6ZnYWnNW$3pTFVdumY7VIR/nGQzuGkJ/icg7aM4et4tHfnD1GVGhsYgYROZIwsQ/uGG2SlCDhrnF5K8fuTHdr2WYhzIqp6.'
+useradd -m -G wheel,video,audio,input -s /usr/bin/zsh -p "$KOOMPI_PASS" koompi 2>/dev/null || true
+
+# Create greeter user for greetd (if not created by package)
+useradd -r -s /usr/bin/nologin -M -d /var/lib/greeter greeter 2>/dev/null || true
+usermod -a -G video greeter 2>/dev/null || true
+mkdir -p /var/lib/greeter
+chown greeter:greeter /var/lib/greeter
+chmod 755 /var/lib/greeter
 
 # Allow wheel group sudo access (with password)
 echo '%wheel ALL=(ALL:ALL) ALL' > /etc/sudoers.d/wheel
@@ -66,6 +74,20 @@ systemctl set-default multi-user.target 2>/dev/null || true
 # Disable services that shouldn't run on live ISO
 systemctl disable systemd-firstboot.service 2>/dev/null || true
 
+# Use agetty autologin instead of greetd for live ISO (more reliable)
+# Disable greetd - it has issues in live environment
+systemctl disable greetd.service 2>/dev/null || true
+
+# Enable autologin on tty1 for koompi user
+mkdir -p /etc/systemd/system/getty@tty1.service.d
+cat > /etc/systemd/system/getty@tty1.service.d/autologin.conf << 'AUTOLOGIN_EOF'
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty -o '-p -f -- \\u' --noclear --autologin koompi %I $TERM
+AUTOLOGIN_EOF
+
+systemctl enable getty@tty1.service 2>/dev/null || true
+
 # ═══════════════════════════════════════════════════════════════════════
 # KOOMPI Immutability Services
 # ═══════════════════════════════════════════════════════════════════════
@@ -91,6 +113,7 @@ chmod +x /usr/local/bin/koompi-snapshot 2>/dev/null || true
 chmod +x /usr/local/bin/koompi-update 2>/dev/null || true
 chmod +x /usr/local/bin/koompi-watchdog 2>/dev/null || true
 chmod +x /usr/local/bin/koompi-desktop 2>/dev/null || true
+chmod +x /usr/local/bin/koompi-security 2>/dev/null || true
 chmod +x /usr/local/bin/koompi-classroom-roles 2>/dev/null || true
 
 # Create snapshots directory structure (for live ISO testing)
@@ -240,24 +263,21 @@ cat > /etc/motd << 'MOTD_EOF'
   ██╔═██╗ ██║   ██║██║   ██║██║╚██╔╝██║██╔═══╝ ██║
   ██║  ██╗╚██████╔╝╚██████╔╝██║ ╚═╝ ██║██║     ██║
   ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚═╝     ╚═╝╚═╝     ╚═╝
-                                   OS Base Edition
+                                            OS v1.0
 
   Quick Start:
   • koompi install <pkg> - Install packages (repos + AUR)
   • koompi upgrade       - Safe system upgrade with snapshot
   • koompi-desktop       - Install a desktop environment
-  • koompi-snapshot      - Manage system snapshots
+  • koompi-security      - Enable security hardening
   • koompi-install       - Install KOOMPI OS to disk
 
   Website: https://koompi.com
-  
+
 MOTD_EOF
 
-# Add fastfetch to shell startup for live user
-if [[ -f /home/koompi/.zshrc ]]; then
-    echo '# Show system info on login' >> /home/koompi/.zshrc
-    echo 'fastfetch' >> /home/koompi/.zshrc
-fi
+# Ensure koompi user has proper shell config
+# (copied from /etc/skel during user creation)
 
 # ═══════════════════════════════════════════════════════════════════════
 # API Key Setup Helper

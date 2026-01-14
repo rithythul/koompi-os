@@ -7,6 +7,7 @@
 base
 linux-lts
 linux-firmware
+mkinitcpio-archiso
 btrfs-progs
 
 # CPU Microcode (both included, kernel auto-loads correct one)
@@ -22,10 +23,14 @@ mesa-vdpau
 
 # Boot
 grub
+syslinux
 efibootmgr
 dosfstools
 mtools
 os-prober
+memtest86+
+memtest86+-efi
+edk2-shell
 
 # Immutability & Snapshots
 snapper
@@ -36,7 +41,7 @@ grub-btrfs
 noto-fonts
 noto-fonts-cjk
 noto-fonts-emoji
-noto-fonts-khmer
+ttf-khmer
 ttf-jetbrains-mono-nerd
 ttf-fira-code
 gnu-free-fonts
@@ -124,6 +129,10 @@ dialog
 # Python (for koompi-cli from AUR)
 python
 python-pip
+
+# Greeter (for CLI login)
+greetd
+greetd-tuigreet
 
 # ═══════════════════════════════════════════════════════════════════════
 # KOOMPI Tools are provided in /usr/local/bin:
