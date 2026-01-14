@@ -14,11 +14,6 @@ mkinitcpio-archiso
 mkinitcpio-nfs-utils
 nbd
 btrfs-progs
-broadcom-wl-dkms
-rtl8821au-dkms-git
-bluez-firmware
-intel-vpl-gpu-rt
-libva-vdpau-driver
 
 # CPU Microcode (both included, kernel auto-loads correct one)
 intel-ucode
