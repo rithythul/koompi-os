@@ -140,11 +140,7 @@ install_desktop() {
     echo ""
     
     # Install packages
-    if [[ "$pm" == "pacman" ]]; then
-        sudo pacman -S --needed --noconfirm $packages
-    else
-        $pm -S --needed --noconfirm $packages
-    fi
+    koompi install --noconfirm $packages
     
     # Enable display manager
     if [[ -n "$dm" ]]; then

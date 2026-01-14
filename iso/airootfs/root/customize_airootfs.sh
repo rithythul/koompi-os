@@ -162,19 +162,25 @@ systemctl enable reflector.timer 2>/dev/null || true
 systemctl enable fstrim.timer 2>/dev/null || true
 systemctl enable haveged.service 2>/dev/null || true
 
-# Ensure mirrorlist has fallback servers immediately
+# Ensure mirrorlist is NEVER empty
 mkdir -p /etc/pacman.d
-if [[ ! -s /etc/pacman.d/mirrorlist ]]; then
-    cat > /etc/pacman.d/mirrorlist << 'MIRROR_EOF'
+cat > /etc/pacman.d/mirrorlist << 'MIRROR_EOF'
+## KOOMPI OS Fallback Mirrors
 Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch
 Server = https://mirror.rackspace.com/archlinux/$repo/os/$arch
+Server = https://mirrors.edge.kernel.org/archlinux/$repo/os/$arch
 MIRROR_EOF
-fi
 
-# Try to run reflector once during build if online to get better local mirrors
+# Initialize pacman keyring
+echo "Initializing pacman keyring..."
+pacman-key --init
+pacman-key --populate archlinux
+
+# Try to run reflector and sync databases if online
 if ping -c1 -W2 archlinux.org &>/dev/null; then
-    echo "Running reflector to optimize mirrors..."
-    reflector --latest 20 --protocol https --sort rate --save /etc/pacman.d/mirrorlist || true
+    echo "Network detected. Optimizing mirrors and syncing databases..."
+    reflector --latest 20 --protocol https --sort rate --save /etc/pacman.d/mirrorlist.tmp && mv /etc/pacman.d/mirrorlist.tmp /etc/pacman.d/mirrorlist || rm -f /etc/pacman.d/mirrorlist.tmp
+    pacman -Sy --noconfirm
 fi
 
 # ═══════════════════════════════════════════════════════════════════════
