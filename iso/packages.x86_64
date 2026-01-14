@@ -136,9 +136,28 @@ dialog
 python
 python-pip
 
-# Greeter (for CLI login)
+# Greeter & Desktop Components
 greetd
 greetd-tuigreet
+hyprland
+xdg-desktop-portal-hyprland
+foot
+waybar
+fuzzel
+mako
+yazi
+thunar
+gvfs
+grim
+slurp
+wl-clipboard
+cliphist
+brightnessctl
+playerctl
+pavucontrol
+nwg-look
+qt5ct
+qt6ct
 
 # Security Tools
 ufw

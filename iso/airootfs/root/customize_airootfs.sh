@@ -162,7 +162,7 @@ systemctl enable reflector.timer 2>/dev/null || true
 systemctl enable fstrim.timer 2>/dev/null || true
 systemctl enable haveged.service 2>/dev/null || true
 
-# Ensure mirrorlist is NEVER empty
+# Ensure mirrorlist is NEVER empty and has good fallbacks
 mkdir -p /etc/pacman.d
 cat > /etc/pacman.d/mirrorlist << 'MIRROR_EOF'
 ## KOOMPI OS Fallback Mirrors
