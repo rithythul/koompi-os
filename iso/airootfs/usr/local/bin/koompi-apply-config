@@ -26,10 +26,16 @@ fi
 
 echo -e "${BLUE}Applying KOOMPI configuration for $DE_NAME...${NC}"
 
-# Define applying logic for specific DEs
+# Check if there's an apply.sh script (for KDE/GNOME/Deepin)
+if [[ -f "$CONFIG_DIR/apply.sh" ]]; then
+    bash "$CONFIG_DIR/apply.sh"
+    echo -e "${GREEN}Configuration applied successfully!${NC}"
+    exit 0
+fi
+
+# Otherwise, copy config files to ~/.config (for tiling WMs)
 case "$DE_NAME" in
     tiling|hyprland)
-        # Apply Hyprland, Waybar, Fuzzel, etc.
         mkdir -p "$HOME/.config"
         cp -r "$CONFIG_DIR"/* "$HOME/.config/" 2>/dev/null || true
         ;;
