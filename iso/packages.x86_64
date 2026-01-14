@@ -134,6 +134,14 @@ python-pip
 greetd
 greetd-tuigreet
 
+# Security Tools
+ufw
+apparmor
+audit
+sbctl
+fail2ban
+firejail
+
 # ═══════════════════════════════════════════════════════════════════════
 # KOOMPI Tools are provided in /usr/local/bin:
 # - koompi          : Unified package manager (pacman + paru)

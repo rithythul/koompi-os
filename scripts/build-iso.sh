@@ -48,11 +48,20 @@ build_iso() {
     # Clean old profile to ensure we use fresh config
     rm -rf "$BUILD_DIR/profile"
     
+    # Optional: Clean work directory if build fails or for fresh start
+    # Uncomment next line to ALWAYS start from scratch (slower but safer)
+    # rm -rf "$BUILD_DIR/work"
+    
     # Copy ISO profile
     cp -r "$ISO_DIR" "$BUILD_DIR/profile"
 
     # Build with mkarchiso
-    mkarchiso -v -w "$BUILD_DIR/work" -o "$OUT_DIR" "$BUILD_DIR/profile"
+    if ! mkarchiso -v -w "$BUILD_DIR/work" -o "$OUT_DIR" "$BUILD_DIR/profile"; then
+        warn "Build failed. Checking for stale mounts in $BUILD_DIR/work..."
+        # Attempt to unmount anything left behind
+        mount | grep "$BUILD_DIR/work" | cut -d' ' -f3 | sort -r | xargs -r umount -l || true
+        error "ISO build failed. You might need to run: sudo $0 clean"
+    fi
     
     # Rename output
     local iso_file=$(ls "$OUT_DIR"/*.iso 2>/dev/null | head -1)
