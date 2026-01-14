@@ -26,5 +26,6 @@ file_permissions=(
   ["/usr/local/bin/koompi-watchdog"]="0:0:755"
   ["/usr/local/bin/koompi-setup-btrfs"]="0:0:755"
   ["/usr/local/bin/koompi-security"]="0:0:755"
+  ["/usr/local/bin/koompi-apply-config"]="0:0:755"
   ["/root/customize_airootfs.sh"]="0:0:755"
 )

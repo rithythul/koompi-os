@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# koompi-apply-config - Apply KOOMPI configurations for desktop environments
+# Part of KOOMPI OS
+
+set -euo pipefail
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+DE_NAME="${1:-}"
+
+if [[ -z "$DE_NAME" ]]; then
+    echo -e "${RED}Usage: koompi-apply-config <desktop_environment>${NC}"
+    exit 1
+fi
+
+CONFIG_DIR="/usr/share/koompi/configs/$DE_NAME"
+
+if [[ ! -d "$CONFIG_DIR" ]]; then
+    echo -e "${RED}Error: Configuration for $DE_NAME not found in $CONFIG_DIR${NC}"
+    exit 1
+fi
+
+echo -e "${BLUE}Applying KOOMPI configuration for $DE_NAME...${NC}"
+
+# Define applying logic for specific DEs
+case "$DE_NAME" in
+    tiling|hyprland)
+        # Apply Hyprland, Waybar, Fuzzel, etc.
+        mkdir -p "$HOME/.config"
+        cp -r "$CONFIG_DIR"/* "$HOME/.config/" 2>/dev/null || true
+        ;;
+    lite|openbox)
+        mkdir -p "$HOME/.config"
+        cp -r "$CONFIG_DIR"/* "$HOME/.config/" 2>/dev/null || true
+        ;;
+    *)
+        # Generic copy to user's .config
+        mkdir -p "$HOME/.config"
+        cp -r "$CONFIG_DIR"/* "$HOME/.config/" 2>/dev/null || true
+        ;;
+esac
+
+echo -e "${GREEN}Configuration applied successfully!${NC}"
