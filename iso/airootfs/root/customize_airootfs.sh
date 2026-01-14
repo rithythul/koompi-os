@@ -169,6 +169,17 @@ systemctl enable reflector.timer 2>/dev/null || true
 systemctl enable fstrim.timer 2>/dev/null || true
 systemctl enable haveged.service 2>/dev/null || true
 
+# Set Plymouth default theme (ensure it looks professional)
+if command -v plymouth-set-default-theme &>/dev/null; then
+    plymouth-set-default-theme spinner 2>/dev/null || true
+fi
+
+# Pre-configure UFW (Firewall) defaults
+if command -v ufw &>/dev/null; then
+    ufw default deny incoming 2>/dev/null || true
+    ufw default allow outgoing 2>/dev/null || true
+fi
+
 # Ensure mirrorlist is NEVER empty and has good fallbacks
 mkdir -p /etc/pacman.d
 cat > /etc/pacman.d/mirrorlist << 'MIRROR_EOF'

@@ -31,6 +31,11 @@ KOOMPI OS Base is a minimal, immutable Arch Linux-based operating system designe
   - Optimized configs for performance
   - Khmer language support out-of-the-box
 
+- **🛡️ Integrated Security**
+  - `koompi-security`: One-command system hardening
+  - UFW Firewall, AppArmor, and Fail2ban pre-configured
+  - Secure Boot management via `sbctl`
+
 ## 🚀 Quick Start
 
 ### 1. Installation
@@ -48,7 +53,7 @@ Login with the user you created.
 koompi-desktop
 ```
 Choose from:
-- **KOOMPI Editions**: Tiling (Hyprland), Terminal-centric, etc.
+- **KOOMPI Editions**: **Tiling (Hyprland)** - Now pre-installed for instant setup! 🚀
 - **Community**: KDE, GNOME, XFCE, Cinnamon, i3, Sway, etc.
 
 **Manage Packages:**
