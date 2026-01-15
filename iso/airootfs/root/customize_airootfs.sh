@@ -72,8 +72,8 @@ sed -i 's|SHELL=/bin/bash|SHELL=/usr/bin/zsh|' /etc/default/useradd 2>/dev/null 
 systemctl enable NetworkManager.service 2>/dev/null || true
 systemctl enable bluetooth.service 2>/dev/null || true
 
-# Set multi-user target as default (CLI-only base)
-systemctl set-default multi-user.target 2>/dev/null || true
+# Set graphical target as default for KDE Plasma
+systemctl set-default graphical.target 2>/dev/null || true
 
 # Disable services that shouldn't run on live ISO
 systemctl disable systemd-firstboot.service 2>/dev/null || true
