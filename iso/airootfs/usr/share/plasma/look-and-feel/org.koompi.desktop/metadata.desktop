@@ -1,0 +1,15 @@
+[Desktop Entry]
+Comment=KOOMPI OS - Modern Khmer Linux
+Encoding=UTF-8
+Icon=koompi
+Keywords=Look and Feel;Appearance;KOOMPI
+Name=KOOMPI OS
+Type=Service
+X-KDE-ParentApp=kcontrol
+X-KDE-PluginInfo-Author=KOOMPI
+X-KDE-PluginInfo-Email=hello@koompi.com
+X-KDE-PluginInfo-License=MIT
+X-KDE-PluginInfo-Name=org.koompi.desktop
+X-KDE-PluginInfo-Version=1.0
+X-KDE-PluginInfo-Website=https://koompi.com
+X-Plasma-MainScript=defaults

@@ -1,0 +1,16 @@
+[kdeglobals][General]
+ColorScheme=BreezeDark
+Name=Breeze Dark
+
+[kdeglobals][Icons]
+Theme=Papirus-Dark
+
+[kdeglobals][KDE]
+LookAndFeelPackage=org.koompi.desktop
+
+[plasmarc][Theme]
+name=breeze-dark
+
+[ksplashrc][KSplash]
+Engine=none
+Theme=None

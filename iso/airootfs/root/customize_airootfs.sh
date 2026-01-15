@@ -103,16 +103,37 @@ HOOKS=(base udev modconf kms memdisk archiso_shutdown archiso_loop_mnt archiso b
 COMPRESSION="zstd"
 MKINIT_EOF
 
-# Enable autologin on tty1 for koompi user (Fallback/Live reliability)
-systemctl disable greetd.service 2>/dev/null || true
-mkdir -p /etc/systemd/system/getty@tty1.service.d
-cat > /etc/systemd/system/getty@tty1.service.d/autologin.conf << 'AUTOLOGIN_EOF'
-[Service]
-ExecStart=
-ExecStart=-/sbin/agetty -o '-p -f -- \\u' --noclear --autologin koompi %I $TERM
-AUTOLOGIN_EOF
+# ═══════════════════════════════════════════════════════════════════════
+# KDE Plasma & SDDM Configuration
+# ═══════════════════════════════════════════════════════════════════════
 
-systemctl enable getty@tty1.service 2>/dev/null || true
+# Enable SDDM display manager
+systemctl enable sddm.service 2>/dev/null || true
+
+# Configure SDDM
+mkdir -p /etc/sddm.conf.d
+cat > /etc/sddm.conf.d/koompi.conf << 'SDDM_EOF'
+[Theme]
+Current=breeze
+
+[Users]
+DefaultPath=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin
+RememberLastUser=true
+RememberLastSession=true
+
+[Wayland]
+SessionDir=/usr/share/wayland-sessions
+
+[X11]
+SessionDir=/usr/share/xsessions
+SDDM_EOF
+
+# Set KDE as default session
+mkdir -p /var/lib/sddm
+echo "[Last]
+Session=/usr/share/xsessions/plasma.desktop" > /var/lib/sddm/state.conf
+chown -R sddm:sddm /var/lib/sddm 2>/dev/null || true
+
 
 # ═══════════════════════════════════════════════════════════════════════
 # KOOMPI Immutability Services

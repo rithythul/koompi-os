@@ -1,7 +1,7 @@
 # ═══════════════════════════════════════════════════════════════════════
-# KOOMPI OS Base - Minimal Immutable Arch Linux
+# KOOMPI OS KDE Edition - Immutable Arch Linux with KDE Plasma
 # ═══════════════════════════════════════════════════════════════════════
-# This is the base system. Users choose their own DE via koompi-desktop.
+# Pre-installed KDE Plasma desktop with KOOMPI branding and customizations
 
 # Core System
 base
@@ -136,9 +136,49 @@ dialog
 python
 python-pip
 
-# Greeter & KOOMPI Components
-greetd
-greetd-tuigreet
+# Greeter & Display Manager
+sddm
+
+# ═══════════════════════════════════════════════════════════════════════
+# KDE Plasma Desktop Environment
+# ═══════════════════════════════════════════════════════════════════════
+plasma-desktop
+plasma-pa
+plasma-nm
+plasma-systemmonitor
+plasma-wayland-protocols
+kscreen
+kdeplasma-addons
+powerdevil
+bluedevil
+
+# KDE Core Applications
+konsole
+dolphin
+kate
+ark
+spectacle
+gwenview
+okular
+kcalc
+kwalletmanager
+partitionmanager
+
+# KDE System Settings & Tools
+systemsettings
+kde-gtk-config
+sddm-kcm
+xdg-desktop-portal-kde
+
+# KDE Wayland Support
+kwayland-integration
+plasma-wayland-session
+
+# KDE Themes
+breeze
+breeze-gtk
+breeze-icons
+papirus-icon-theme
 
 # Security Tools
 ufw
