@@ -10,7 +10,15 @@
     "modules": [
         {
             "type": "custom",
-            "format": "Welcome to KOOMPI OS"
+            "format": "┌────────────────────────────────┐"
+        },
+        {
+            "type": "custom",
+            "format": "│    Welcome to KOOMPI OS        │"
+        },
+        {
+            "type": "custom",
+            "format": "└────────────────────────────────┘"
         },
         "break",
         {

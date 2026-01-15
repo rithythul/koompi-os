@@ -300,15 +300,15 @@ cat > /etc/fastfetch/config.jsonc << 'FASTFETCH_EOF'
     "modules": [
         {
             "type": "custom",
-            "format": "┌──────────────────────────────────────────┐"
+            "format": "┌────────────────────────────────┐"
         },
         {
             "type": "custom",
-            "format": "│  Welcome to KOOMPI OS                   │"
+            "format": "│    Welcome to KOOMPI OS        │"
         },
         {
             "type": "custom",
-            "format": "└──────────────────────────────────────────┘"
+            "format": "└────────────────────────────────┘"
         },
         "break",
         "title",
