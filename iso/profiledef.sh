@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
-# KOOMPI OS Base Edition - ISO Profile Definition
-# This is the minimal base ISO - no desktop environment included
-# For KDE edition, see the koompi-kde branch
+# KOOMPI OS KDE Edition - ISO Profile Definition
+# Pre-installed KDE Plasma desktop with KOOMPI branding
 
-iso_name="koompi-os-base"
+iso_name="koompi-os"
 iso_label="KOOMPI_$(date +%Y%m)"
 iso_publisher="KOOMPI <https://koompi.com>"
-iso_application="KOOMPI OS Base - Minimal Arch + AI CLI"
+iso_application="KOOMPI OS - KDE Plasma Edition"
 iso_version="$(date +%Y.%m)"
 install_dir="koompi"
 buildmodes=('iso')
