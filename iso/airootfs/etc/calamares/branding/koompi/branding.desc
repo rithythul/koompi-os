@@ -1,0 +1,31 @@
+---
+componentName: koompi
+welcomeStyleCalamares: true
+welcomeExpandingLogo: true
+
+strings:
+    productName: KOOMPI OS
+    shortProductName: KOOMPI
+    version: 2026.01
+    shortVersion: 2026.01
+    versionedName: KOOMPI OS 2026.01
+    shortVersionedName: KOOMPI 2026.01
+    bootloaderEntryName: KOOMPI
+    productUrl: https://koompi.com
+    supportUrl: https://koompi.com/support
+    knownIssuesUrl: https://github.com/rithythul/koompi-os/issues
+    releaseNotesUrl: https://github.com/rithythul/koompi-os/releases
+
+images:
+    productLogo: "logo.png"
+    productIcon: "logo.png"
+    productWelcome: "welcome.png"
+
+slideshow: "show.qml"
+slideshowAPI: 2
+
+style:
+    sidebarBackground: "#1e1e2e"
+    sidebarText: "#cdd6f4"
+    sidebarTextSelect: "#33ccff"
+    sidebarTextHighlight: "#ffffff"

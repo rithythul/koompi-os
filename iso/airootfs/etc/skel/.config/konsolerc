@@ -1,2 +1,16 @@
 [Desktop Entry]
 DefaultProfile=KOOMPI.profile
+
+[KonsoleWindow]
+RememberWindowSize=false
+ShowWindowTitleOnTitleBar=true
+
+[MainWindow]
+MenuBar=Disabled
+ToolBarsMovable=Disabled
+
+[MainWindow][Toolbar mainToolBar]
+Visible=false
+
+[MainWindow][Toolbar sessionToolbar]
+Visible=false

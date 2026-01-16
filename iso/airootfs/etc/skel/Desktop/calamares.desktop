@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Install KOOMPI OS
+Comment=Install KOOMPI OS to your computer
+Exec=sudo -E calamares
+Icon=/etc/calamares/branding/koompi/logo.png
+Terminal=false
+Categories=System;
+Keywords=install;installer;calamares;koompi;

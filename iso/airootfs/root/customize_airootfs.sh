@@ -114,7 +114,7 @@ systemctl enable sddm.service 2>/dev/null || true
 mkdir -p /etc/sddm.conf.d
 cat > /etc/sddm.conf.d/koompi.conf << 'SDDM_EOF'
 [Theme]
-Current=breeze
+Current=koompi
 
 [Users]
 DefaultPath=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin

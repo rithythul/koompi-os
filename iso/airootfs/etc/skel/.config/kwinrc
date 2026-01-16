@@ -1,0 +1,17 @@
+[org.kde.kdecoration2]
+BorderSize=Normal
+BorderSizeAuto=false
+ButtonsOnLeft=XIA
+ButtonsOnRight=
+library=org.kde.kwin.aurorae
+theme=__aurorae__svg__ChromeOS
+
+[Desktops]
+Number=2
+Rows=1
+
+[Effect-overview]
+BorderActivate=9
+
+[Windows]
+Placement=Centered

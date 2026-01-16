@@ -28,7 +28,8 @@
         "break",
         {
             "type": "os",
-            "key": "OS"
+            "key": "OS",
+            "format": "KOOMPI OS KDE Edition x86_64"
         },
         {
             "type": "kernel",
@@ -45,6 +46,10 @@
         {
             "type": "shell",
             "key": "Shell"
+        },
+        {
+            "type": "de",
+            "key": "Desktop"
         },
         {
             "type": "terminal",
