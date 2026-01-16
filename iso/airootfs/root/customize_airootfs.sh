@@ -166,6 +166,10 @@ chmod +x /usr/local/bin/koompi-desktop 2>/dev/null || true
 chmod +x /usr/local/bin/koompi-security 2>/dev/null || true
 chmod +x /usr/local/bin/koompi-classroom-roles 2>/dev/null || true
 
+# Make desktop shortcuts executable
+chmod +x /home/koompi/Desktop/*.desktop 2>/dev/null || true
+chmod +x /etc/skel/Desktop/*.desktop 2>/dev/null || true
+
 # Create snapshots directory structure (for live ISO testing)
 mkdir -p /.snapshots/rootfs 2>/dev/null || true
 
@@ -256,25 +260,7 @@ if ! command -v paru &>/dev/null; then
     fi
 fi
 
-# ═══════════════════════════════════════════════════════════════════════
-# Build Calamares Installer from AUR
-# ═══════════════════════════════════════════════════════════════════════
-
-if ! command -v calamares &>/dev/null && command -v paru &>/dev/null; then
-    echo "Building Calamares from AUR..."
-    cd /tmp
-    git clone --depth=1 https://aur.archlinux.org/calamares.git 2>/dev/null || true
-    if [[ -d calamares ]]; then
-        chown -R koompi:koompi calamares
-        cd calamares
-        # Build as koompi user
-        su koompi -c "makepkg -s --noconfirm" 2>/dev/null || true
-        # Install as root
-        pacman -U --noconfirm calamares-*.pkg.tar.zst 2>/dev/null || true
-        cd /
-        rm -rf /tmp/calamares
-    fi
-fi
+# Calamares is now installed from official repositories
 
 # ═══════════════════════════════════════════════════════════════════════
 # KOOMPI CLI + AI Setup

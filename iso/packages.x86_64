@@ -190,7 +190,10 @@ firejail
 # Web Browser
 firefox
 
-# Note: Calamares is built from AUR during customize_airootfs.sh
+# Installer & Dependencies
+calamares
+ckbcomp
+mkinitcpio-openswap
 
 # ═══════════════════════════════════════════════════════════════════════
 # KOOMPI Tools are provided in /usr/local/bin:
