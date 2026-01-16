@@ -1,0 +1,105 @@
+/* KOOMPI OS - Waybar Styles */
+/* Tiling Edition */
+
+* {
+    font-family: "JetBrainsMono Nerd Font", "Noto Sans Khmer", sans-serif;
+    font-size: 13px;
+    min-height: 0;
+}
+
+window#waybar {
+    background: rgba(30, 30, 46, 0.9);
+    border-bottom: 2px solid rgba(51, 204, 255, 0.5);
+    color: #cdd6f4;
+}
+
+#workspaces button {
+    padding: 0 8px;
+    color: #6c7086;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+}
+
+#workspaces button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #cdd6f4;
+}
+
+#workspaces button.active {
+    color: #33ccff;
+    border-bottom: 2px solid #33ccff;
+}
+
+#workspaces button.urgent {
+    color: #f38ba8;
+}
+
+#window {
+    padding: 0 10px;
+    color: #a6adc8;
+}
+
+#clock {
+    padding: 0 12px;
+    color: #cdd6f4;
+    font-weight: bold;
+}
+
+#tray {
+    padding: 0 8px;
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
+    background-color: #f38ba8;
+}
+
+#pulseaudio {
+    padding: 0 10px;
+    color: #fab387;
+}
+
+#pulseaudio.muted {
+    color: #6c7086;
+}
+
+#network {
+    padding: 0 10px;
+    color: #89b4fa;
+}
+
+#network.disconnected {
+    color: #f38ba8;
+}
+
+#battery {
+    padding: 0 10px;
+    color: #a6e3a1;
+}
+
+#battery.warning {
+    color: #f9e2af;
+}
+
+#battery.critical {
+    color: #f38ba8;
+}
+
+#battery.charging {
+    color: #a6e3a1;
+}
+
+tooltip {
+    background: rgba(30, 30, 46, 0.95);
+    border: 1px solid rgba(51, 204, 255, 0.5);
+    border-radius: 8px;
+}
+
+tooltip label {
+    color: #cdd6f4;
+}

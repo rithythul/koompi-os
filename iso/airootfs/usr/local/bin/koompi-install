@@ -1,0 +1,555 @@
+#!/usr/bin/env bash
+# KOOMPI Install - System Installer TUI
+# Installs KOOMPI OS to disk with Btrfs, snapshots, and optional encryption
+# Part of KOOMPI OS
+
+set -euo pipefail
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+# Installation variables
+INSTALL_DISK=""
+INSTALL_PART_BOOT=""
+INSTALL_PART_ROOT=""
+INSTALL_MOUNT="/mnt"
+USE_ENCRYPTION=false
+ENCRYPTION_PASSWORD=""
+ROOT_DEV=""
+LOCALE="en_US.UTF-8"
+KEYMAP="us"
+TIMEZONE="UTC"
+HOSTNAME="koompi"
+USERNAME=""
+USER_PASSWORD=""
+ROOT_PASSWORD=""
+
+# Check if dialog is available
+if ! command -v dialog &>/dev/null; then
+    echo -e "${RED}Error: dialog is required${NC}"
+    exit 1
+fi
+
+# Check if running as root
+if [[ $EUID -ne 0 ]]; then
+    echo -e "${RED}Error: This script must be run as root${NC}"
+    exit 1
+fi
+
+# Cleanup function
+cleanup() {
+    umount -R "$INSTALL_MOUNT" 2>/dev/null || true
+    if [[ "$USE_ENCRYPTION" == true ]]; then
+        cryptsetup close cryptroot 2>/dev/null || true
+    fi
+}
+trap cleanup EXIT
+
+# Dialog wrapper
+show_dialog() {
+    dialog --backtitle "KOOMPI OS Installer" "$@" 2>&1 >/dev/tty
+}
+
+# Welcome screen
+show_welcome() {
+    show_dialog --title "Welcome to KOOMPI OS" --msgbox \
+"Welcome to KOOMPI OS Installer!
+
+This wizard will guide you through installing KOOMPI OS on your computer.
+
+Features:
+• Btrfs filesystem with automatic snapshots
+• Optional LUKS2 disk encryption
+• Boot watchdog for automatic recovery
+• Multiple desktop environment options
+
+Press OK to continue." 16 55
+}
+
+# Network check
+check_network() {
+    show_dialog --infobox "Checking network connection..." 3 40
+    
+    if ! ping -c1 -W3 archlinux.org &>/dev/null; then
+        show_dialog --title "Network Error" --yesno \
+"No network connection detected.
+
+KOOMPI OS requires an internet connection to install.
+
+Would you like to configure networking now?" 10 50
+        
+        if [[ $? -eq 0 ]]; then
+            nmtui
+            # Recheck
+            if ! ping -c1 -W3 archlinux.org &>/dev/null; then
+                show_dialog --msgbox "Still no connection. Please fix networking and restart installer." 6 60
+                exit 1
+            fi
+        else
+            exit 1
+        fi
+    fi
+}
+
+# Locale selection
+select_locale() {
+    local locales=("en_US.UTF-8" "English (US)" "km_KH.UTF-8" "Khmer (Cambodia)" 
+                   "zh_CN.UTF-8" "Chinese (Simplified)" "ja_JP.UTF-8" "Japanese"
+                   "ko_KR.UTF-8" "Korean" "th_TH.UTF-8" "Thai" "vi_VN.UTF-8" "Vietnamese")
+    
+    LOCALE=$(show_dialog --title "Locale Selection" --menu \
+        "Select your system locale:" 15 55 7 "${locales[@]}")
+}
+
+# Keyboard selection
+select_keymap() {
+    local keymaps=("us" "US English" "uk" "UK English" "de" "German" "fr" "French"
+                   "es" "Spanish" "pt" "Portuguese" "it" "Italian" "ru" "Russian")
+    
+    KEYMAP=$(show_dialog --title "Keyboard Layout" --menu \
+        "Select your keyboard layout:" 14 50 6 "${keymaps[@]}")
+}
+
+# Timezone selection
+select_timezone() {
+    # Common timezones
+    local zones=("Asia/Phnom_Penh" "Cambodia" "Asia/Bangkok" "Thailand" 
+                 "Asia/Singapore" "Singapore" "Asia/Tokyo" "Japan"
+                 "America/New_York" "US Eastern" "America/Los_Angeles" "US Pacific"
+                 "Europe/London" "UK" "Europe/Paris" "France" "UTC" "UTC")
+    
+    TIMEZONE=$(show_dialog --title "Timezone" --menu \
+        "Select your timezone:" 15 55 8 "${zones[@]}")
+}
+
+# Disk selection
+select_disk() {
+    local disks=()
+    
+    while IFS= read -r line; do
+        local name=$(echo "$line" | awk '{print $1}')
+        local size=$(echo "$line" | awk '{print $2}')
+        local model=$(echo "$line" | cut -d' ' -f3-)
+        disks+=("$name" "$size $model")
+    done < <(lsblk -d -n -o NAME,SIZE,MODEL | grep -E '^(sd|nvme|vd)')
+    
+    if [[ ${#disks[@]} -eq 0 ]]; then
+        show_dialog --msgbox "No suitable disks found!" 6 40
+        exit 1
+    fi
+    
+    INSTALL_DISK=$(show_dialog --title "Disk Selection" --menu \
+        "Select installation disk:\n\n⚠️  WARNING: All data on selected disk will be ERASED!" 15 65 5 "${disks[@]}")
+    
+    INSTALL_DISK="/dev/$INSTALL_DISK"
+    
+    # Confirm disk selection
+    show_dialog --title "Confirm Disk" --yesno \
+"Selected disk: $INSTALL_DISK
+
+$(lsblk -o NAME,SIZE,TYPE,FSTYPE "$INSTALL_DISK")
+
+⚠️  ALL DATA ON THIS DISK WILL BE PERMANENTLY ERASED!
+
+Are you absolutely sure?" 15 60 || exit 1
+}
+
+# Encryption option
+select_encryption() {
+    show_dialog --title "Disk Encryption" --yesno \
+"Would you like to encrypt your disk?
+
+Encryption (LUKS2) protects your data if the computer is lost or stolen.
+
+• You'll need to enter a password on every boot
+• Forgetting the password means losing your data
+• Slight performance impact
+
+Enable encryption?" 14 55
+    
+    if [[ $? -eq 0 ]]; then
+        USE_ENCRYPTION=true
+        
+        ENCRYPTION_PASSWORD=$(show_dialog --title "Encryption Password" --insecure --passwordbox \
+            "Enter encryption password:" 8 50)
+        
+        local confirm=$(show_dialog --title "Confirm Password" --insecure --passwordbox \
+            "Confirm encryption password:" 8 50)
+        
+        if [[ "$ENCRYPTION_PASSWORD" != "$confirm" ]]; then
+            show_dialog --msgbox "Passwords do not match!" 6 30
+            exit 1
+        fi
+    fi
+}
+
+# Hostname selection
+select_hostname() {
+    HOSTNAME=$(show_dialog --title "Hostname" --inputbox \
+        "Enter computer name (hostname):" 8 50 "koompi")
+}
+
+# User creation
+create_user() {
+    USERNAME=$(show_dialog --title "User Account" --inputbox \
+        "Enter username (lowercase, no spaces):" 8 50)
+    
+    if [[ -z "$USERNAME" || "$USERNAME" =~ [^a-z0-9_-] ]]; then
+        show_dialog --msgbox "Invalid username. Use only lowercase letters, numbers, dash, underscore." 6 60
+        exit 1
+    fi
+    
+    USER_PASSWORD=$(show_dialog --title "User Password" --insecure --passwordbox \
+        "Enter password for $USERNAME:" 8 50)
+    
+    local confirm=$(show_dialog --title "Confirm Password" --insecure --passwordbox \
+        "Confirm password:" 8 50)
+    
+    if [[ "$USER_PASSWORD" != "$confirm" ]]; then
+        show_dialog --msgbox "Passwords do not match!" 6 30
+        exit 1
+    fi
+    
+    # Root password same as user?
+    show_dialog --title "Root Password" --yesno \
+        "Use the same password for root (administrator) account?" 6 55
+    
+    if [[ $? -eq 0 ]]; then
+        ROOT_PASSWORD="$USER_PASSWORD"
+    else
+        ROOT_PASSWORD=$(show_dialog --title "Root Password" --insecure --passwordbox \
+            "Enter root password:" 8 50)
+    fi
+}
+
+# Partition disk
+partition_disk() {
+    show_dialog --infobox "Partitioning disk..." 3 30
+    
+    # Wipe disk
+    wipefs -af "$INSTALL_DISK" &>/dev/null
+    
+    # Create GPT partition table
+    parted -s "$INSTALL_DISK" mklabel gpt
+    
+    # Create partitions
+    # 1: EFI boot partition (512MB)
+    # 2: Root partition (rest)
+    parted -s "$INSTALL_DISK" mkpart "EFI" fat32 1MiB 513MiB
+    parted -s "$INSTALL_DISK" set 1 esp on
+    parted -s "$INSTALL_DISK" mkpart "ROOT" btrfs 513MiB 100%
+    
+    # Get partition names (handle nvme naming)
+    if [[ "$INSTALL_DISK" == *"nvme"* ]]; then
+        INSTALL_PART_BOOT="${INSTALL_DISK}p1"
+        INSTALL_PART_ROOT="${INSTALL_DISK}p2"
+    else
+        INSTALL_PART_BOOT="${INSTALL_DISK}1"
+        INSTALL_PART_ROOT="${INSTALL_DISK}2"
+    fi
+    
+    sleep 1  # Wait for kernel to recognize partitions
+}
+
+# Format partitions
+format_partitions() {
+    show_dialog --infobox "Formatting partitions..." 3 35
+    
+    # Format EFI partition
+    mkfs.fat -F32 "$INSTALL_PART_BOOT" &>/dev/null
+    
+    # Setup encryption if enabled
+    ROOT_DEV="$INSTALL_PART_ROOT"
+    
+    if [[ "$USE_ENCRYPTION" == true ]]; then
+        show_dialog --infobox "Setting up encryption..." 3 35
+        echo -n "$ENCRYPTION_PASSWORD" | cryptsetup luksFormat --type luks2 "$INSTALL_PART_ROOT" -
+        echo -n "$ENCRYPTION_PASSWORD" | cryptsetup open "$INSTALL_PART_ROOT" cryptroot -
+        ROOT_DEV="/dev/mapper/cryptroot"
+    fi
+    
+    # Format root as Btrfs
+    mkfs.btrfs -f "$ROOT_DEV" &>/dev/null
+    
+    # Mount and create subvolumes
+    mount "$ROOT_DEV" "$INSTALL_MOUNT"
+    
+    btrfs subvolume create "$INSTALL_MOUNT/@" 
+    btrfs subvolume create "$INSTALL_MOUNT/@home"
+    btrfs subvolume create "$INSTALL_MOUNT/@snapshots"
+    btrfs subvolume create "$INSTALL_MOUNT/@var_log"
+    
+    umount "$INSTALL_MOUNT"
+    
+    # Remount with subvolumes
+    mount -o subvol=@,compress=zstd,noatime "$ROOT_DEV" "$INSTALL_MOUNT"
+    mkdir -p "$INSTALL_MOUNT"/{home,boot,.snapshots,var/log}
+    mount -o subvol=@home,compress=zstd,noatime "$ROOT_DEV" "$INSTALL_MOUNT/home"
+    mount -o subvol=@snapshots,compress=zstd,noatime "$ROOT_DEV" "$INSTALL_MOUNT/.snapshots"
+    mount -o subvol=@var_log,compress=zstd,noatime "$ROOT_DEV" "$INSTALL_MOUNT/var/log"
+    mount "$INSTALL_PART_BOOT" "$INSTALL_MOUNT/boot"
+}
+
+# Install base system
+install_base() {
+    show_dialog --infobox "Installing base system (this may take a while)..." 3 55
+    
+    # Detect CPU for microcode
+    local microcode=""
+    if grep -q "GenuineIntel" /proc/cpuinfo; then
+        microcode="intel-ucode"
+    elif grep -q "AuthenticAMD" /proc/cpuinfo; then
+        microcode="amd-ucode"
+    fi
+    
+    # Base packages + Essential KOOMPI components
+    pacstrap -K "$INSTALL_MOUNT" \
+        base linux-lts linux-firmware btrfs-progs \
+        grub efibootmgr $microcode \
+        snapper snap-pac grub-btrfs \
+        networkmanager network-manager-applet sudo zsh git \
+        base-devel rust dialog fastfetch jq \
+        plymouth haveged reflector tlp acpid zram-generator \
+        pipewire pipewire-pulse pipewire-alsa wireplumber \
+        bluez bluez-utils openssh iwd \
+        ntfs-3g exfatprogs xdg-user-dirs \
+        2>/dev/null
+    
+    # Sync mirrors and keyring to target to ensure first boot works
+    mkdir -p "$INSTALL_MOUNT/etc/pacman.d"
+    cp /etc/pacman.d/mirrorlist "$INSTALL_MOUNT/etc/pacman.d/"
+    cp /etc/pacman.conf "$INSTALL_MOUNT/etc/"
+    
+    # Generate fstab
+    genfstab -U "$INSTALL_MOUNT" >> "$INSTALL_MOUNT/etc/fstab"
+    
+    # CRITICAL: For 'koompi-snapshot rollback' to work via set-default,
+    # the root mount must NOT have subvol=@ in fstab.
+    # It should mount the default subvolume.
+    sed -i "/ \/ /s/subvol=@,//" "$INSTALL_MOUNT/etc/fstab"
+    sed -i "/ \/ /s/subvol=@//" "$INSTALL_MOUNT/etc/fstab"
+}
+
+# Configure system
+configure_system() {
+    show_dialog --infobox "Configuring system..." 3 30
+    
+    # Timezone
+    arch-chroot "$INSTALL_MOUNT" ln -sf "/usr/share/zoneinfo/$TIMEZONE" /etc/localtime
+    arch-chroot "$INSTALL_MOUNT" hwclock --systohc
+    
+    # Locale
+    echo "$LOCALE UTF-8" >> "$INSTALL_MOUNT/etc/locale.gen"
+    arch-chroot "$INSTALL_MOUNT" locale-gen
+    echo "LANG=$LOCALE" > "$INSTALL_MOUNT/etc/locale.conf"
+    echo "KEYMAP=$KEYMAP" > "$INSTALL_MOUNT/etc/vconsole.conf"
+    
+    # Hostname
+    echo "$HOSTNAME" > "$INSTALL_MOUNT/etc/hostname"
+    cat > "$INSTALL_MOUNT/etc/hosts" <<EOF
+127.0.0.1   localhost
+::1         localhost
+127.0.1.1   $HOSTNAME.localdomain $HOSTNAME
+EOF
+    
+    # User
+    arch-chroot "$INSTALL_MOUNT" useradd -m -G wheel,video,audio,input -s /usr/bin/zsh "$USERNAME"
+    echo "$USERNAME:$USER_PASSWORD" | arch-chroot "$INSTALL_MOUNT" chpasswd
+    echo "root:$ROOT_PASSWORD" | arch-chroot "$INSTALL_MOUNT" chpasswd
+    
+    # Sudo
+    echo "%wheel ALL=(ALL:ALL) ALL" > "$INSTALL_MOUNT/etc/sudoers.d/wheel"
+    chmod 440 "$INSTALL_MOUNT/etc/sudoers.d/wheel"
+    
+    # Enable services
+    arch-chroot "$INSTALL_MOUNT" systemctl enable NetworkManager
+    arch-chroot "$INSTALL_MOUNT" systemctl enable bluetooth
+    arch-chroot "$INSTALL_MOUNT" systemctl enable tlp
+    arch-chroot "$INSTALL_MOUNT" systemctl enable haveged
+    arch-chroot "$INSTALL_MOUNT" systemctl enable reflector.timer
+    arch-chroot "$INSTALL_MOUNT" systemctl enable fstrim.timer
+    arch-chroot "$INSTALL_MOUNT" systemctl enable avahi-daemon
+    arch-chroot "$INSTALL_MOUNT" systemctl enable grub-btrfsd
+    
+    # Setup zram-generator config
+    cat > "$INSTALL_MOUNT/etc/systemd/zram-generator.conf" <<EOF
+[zram0]
+zram-size = ram / 2
+compression-algorithm = zstd
+EOF
+}
+
+# Install bootloader
+install_bootloader() {
+    show_dialog --infobox "Installing bootloader..." 3 35
+    
+    arch-chroot "$INSTALL_MOUNT" grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=KOOMPI
+    
+    # Configure GRUB
+    # Note: We do NOT specify rootflags=subvol=@ here to allow 
+    # Btrfs 'set-default' rollbacks to work on reboot.
+    local cmdline="quiet splash"
+    if [[ "$USE_ENCRYPTION" == true ]]; then
+        local uuid=$(blkid -s UUID -o value "$INSTALL_PART_ROOT")
+        cmdline+=" rd.luks.name=$uuid=cryptroot root=/dev/mapper/cryptroot"
+    fi
+    
+    sed -i "s|GRUB_CMDLINE_LINUX_DEFAULT=.*|GRUB_CMDLINE_LINUX_DEFAULT=\"$cmdline\"|" \
+        "$INSTALL_MOUNT/etc/default/grub"
+    echo "GRUB_DISABLE_OS_PROBER=false" >> "$INSTALL_MOUNT/etc/default/grub"
+    
+    # Fix the mkinitcpio hooks for the target system
+    # Using 'sd-plymouth' because we are using the 'systemd' hook
+    local hooks="base systemd autodetect modconf kms keyboard sd-vconsole block"
+    [[ "$USE_ENCRYPTION" == true ]] && hooks+=" sd-encrypt"
+    hooks+=" sd-plymouth filesystems fsck"
+    
+    sed -i "s/HOOKS=.*/HOOKS=($hooks)/" "$INSTALL_MOUNT/etc/mkinitcpio.conf"
+    arch-chroot "$INSTALL_MOUNT" mkinitcpio -P
+    
+    arch-chroot "$INSTALL_MOUNT" grub-mkconfig -o /boot/grub/grub.cfg
+}
+
+# Copy KOOMPI tools
+install_koompi_tools() {
+    show_dialog --infobox "Installing KOOMPI tools..." 3 35
+    
+    # Copy scripts
+    mkdir -p "$INSTALL_MOUNT/usr/local/bin"
+    cp /usr/local/bin/koompi* "$INSTALL_MOUNT/usr/local/bin/" 2>/dev/null || true
+    chmod +x "$INSTALL_MOUNT/usr/local/bin/"koompi* 2>/dev/null || true
+    
+    # Copy configs
+    mkdir -p "$INSTALL_MOUNT/usr/share/koompi"
+    cp -r /usr/share/koompi/* "$INSTALL_MOUNT/usr/share/koompi/" 2>/dev/null || true
+    
+    # Create KOOMPI directories
+    mkdir -p "$INSTALL_MOUNT/.snapshots"
+    mkdir -p "$INSTALL_MOUNT/var/lib/koompi"
+    
+    # OS release
+    cat > "$INSTALL_MOUNT/etc/os-release" <<EOF
+NAME="KOOMPI OS"
+ID=koompi
+ID_LIKE=arch
+VERSION="1.0"
+VERSION_ID="1.0"
+PRETTY_NAME="KOOMPI OS"
+HOME_URL="https://koompi.com"
+DOCUMENTATION_URL="https://docs.koompi.com"
+SUPPORT_URL="https://github.com/koompi/koompi-os"
+EOF
+}
+
+# Create recovery snapshot
+create_recovery_snapshot() {
+    show_dialog --infobox "Setting up Snapper and creating recovery snapshot..." 3 55
+    
+    # Initialize snapper
+    # We must unmount and remount .snapshots correctly for snapper to work
+    umount "$INSTALL_MOUNT/.snapshots"
+    rmdir "$INSTALL_MOUNT/.snapshots"
+    arch-chroot "$INSTALL_MOUNT" snapper -c root create-config /
+    rmdir "$INSTALL_MOUNT/.snapshots"
+    mkdir "$INSTALL_MOUNT/.snapshots"
+    mount -o subvol=@snapshots,compress=zstd,noatime "$ROOT_DEV" "$INSTALL_MOUNT/.snapshots"
+    
+    # Enable snapper cleanup
+    arch-chroot "$INSTALL_MOUNT" systemctl enable snapper-cleanup.timer
+    
+    local timestamp=$(date +%Y%m%d)
+    btrfs subvolume snapshot -r "$INSTALL_MOUNT" "$INSTALL_MOUNT/.snapshots/factory-$timestamp" 2>/dev/null || true
+    
+    # Create metadata
+    cat > "$INSTALL_MOUNT/.snapshots/factory-$timestamp/metadata.json" <<EOF
+{
+  "id": "factory-$timestamp",
+  "name": "Factory Install",
+  "created_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "snapshot_type": "Manual",
+  "description": "Initial KOOMPI OS installation"
+}
+EOF
+}
+
+# Installation complete
+show_complete() {
+    show_dialog --title "Installation Complete!" --msgbox \
+"KOOMPI OS has been installed successfully!
+
+Username: $USERNAME
+Hostname: $HOSTNAME
+
+Next steps:
+1. Remove the installation media
+2. Reboot your computer
+3. Run 'koompi-desktop' to install a desktop environment
+
+A recovery snapshot 'factory-*' has been created.
+
+Press OK to reboot." 16 55
+    
+    show_dialog --title "Reboot" --yesno "Reboot now?" 6 30
+    
+    if [[ $? -eq 0 ]]; then
+        umount -R "$INSTALL_MOUNT"
+        reboot
+    fi
+}
+
+# Summary before installation
+show_summary() {
+    local encrypt_text="No"
+    [[ "$USE_ENCRYPTION" == true ]] && encrypt_text="Yes (LUKS2)"
+    
+    show_dialog --title "Installation Summary" --yesno \
+"Ready to install KOOMPI OS with these settings:
+
+Disk:       $INSTALL_DISK
+Encryption: $encrypt_text
+Hostname:   $HOSTNAME
+Username:   $USERNAME
+Locale:     $LOCALE
+Timezone:   $TIMEZONE
+Keymap:     $KEYMAP
+
+⚠️  This will ERASE all data on $INSTALL_DISK
+
+Proceed with installation?" 18 55
+}
+
+# Main installation flow
+main() {
+    show_welcome
+    check_network
+    
+    # Gather settings
+    select_locale
+    select_keymap
+    select_timezone
+    select_disk
+    select_encryption
+    select_hostname
+    create_user
+    
+    # Confirm
+    show_summary || exit 1
+    
+    # Install
+    partition_disk
+    format_partitions
+    install_base
+    configure_system
+    install_bootloader
+    install_koompi_tools
+    create_recovery_snapshot
+    
+    # Done
+    show_complete
+}
+
+main

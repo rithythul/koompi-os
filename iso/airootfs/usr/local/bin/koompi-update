@@ -1,0 +1,183 @@
+#!/usr/bin/env bash
+# KOOMPI Update - Safe System Update with Snapshots
+# Creates a pre-update snapshot before upgrading the system
+# Part of KOOMPI OS immutability system
+
+set -euo pipefail
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+log() {
+    echo -e "${GREEN}[KOOMPI UPDATE]${NC} $1"
+}
+
+warn() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+    exit 1
+}
+
+# Check for network connectivity
+check_network() {
+    if ! ping -c1 -W2 archlinux.org &>/dev/null; then
+        error "No network connection. Please check your internet."
+    fi
+}
+
+# Create pre-update snapshot
+create_pre_update_snapshot() {
+    log "Creating pre-update snapshot..."
+    
+    local timestamp=$(date +%Y%m%d-%H%M%S)
+    local name="pre-update-$timestamp"
+    
+    if /usr/local/bin/koompi-snapshot create "$name" "PreUpdate" "Before system update on $(date)" >/dev/null; then
+        log "Pre-update snapshot created: $name"
+        echo "$name"
+    else
+        warn "Failed to create snapshot - continuing anyway"
+        echo ""
+    fi
+}
+
+# Perform system update
+perform_update() {
+    log "Updating system packages..."
+    
+    # Use paru if available (handles AUR), fallback to pacman
+    if command -v paru &>/dev/null; then
+        log "Using paru (includes AUR)..."
+        paru -Syu --noconfirm
+    else
+        log "Using pacman..."
+        pacman -Syu --noconfirm
+    fi
+}
+
+# Update GRUB boot entries with new snapshots
+update_grub() {
+    if [[ -f /boot/grub/grub.cfg ]]; then
+        log "Updating GRUB configuration..."
+        
+        # Update grub-btrfs snapshots
+        if command -v grub-btrfs &>/dev/null; then
+            /etc/grub.d/41_snapshots-btrfs >/dev/null 2>&1 || true
+        fi
+        
+        grub-mkconfig -o /boot/grub/grub.cfg 2>/dev/null
+        log "GRUB updated"
+    fi
+}
+
+# Apply retention policy
+apply_retention() {
+    log "Applying snapshot retention policy..."
+    /usr/local/bin/koompi-snapshot cleanup 10 2>/dev/null || true
+}
+
+# Main update process
+cmd_update() {
+    local skip_snapshot=false
+    local skip_grub=false
+    
+    # Parse arguments
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --no-snapshot)
+                skip_snapshot=true
+                shift
+                ;;
+            --no-grub)
+                skip_grub=true
+                shift
+                ;;
+            *)
+                shift
+                ;;
+        esac
+    done
+    
+    # Check root
+    if [[ $EUID -ne 0 ]]; then
+        error "This script must be run as root (use sudo)"
+    fi
+    
+    log "Starting KOOMPI safe update..."
+    echo ""
+    
+    # Step 1: Check network
+    check_network
+    
+    # Step 2: Create snapshot
+    local snapshot_name=""
+    if [[ "$skip_snapshot" == false ]]; then
+        snapshot_name=$(create_pre_update_snapshot)
+    else
+        warn "Skipping pre-update snapshot"
+    fi
+    
+    # Step 3: Perform update
+    echo ""
+    perform_update
+    
+    # Step 4: Update GRUB
+    if [[ "$skip_grub" == false ]]; then
+        echo ""
+        update_grub
+    fi
+    
+    # Step 5: Apply retention
+    echo ""
+    apply_retention
+    
+    echo ""
+    log "Update complete!"
+    
+    if [[ -n "$snapshot_name" ]]; then
+        echo ""
+        echo -e "${BLUE}If something went wrong, rollback with:${NC}"
+        echo "  sudo koompi-snapshot rollback $snapshot_name"
+    fi
+}
+
+# Show usage
+usage() {
+    cat <<EOF
+KOOMPI Update - Safe System Update
+
+Usage: koompi-update [options]
+
+Options:
+  --no-snapshot    Skip creating pre-update snapshot
+  --no-grub        Skip updating GRUB bootloader
+
+This tool:
+  1. Creates a pre-update snapshot (for easy rollback)
+  2. Updates all system packages (pacman or paru)
+  3. Updates GRUB with new snapshot entries
+  4. Applies snapshot retention policy
+
+Examples:
+  sudo koompi-update              # Full safe update
+  sudo koompi-update --no-grub    # Update without GRUB regeneration
+
+EOF
+}
+
+# Main
+case "${1:-}" in
+    help|--help|-h)
+        usage
+        ;;
+    *)
+        cmd_update "$@"
+        ;;
+esac

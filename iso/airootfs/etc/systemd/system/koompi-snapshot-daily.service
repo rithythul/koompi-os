@@ -1,0 +1,31 @@
+[Unit]
+Description=KOOMPI OS Daily Snapshot Creation
+Documentation=man:koompi-snapshot(8)
+After=local-fs.target
+Requires=local-fs.target
+
+# Ensure dependencies are met
+ConditionPathExists=/
+ConditionPathIsDirectory=/.snapshots
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/koompi-snapshot create "daily-$(date +\%Y\%m\%d)" Scheduled "Automatic daily snapshot"
+ExecStartPost=/usr/local/bin/koompi-snapshot cleanup 10
+
+# Run with low priority to avoid impacting system performance
+Nice=19
+IOSchedulingClass=idle
+
+# Security hardening
+ProtectHome=read-only
+PrivateTmp=yes
+NoNewPrivileges=true
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=koompi-snapshot-daily
+
+[Install]
+WantedBy=multi-user.target

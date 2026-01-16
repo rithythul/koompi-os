@@ -1,0 +1,26 @@
+# KOOMPI OS - Mako Notification Configuration
+# Tiling Edition
+
+max-visible=5
+default-timeout=5000
+ignore-timeout=0
+
+font=JetBrainsMono Nerd Font 11
+background-color=#1e1e2eee
+text-color=#cdd6f4
+border-color=#33ccffaa
+border-size=2
+border-radius=10
+padding=12
+margin=10
+width=350
+
+[urgency=low]
+border-color=#6c7086aa
+
+[urgency=normal]
+border-color=#33ccffaa
+
+[urgency=critical]
+border-color=#f38ba8aa
+default-timeout=0

@@ -1,83 +1,195 @@
-#!/bin/bash
-# koompi - KOOMPI OS Command Line Interface
-# This is a wrapper that calls the Python koompi-cli package.
+#!/usr/bin/env bash
+# koompi - KOOMPI OS Unified Package Manager
+# Wrapper for pacman + paru (AUR) with snapshot integration
 #
-# Supports natural language:
-#   koompi install firefox
-#   koompi help me install firefox
-#   koompi I want to use kde
+# Usage:
+#   koompi install firefox          # Install from repos or AUR
+#   koompi remove firefox           # Remove package
+#   koompi upgrade                  # Safe upgrade with snapshot
+#   koompi search neovim            # Search repos + AUR
+#   koompi -Syu                     # Pass-through to paru
 #
-# For full help: koompi --help
+# For full AI assistant: koompi-cli (separate package)
 
-# Check if Python koompi-cli is available
-if python -c "import koompi_cli" 2>/dev/null; then
-    exec python -m koompi_cli.main "$@"
-fi
+set -euo pipefail
 
-# Fallback: Check if installed in /opt/koompi
-if [[ -d /opt/koompi/koompi-cli ]]; then
-    export PYTHONPATH="/opt/koompi:$PYTHONPATH"
-    exec python -m koompi_cli.main "$@"
-fi
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
 
-# If no Python CLI, show error and basic help
-echo "KOOMPI CLI not fully installed. Basic commands available:"
-echo ""
+# Check network for operations that need it
+check_network() {
+    if ! ping -c1 -W2 archlinux.org &>/dev/null; then
+        echo -e "${RED}Error: No network connection${NC}"
+        exit 1
+    fi
+}
 
-# Minimal bash fallback for essential commands
-case "$1" in
-    install)
-        shift
+# Get the package manager (prefer paru for AUR support)
+get_pm() {
+    if command -v paru &>/dev/null; then
+        echo "paru"
+    elif command -v yay &>/dev/null; then
+        echo "yay"
+    else
+        echo "pacman"
+    fi
+}
+
+# Install packages
+cmd_install() {
+    check_network
+    local pm=$(get_pm)
+    
+    # Check if databases exist, sync if not
+    if [[ ! -d /var/lib/pacman/sync ]] || [[ -z "$(ls -A /var/lib/pacman/sync 2>/dev/null)" ]]; then
+        echo -e "${YELLOW}Package databases missing. Synchronizing...${NC}"
+        sudo pacman -Sy
+    fi
+    
+    if [[ "$pm" == "pacman" ]]; then
+        echo -e "${YELLOW}Note: Using pacman. For AUR packages, install paru first.${NC}"
         sudo pacman -S --needed "$@"
-        ;;
-    remove)
-        shift
+    else
+        $pm -S --needed "$@"
+    fi
+}
+
+# Remove packages
+cmd_remove() {
+    local pm=$(get_pm)
+    
+    if [[ "$pm" == "pacman" ]]; then
         sudo pacman -Rns "$@"
-        ;;
-    update)
-        if command -v yay &>/dev/null; then
-            yay -Syu
-        else
-            sudo pacman -Syu
-        fi
-        ;;
-    search)
-        shift
-        pacman -Ss "$@"
-        ;;
-    desktop)
-        echo "Install a desktop: koompi desktop <kde|gnome|xfce|sway|hyprland>"
-        echo ""
-        echo "Quick install:"
-        echo "  KDE:      sudo pacman -S plasma-desktop sddm konsole dolphin"
-        echo "  GNOME:    sudo pacman -S gnome gdm"
-        echo "  XFCE:     sudo pacman -S xfce4 lightdm"
-        echo "  Sway:     sudo pacman -S sway waybar foot greetd"
-        echo "  Hyprland: sudo pacman -S hyprland waybar foot greetd"
-        ;;
-    setup-yay)
-        if command -v yay &>/dev/null; then
-            echo "yay is already installed"
-        else
-            echo "Installing yay..."
-            cd /tmp
-            git clone https://aur.archlinux.org/yay.git
-            cd yay
-            makepkg -si
-        fi
-        ;;
-    *)
-        echo "Usage: koompi <command> [args]"
-        echo ""
-        echo "Commands:"
-        echo "  install <pkg>    Install packages"
-        echo "  remove <pkg>     Remove packages"
-        echo "  update           Update system"
-        echo "  search <query>   Search packages"
-        echo "  desktop <name>   Install desktop environment"
-        echo "  setup-yay        Install yay (AUR helper)"
-        echo ""
-        echo "For full features, install koompi-cli:"
-        echo "  pip install /opt/koompi/koompi-cli"
-        ;;
-esac
+    else
+        $pm -Rns "$@"
+    fi
+}
+
+# Safe upgrade with snapshot
+cmd_upgrade() {
+    if [[ $EUID -ne 0 ]]; then
+        echo -e "${BLUE}Running safe upgrade with snapshot...${NC}"
+        exec sudo /usr/local/bin/koompi-update "$@"
+    else
+        /usr/local/bin/koompi-update "$@"
+    fi
+}
+
+# Search packages
+cmd_search() {
+    local pm=$(get_pm)
+    $pm -Ss "$@"
+}
+
+# Package info
+cmd_info() {
+    local pm=$(get_pm)
+    $pm -Si "$@" 2>/dev/null || $pm -Qi "$@" 2>/dev/null || echo "Package not found"
+}
+
+# List installed packages
+cmd_list() {
+    local pm=$(get_pm)
+    if [[ $# -eq 0 ]]; then
+        $pm -Q
+    else
+        $pm -Q "$@"
+    fi
+}
+
+# Clean package cache
+cmd_clean() {
+    local pm=$(get_pm)
+    if [[ "$pm" == "pacman" ]]; then
+        sudo pacman -Sc
+    else
+        $pm -Sc
+    fi
+}
+
+# Show help
+show_help() {
+    cat <<EOF
+${GREEN}KOOMPI${NC} - Unified Package Manager
+
+${BLUE}Usage:${NC} koompi <command> [packages...]
+
+${BLUE}Commands:${NC}
+  install, -S     Install packages (repos + AUR)
+  remove, -R      Remove packages and dependencies
+  upgrade, -U     Safe system upgrade with snapshot
+  search, -Ss     Search for packages
+  info, -Si       Show package information
+  list, -Q        List installed packages
+  clean, -Sc      Clean package cache
+
+${BLUE}Examples:${NC}
+  koompi install firefox neovim    # Install packages
+  koompi remove firefox            # Remove package
+  koompi upgrade                   # Safe upgrade (creates snapshot first)
+  koompi search terminal           # Search for packages
+  koompi -Syu                      # Pass-through to paru/pacman
+
+${BLUE}Related Commands:${NC}
+  koompi-snapshot  Manage Btrfs snapshots
+  koompi-desktop   Install desktop environments
+  koompi-update    Safe system update (called by 'koompi upgrade')
+
+${YELLOW}Tip:${NC} 'koompi upgrade' creates a snapshot before updating.
+     If something breaks, rollback with: koompi-snapshot rollback <id>
+
+EOF
+}
+
+# Main command handler
+main() {
+    local cmd="${1:-help}"
+    shift 2>/dev/null || true
+    
+    case "$cmd" in
+        install|-S)
+            cmd_install "$@"
+            ;;
+        remove|-R|-Rns)
+            cmd_remove "$@"
+            ;;
+        upgrade|-U|update)
+            cmd_upgrade "$@"
+            ;;
+        search|-Ss)
+            cmd_search "$@"
+            ;;
+        info|-Si|-Qi)
+            cmd_info "$@"
+            ;;
+        list|-Q)
+            cmd_list "$@"
+            ;;
+        clean|-Sc)
+            cmd_clean "$@"
+            ;;
+        help|--help|-h)
+            show_help
+            ;;
+        # Pass-through for advanced pacman/paru flags
+        -*)
+            local pm=$(get_pm)
+            if [[ "$pm" == "pacman" ]]; then
+                sudo pacman "$cmd" "$@"
+            else
+                $pm "$cmd" "$@"
+            fi
+            ;;
+        *)
+            echo -e "${RED}Unknown command: $cmd${NC}"
+            echo "Run 'koompi help' for usage"
+            exit 1
+            ;;
+    esac
+}
+
+main "$@"

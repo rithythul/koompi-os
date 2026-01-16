@@ -1,0 +1,18 @@
+[Unit]
+Description=KOOMPI OS Boot Success Marker
+Documentation=man:koompi-snapshot(8)
+After=multi-user.target
+
+[Service]
+Type=oneshot
+# Wait 5 minutes after multi-user.target before marking boot as successful
+ExecStartPre=/bin/sleep 300
+ExecStart=/usr/local/bin/koompi-watchdog success
+RemainAfterExit=yes
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=koompi-boot-success
+
+[Install]
+WantedBy=multi-user.target
