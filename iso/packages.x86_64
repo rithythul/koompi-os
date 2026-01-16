@@ -179,10 +179,6 @@ breeze-gtk
 breeze-icons
 papirus-icon-theme
 
-# Window Decorations
-kwin
-kwin-decoration-chromeos
-
 # Security Tools
 ufw
 apparmor
@@ -194,9 +190,7 @@ firejail
 # Web Browser
 firefox
 
-# Graphical Installer
-calamares
-calamares-git
+# Note: Calamares is built from AUR during customize_airootfs.sh
 
 # ═══════════════════════════════════════════════════════════════════════
 # KOOMPI Tools are provided in /usr/local/bin:

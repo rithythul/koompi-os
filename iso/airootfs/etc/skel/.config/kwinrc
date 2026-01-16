@@ -3,8 +3,8 @@ BorderSize=Normal
 BorderSizeAuto=false
 ButtonsOnLeft=XIA
 ButtonsOnRight=
-library=org.kde.kwin.aurorae
-theme=__aurorae__svg__ChromeOS
+library=org.kde.breeze
+theme=Breeze
 
 [Desktops]
 Number=2
