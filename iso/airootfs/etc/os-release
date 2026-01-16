@@ -1,0 +1,12 @@
+NAME="KOOMPI OS"
+PRETTY_NAME="KOOMPI OS"
+ID=koompi
+ID_LIKE=arch
+BUILD_ID=rolling
+ANSI_COLOR="38;2;51;204;255"
+HOME_URL="https://koompi.com/"
+DOCUMENTATION_URL="https://wiki.koompi.com/"
+SUPPORT_URL="https://koompi.com/support"
+BUG_REPORT_URL="https://github.com/rithythul/koompi-os/issues"
+PRIVACY_POLICY_URL="https://koompi.com/privacy"
+LOGO=koompi
