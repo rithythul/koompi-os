@@ -190,10 +190,10 @@ firejail
 # Web Browser
 firefox
 
-# Installer & Dependencies
-calamares
-ckbcomp
-mkinitcpio-openswap
+# Installer & Dependencies (Built from AUR in customize_airootfs.sh)
+# calamares
+# ckbcomp
+# mkinitcpio-openswap
 
 # ═══════════════════════════════════════════════════════════════════════
 # KOOMPI Tools are provided in /usr/local/bin:

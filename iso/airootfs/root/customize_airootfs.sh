@@ -260,7 +260,43 @@ if ! command -v paru &>/dev/null; then
     fi
 fi
 
-# Calamares is now installed from official repositories
+# ═══════════════════════════════════════════════════════════════════════
+# Build Calamares & Dependencies from AUR
+# ═══════════════════════════════════════════════════════════════════════
+
+build_aur_pkg() {
+    local pkg="$1"
+    echo "Building $pkg from AUR..."
+    cd /tmp
+    rm -rf "$pkg"
+    git clone --depth=1 "https://aur.archlinux.org/$pkg.git" 2>/dev/null || true
+    if [[ -d "$pkg" ]]; then
+        chown -R koompi:koompi "$pkg"
+        cd "$pkg"
+        # Build as koompi user
+        su koompi -c "makepkg -s --noconfirm" 2>/dev/null || true
+        # Install as root used
+        pacman -U --noconfirm "$pkg"-*.pkg.tar.zst 2>/dev/null || true
+        cd /
+        rm -rf "/tmp/$pkg"
+    else
+        echo "Failed to clone $pkg"
+    fi
+}
+
+if command -v paru &>/dev/null; then
+    # Install dependencies first
+    build_aur_pkg "ckbcomp"
+    build_aur_pkg "mkinitcpio-openswap"
+    
+    # Install Calamares build deps that might be missing
+    # (paru/makepkg handles this via -s, but let's be sure we have base-devel)
+    
+    # Build Calamares
+    if ! command -v calamares &>/dev/null; then
+        build_aur_pkg "calamares"
+    fi
+fi
 
 # ═══════════════════════════════════════════════════════════════════════
 # KOOMPI CLI + AI Setup
