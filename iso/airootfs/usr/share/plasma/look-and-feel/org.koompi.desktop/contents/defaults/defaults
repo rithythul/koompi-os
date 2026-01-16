@@ -12,5 +12,5 @@ LookAndFeelPackage=org.koompi.desktop
 name=breeze-dark
 
 [ksplashrc][KSplash]
-Engine=none
-Theme=None
+Engine=KSplashQML
+Theme=org.koompi.desktop

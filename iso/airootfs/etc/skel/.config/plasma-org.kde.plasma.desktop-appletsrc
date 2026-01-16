@@ -15,7 +15,7 @@ plugin=org.kde.plasma.kickoff
 PreloadWeight=100
 
 [Containments][1][Applets][2][Configuration][General]
-icon=/usr/share/koompi/icons/koompi-menu-dark.png
+icon=koompi
 favoritesPortedToKAstats=true
 
 [Containments][1][Applets][3]

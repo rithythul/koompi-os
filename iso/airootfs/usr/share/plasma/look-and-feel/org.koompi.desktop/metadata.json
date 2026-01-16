@@ -1,0 +1,16 @@
+{
+    "KPlugin": {
+        "Id": "org.koompi.desktop",
+        "Name": "KOOMPI",
+        "Description": "KOOMPI OS Look and Feel",
+        "Authors": [
+            {
+                "Name": "KOOMPI",
+                "Email": "hello@koompi.com"
+            }
+        ],
+        "Website": "https://koompi.com",
+        "License": "MIT"
+    },
+    "KPackageStructure": "Plasma/LookAndFeel"
+}

@@ -1,0 +1,15 @@
+{
+    "KPlugin": {
+        "Id": "KOOMPI",
+        "Name": "KOOMPI",
+        "Authors": [
+            {
+                "Name": "KOOMPI",
+                "Email": "hello@koompi.com"
+            }
+        ],
+        "Description": "KOOMPI OS default wallpaper",
+        "License": "CC-BY-SA-4.0",
+        "Website": "https://koompi.com"
+    }
+}
