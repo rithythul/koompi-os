@@ -1,40 +1,40 @@
-# KOOMPI OS Base Edition
+# KOOMPI OS - Base Edition
 
-**The immutable, snapshot-based Linux foundation for education and enterprise.**
+**The minimal, immutable Linux foundation - build your perfect system.**
 
-[![Build ISO](https://github.com/koompi/koompi-os/actions/workflows/build-iso.yml/badge.svg)](https://github.com/koompi/koompi-os/actions/workflows/build-iso.yml)
+[![Build ISO](https://github.com/rithythul/koompi-os/actions/workflows/build-iso.yml/badge.svg)](https://github.com/rithythul/koompi-os/actions/workflows/build-iso.yml)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-KOOMPI OS Base is a minimal, immutable Arch Linux-based operating system designed for stability and recoverability. It boots to a CLI environment and allows users to install their preferred desktop environment or use it as a robust server foundation.
-
-> **Note:** The AI-powered tools (`koompi-cli`, `koompi-ai`) are developed in a separate repository and can be installed via AUR/PyPI. This repository focuses on the core OS architecture.
+KOOMPI OS Base is a minimal, CLI-only Arch Linux-based system designed for users who want to choose their own desktop environment. It provides the stable, snapshot-based foundation - you add what you want.
 
 ## 🎯 Key Features
 
-- **🔒 Pragmatic Immutability**
-  - Read-only root filesystem with overlayfs for configuration
-  - Btrfs snapshots for instant rollback
-  - Use `koompi-snapshot` to manage system states
+### 🔒 Immutable Foundation
+- Btrfs snapshots for instant rollback
+- Automatic snapshot before updates
+- Boot failure watchdog with auto-recovery
+- Use `koompi-snapshot` to manage system states
 
-- **🔄 Safe Atomic Updates**
-  - Updates are wrapped in pre/post snapshots
-  - Automatic rollback on boot failure (Watchdog)
-  - Unified `koompi` command for package management
+### 🛠️ Choose Your Desktop
+After installation, use `koompi-desktop` to install:
 
-- **🛠️ TUI Installers**
-  - `koompi-install`: User-friendly text-based system installer
-  - `koompi-desktop`: Easy installation of KDE, GNOME, Hyprland, and more
-  - `koompi-setup-btrfs`: Automatic Btrfs subvolume handling
+| Type | Options |
+|------|---------|
+| **KOOMPI Editions** | Tiling (Hyprland), KDE, GNOME |
+| **Community** | XFCE, Cinnamon, MATE, i3, Sway, etc. |
 
-- **✨ KOOMPI Branding**
-  - Custom boot splash and prompt
-  - Optimized configs for performance
-  - Khmer language support out-of-the-box
+### 📦 Unified Package Manager
+```bash
+koompi install <package>    # Repos + AUR
+koompi remove <package>
+koompi search <query>
+koompi update               # Safe update with snapshot
+```
 
-- **🛡️ Integrated Security**
-  - `koompi-security`: One-command system hardening
-  - UFW Firewall, AppArmor, and Fail2ban pre-configured
-  - Secure Boot management via `sbctl`
+### 🛡️ Security Ready
+- UFW Firewall, AppArmor, Fail2ban included
+- Secure Boot support via sbctl
+- `koompi-security` for one-command hardening
 
 ## 🚀 Quick Start
 
@@ -43,69 +43,41 @@ Boot the ISO and run:
 ```bash
 koompi-install
 ```
-Follow the TUI prompts to partition, select locale, set passwords, and install.
+Follow the TUI prompts.
 
-### 2. After First Boot
-Login with the user you created.
-
-**Install a Desktop Environment:**
+### 2. Install a Desktop
 ```bash
 koompi-desktop
 ```
-Choose from:
-- **KOOMPI Editions**: **Tiling (Hyprland)** - Now pre-installed for instant setup! 🚀
-- **Community**: KDE, GNOME, XFCE, Cinnamon, i3, Sway, etc.
+Select from KOOMPI editions or community desktops.
 
-**Manage Packages:**
+### 3. Manage Your System
 ```bash
-koompi install firefox    # Install from repos or AUR
-koompi remove firefox
-koompi search browser
+koompi update                    # Update with snapshot
+koompi-snapshot list             # View snapshots
+koompi-snapshot rollback <id>    # Restore previous state
 ```
 
-**System Update:**
-```bash
-koompi update
-# Or
-koompi upgrade
-```
-*Creates a snapshot -> Updates system ->Updates bootloader -> Cleans old snapshots*
+## 🗂️ Branches
 
-**Manage Snapshots:**
-```bash
-koompi-snapshot list
-koompi-snapshot create "Before experiment"
-koompi-snapshot rollback <id>
-```
-
-## 🗂️ Project Structure
-
-```
-koompi-os/
-├── iso/                    # archiso build profile
-│   ├── packages.x86_64     # Core package list
-│   ├── airootfs/           # Live system overlay
-│   │   ├── etc/            # System configs (motd, issue, etc)
-│   │   └── usr/local/bin/  # Core scripts (koompi-*)
-│   └── profiledef.sh       # ISO definition
-├── scripts/                # Build helper scripts
-└── docs/                   # Documentation
-```
+| Branch | Description |
+|--------|-------------|
+| `baseOS` | **This branch** - Minimal CLI, choose your DE |
+| `koompi-kde` | KDE Plasma Edition - Ready to use |
 
 ## 🛠️ Building from Source
 
-Requirements: Arch Linux (or derivative), `archiso` package.
-
 ```bash
-# 1. Clone the repository
-git clone https://github.com/koompi/koompi-os.git
+# Clone & checkout
+git clone https://github.com/rithythul/koompi-os.git
 cd koompi-os
+git checkout baseOS
 
-# 2. Build the ISO
-sudo ./scripts/build-iso.sh
+# Build ISO
+sudo ./scripts/build-iso.sh clean && sudo ./scripts/build-iso.sh all
 
-# 3. Test in VM (Requires QEMU)
-./scripts/test-vm.sh out/koompi-os-base-*.iso
+# Test in VM
+./scripts/test-vm.sh out/koompi-os-*.iso
 ```
 
 ## 📄 License
@@ -114,4 +86,3 @@ MIT License - see [LICENSE](LICENSE) for details.
 ## 🔗 Links
 - Website: https://koompi.com
 - Documentation: https://docs.koompi.com
-- Community: [Discord](https://discord.gg/koompi)
