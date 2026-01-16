@@ -4,13 +4,18 @@ DefaultProfile=KOOMPI.profile
 [KonsoleWindow]
 RememberWindowSize=false
 ShowWindowTitleOnTitleBar=true
+ShowMenuBarByDefault=false
 
 [MainWindow]
 MenuBar=Disabled
 ToolBarsMovable=Disabled
+State=AAAA/wAAAAD9AAAAAQAAAAAAAAAAAAAAAPwCAAAAAvsAAAAiAFEAdQBpAGMAawBDAG8AbQBtAGEAbgBkAHMARABvAGMAawAAAAAA/////wAAAXwBAAAD+wAAABwAUwBTAEgATQBhAG4AYQBnAGUAcgBEAG8AYwBrAAAAAAD/////AAABGAEAAAMAAAeAAAAEVwAAAAQAAAAEAAAACAAAAAj8AAAAAQAAAAIAAAACAAAAFgBtAGEAaQBuAFQAbwBvAGwAQgBhAHIAAAAAAP////8AAAAAAAAAAAAAABwAcwBlAHMAcwBpAG8AbgBUAG8AbwBsAGIAYQByAAAAAAD/////AAAAAAAAAAA=
 
 [MainWindow][Toolbar mainToolBar]
 Visible=false
 
 [MainWindow][Toolbar sessionToolbar]
 Visible=false
+
+[TabBar]
+TabBarVisibility=ShowTabBarWhenNeeded

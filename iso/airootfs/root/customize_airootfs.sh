@@ -114,7 +114,7 @@ systemctl enable sddm.service 2>/dev/null || true
 mkdir -p /etc/sddm.conf.d
 cat > /etc/sddm.conf.d/koompi.conf << 'SDDM_EOF'
 [Theme]
-Current=koompi
+Current=breeze
 
 [Users]
 DefaultPath=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin
@@ -305,7 +305,7 @@ ID=koompi
 ID_LIKE=arch
 VERSION="1.0"
 VERSION_ID="1.0"
-PRETTY_NAME="KOOMPI OS Base Edition"
+PRETTY_NAME="KOOMPI OS"
 HOME_URL="https://koompi.com"
 DOCUMENTATION_URL="https://docs.koompi.com"
 SUPPORT_URL="https://github.com/koompi/koompi-os"
@@ -315,7 +315,7 @@ OSRELEASE_EOF
 # Create /etc/issue (login prompt banner)
 cat > /etc/issue << 'ISSUE_EOF'
 
-  \e[1;34mKOOMPI OS\e[0m Base Edition
+  \e[1;34mKOOMPI OS\e[0m
   Kernel: \r on \m
 
   Login: \e[1;32mkoompi\e[0m | Password: \e[1;32mkoompi\e[0m
@@ -452,7 +452,7 @@ chmod +x /usr/local/bin/koompi-setup-ai
 
 echo ""
 echo "════════════════════════════════════════════════════════════════"
-echo "  KOOMPI OS Base Edition - Customization Complete!"
+echo "  KOOMPI OS - Customization Complete!"
 echo "════════════════════════════════════════════════════════════════"
 echo ""
 echo "  Features:"

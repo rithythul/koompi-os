@@ -1,8 +1,8 @@
 [org.kde.kdecoration2]
 BorderSize=Normal
 BorderSizeAuto=false
-ButtonsOnLeft=XIA
-ButtonsOnRight=
+ButtonsOnLeft=M
+ButtonsOnRight=IAX
 library=org.kde.breeze
 theme=Breeze
 
