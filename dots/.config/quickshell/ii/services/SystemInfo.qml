@@ -78,6 +78,10 @@ Singleton {
             if (textOsRelease.toLowerCase().includes("nyarch")) {
                 distroIcon = "nyarch-symbolic"
             }
+            // KOOMPI OS reports ID=arch, so detect it by name
+            if (textOsRelease.toLowerCase().includes("koompi")) {
+                distroIcon = "koompi-symbolic"
+            }
 
             if (logo.trim().length === 0) {
                 logo = distroIcon
