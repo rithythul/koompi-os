@@ -306,11 +306,6 @@ Item { // Bar content region
                 }
             }
 
-            Media {
-                visible: root.useShortenedForm < 2
-                Layout.alignment: Qt.AlignVCenter
-            }
-
             Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -324,6 +319,12 @@ Item { // Bar content region
                 sourceComponent: BarGroup {
                     WeatherBar {}
                 }
+            }
+
+            Media { // Far left; given room since it grows with track title
+                visible: root.useShortenedForm < 2
+                Layout.leftMargin: 4
+                Layout.alignment: Qt.AlignVCenter
             }
         }
     }

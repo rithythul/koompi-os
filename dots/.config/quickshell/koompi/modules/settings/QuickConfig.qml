@@ -281,12 +281,13 @@ ContentPage {
                             displayName: Translation.tr("Float"),
                             icon: "page_header",
                             value: 1
-                        },
-                        {
-                            displayName: Translation.tr("Rect"),
-                            icon: "toolbar",
-                            value: 2
                         }
+                        // Rect (value 2) hidden: too easy to mis-click and flattens the bar
+                        // {
+                        //     displayName: Translation.tr("Rect"),
+                        //     icon: "toolbar",
+                        //     value: 2
+                        // }
                     ]
                 }
             }
