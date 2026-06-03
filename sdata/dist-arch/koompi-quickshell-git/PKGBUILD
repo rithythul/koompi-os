@@ -3,8 +3,8 @@ _commit='7511545ee20664e3b8b8d3322c0ffe7567c56f7a'
 # https://git.outfoxxed.me/quickshell/quickshell/commits/branch/master
 # https://aur.archlinux.org/packages/quickshell-git
 
-groups=(illogical-impulse)
-_prefix='illogical-impulse'
+groups=(koompi)
+_prefix='koompi'
 _pkgname=quickshell
 pkgname="$_prefix-$_pkgname-git"
 pkgver=0.1.0.r1
@@ -25,7 +25,7 @@ depends=(
   'libpipewire'
   'libxcb'
   'wayland'
-  # NOTE: Below are custom dependencies of illogical-impulse
+  # NOTE: Below are custom dependencies of koompi
   qt6-5compat 
   qt6-avif-image-plugin
   qt6-imageformats

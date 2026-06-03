@@ -1,8 +1,8 @@
-groups=(illogical-impulse)
-pkgname=illogical-impulse-bibata-modern-classic-bin
+groups=(koompi)
+pkgname=koompi-bibata-modern-classic-bin
 pkgver=2.0.6
 pkgrel=2
-pkgdesc="Material Based Cursor Theme, installed for illogical-impulse dotfiles"
+pkgdesc="Material Based Cursor Theme, installed for koompi dotfiles"
 arch=('any')
 url="https://github.com/ful1e5/Bibata_Cursor"
 license=('GPL-3.0-or-later')

@@ -1,8 +1,8 @@
-groups=(illogical-impulse)
-pkgname=illogical-impulse-kde
+groups=(koompi)
+pkgname=koompi-kde
 pkgver=1.0
 pkgrel=3
-pkgdesc='Illogical Impulse KDE Dependencies'
+pkgdesc='KOOMPI KDE Dependencies'
 arch=(any)
 license=(None)
 depends=(

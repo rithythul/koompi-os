@@ -1,8 +1,8 @@
-groups=(illogical-impulse)
-pkgname=illogical-impulse-fonts-themes
+groups=(koompi)
+pkgname=koompi-fonts-themes
 pkgver=1.0
 pkgrel=6
-pkgdesc='Illogical Impulse Fonts and Theming Dependencies'
+pkgdesc='KOOMPI Fonts and Theming Dependencies'
 arch=(any)
 license=(None)
 depends=(

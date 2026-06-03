@@ -1,8 +1,8 @@
-groups=(illogical-impulse)
-pkgname=illogical-impulse-widgets
+groups=(koompi)
+pkgname=koompi-widgets
 pkgver=1.0
 pkgrel=7
-pkgdesc='Illogical Impulse Widget Dependencies'
+pkgdesc='KOOMPI Widget Dependencies'
 arch=(any)
 license=(None)
 depends=(

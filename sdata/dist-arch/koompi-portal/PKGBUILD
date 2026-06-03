@@ -1,8 +1,8 @@
-groups=(illogical-impulse)
-pkgname=illogical-impulse-portal
+groups=(koompi)
+pkgname=koompi-portal
 pkgver=1.0
 pkgrel=3
-pkgdesc='Illogical Impulse XDG Desktop Portals'
+pkgdesc='KOOMPI XDG Desktop Portals'
 arch=(any)
 license=(None)
 depends=(
