@@ -148,11 +148,6 @@ Item { // Bar content region
                 id: rightCenterGroupContent
                 anchors.fill: parent
 
-                UtilButtons {
-                    visible: (Config.options.bar.verbose && root.useShortenedForm === 0)
-                    Layout.alignment: Qt.AlignVCenter
-                }
-
                 BatteryIndicator {
                     visible: (root.useShortenedForm < 2 && Battery.available)
                     Layout.alignment: Qt.AlignVCenter
@@ -296,6 +291,14 @@ Item { // Bar content region
                 Layout.fillWidth: false
                 Layout.fillHeight: true
                 invertSide: Config?.options.bar.bottom
+            }
+
+            BarGroup { // Utility icons, one group between tray and media
+                visible: root.useShortenedForm === 0
+                Layout.alignment: Qt.AlignVCenter
+                UtilButtons {
+                    Layout.alignment: Qt.AlignVCenter
+                }
             }
 
             ClockWidget { // Time, just left of the tray; date removed by default
