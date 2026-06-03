@@ -197,17 +197,15 @@ Item { // Bar content region
                 showDate: false
                 Layout.alignment: Qt.AlignVCenter
                 Layout.rightMargin: Appearance.rounding.screenRounding
-                Layout.leftMargin: 4
             }
 
             RippleButton { // Right sidebar button
                 id: rightSidebarButton
 
                 Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                Layout.rightMargin: Appearance.rounding.screenRounding
                 Layout.fillWidth: false
 
-                implicitWidth: indicatorsRowLayout.implicitWidth + 10 * 2
+                implicitWidth: indicatorsRowLayout.implicitWidth + 6 * 2
                 implicitHeight: indicatorsRowLayout.implicitHeight + 5 * 2
 
                 buttonRadius: Appearance.rounding.full
