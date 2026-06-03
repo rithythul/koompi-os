@@ -13,7 +13,8 @@ Item {
     id: root
     property bool borderless: Config.options.bar.borderless
     readonly property MprisPlayer activePlayer: MprisController.activePlayer
-    readonly property string cleanedTitle: StringUtils.cleanMusicTitle(activePlayer?.trackTitle) || Translation.tr("No media")
+    readonly property bool hasMedia: (activePlayer?.trackTitle ?? "").length > 0
+    readonly property string cleanedTitle: StringUtils.cleanMusicTitle(activePlayer?.trackTitle)
 
     Layout.fillHeight: true
     implicitWidth: rowLayout.implicitWidth + rowLayout.spacing * 2
@@ -72,16 +73,14 @@ Item {
             }
         }
 
-        StyledText {
-            visible: Config.options.bar.verbose
-            width: rowLayout.width - (CircularProgress.size + rowLayout.spacing * 2)
+        StyledText { // Trimmed track title; hidden entirely when no player (icon only)
+            visible: root.hasMedia
             Layout.alignment: Qt.AlignVCenter
-            Layout.fillWidth: true // Ensures the text takes up available space
+            Layout.maximumWidth: 150
             Layout.rightMargin: rowLayout.spacing
-            horizontalAlignment: Text.AlignHCenter
-            elide: Text.ElideRight // Truncates the text on the right
+            elide: Text.ElideRight
             color: Appearance.colors.colOnLayer1
-            text: `${cleanedTitle}${activePlayer?.trackArtist ? ' • ' + activePlayer.trackArtist : ''}`
+            text: root.cleanedTitle
         }
 
     }

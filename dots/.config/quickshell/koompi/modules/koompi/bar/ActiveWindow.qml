@@ -30,6 +30,16 @@ Item { // Faux global menu: app icon + bold app name + window title
         });
     }
 
+    function cleanTitle(s) {
+        if (!s)
+            return "";
+        // Strip leading whitespace + symbol/icon code points (Braille, arrows, BMP PUA,
+        // variation selectors) and astral-plane glyphs (emoji / supplementary-PUA Nerd Font
+        // icons, which arrive as UTF-16 surrogate pairs). \u escapes only — Qt's QML JS
+        // engine has no \p{L} unicode-property support.
+        return String(s).replace(/^[\s\u2000-\u2BFF\u2E00-\u2E7F\uE000-\uF8FF\uFE00-\uFE0F\uD800-\uDFFF]+/, "").trim();
+    }
+
     implicitWidth: rowLayout.implicitWidth
 
     RowLayout {
@@ -42,29 +52,33 @@ Item { // Faux global menu: app icon + bold app name + window title
 
         IconImage {
             id: appIcon
-            implicitSize: 17
+            implicitSize: 22
             Layout.alignment: Qt.AlignVCenter
             visible: root.appClass.length > 0 && status === Image.Ready
             source: Quickshell.iconPath(AppSearch.guessIcon(root.appClass), "")
         }
 
-        StyledText { // Bold app name, menubar-style
-            Layout.alignment: Qt.AlignVCenter
-            font.pixelSize: Appearance.font.pixelSize.small
-            font.weight: Font.DemiBold
-            color: Appearance.colors.colOnLayer0
-            elide: Text.ElideRight
-            text: root.prettyName(root.appClass)
-        }
-
-        StyledText { // Window title, dimmed
+        ColumnLayout { // Two stacked rows: app name over window title
             Layout.fillWidth: true
-            Layout.alignment: Qt.AlignVCenter
-            visible: root.windowTitle.length > 0
-            font.pixelSize: Appearance.font.pixelSize.smaller
-            color: Appearance.colors.colSubtext
-            elide: Text.ElideRight
-            text: root.windowTitle
+            spacing: -4
+
+            StyledText { // App name, menubar-style
+                Layout.fillWidth: true
+                font.pixelSize: Appearance.font.pixelSize.smaller
+                font.weight: Font.DemiBold
+                color: Appearance.colors.colOnLayer0
+                elide: Text.ElideRight
+                text: root.prettyName(root.appClass)
+            }
+
+            StyledText { // Window title, dimmed
+                Layout.fillWidth: true
+                visible: text.length > 0
+                font.pixelSize: Appearance.font.pixelSize.smaller
+                color: Appearance.colors.colSubtext
+                elide: Text.ElideRight
+                text: root.cleanTitle(root.windowTitle)
+            }
         }
     }
 }

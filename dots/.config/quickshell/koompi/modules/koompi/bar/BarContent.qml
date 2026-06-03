@@ -288,11 +288,6 @@ Item { // Bar content region
                 }
             }
 
-            Item {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-            }
-
             // Weather
             Loader {
                 Layout.leftMargin: 4
@@ -303,11 +298,16 @@ Item { // Bar content region
                 }
             }
 
-            Media { // Far left; capped so a long title elides instead of overlapping workspaces
+            Media { // Grouped on the right with the utilities; title elides so it stays short
                 visible: root.useShortenedForm < 2
                 Layout.leftMargin: 4
-                Layout.maximumWidth: root.centerSideModuleWidth
+                Layout.maximumWidth: 180
                 Layout.alignment: Qt.AlignVCenter
+            }
+
+            Item { // Leftmost in RTL: absorbs slack so the cluster pins to the right edge
+                Layout.fillWidth: true
+                Layout.fillHeight: true
             }
         }
     }
