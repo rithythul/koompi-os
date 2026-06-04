@@ -72,10 +72,18 @@ v gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 v kwriteconfig6 --file kdeglobals --group KDE --key widgetStyle Darkly
 
 #####################################################################################
-# Fingerprint login/unlock (opt-in, per-machine).
+# Fingerprint unlock (opt-in, per-machine).
 # Never ships enrolled prints: templates live in /var/lib/fprint, outside this repo.
-# 'sufficient' placement means a fingerprint succeeds login but failure/absence
-# always falls through to the password — no lockout risk.
+#
+# Two surfaces, two mechanisms — both let you scan OR type, password always works:
+#   - hyprlock: its NATIVE fingerprint (fprintd over D-Bus, in a thread parallel to
+#     the password field) — configured in hyprlock.conf, NOT via pam_fprintd. A PAM
+#     rule in /etc/pam.d/hyprlock is sequential and would block a typed password on
+#     the reader, so we deliberately keep it out. Distro-independent.
+#   - sudo: pam_fprintd as a 'sufficient' first auth rule (finger succeeds, else
+#     falls through to the password — no lockout). sudo's PAM is sequential. Arch only.
+# SDDM login stays password-only: its QtQuick greeter can't cancel the fprintd
+# conversation, so fprintd in the shared system-auth stack hangs password login ~30s.
 
 # Prepend pam_fprintd as the first auth rule in a PAM stack. Idempotent.
 prepend_pam_fprintd(){
@@ -92,21 +100,58 @@ prepend_pam_fprintd(){
   x sudo sed -i '0,/^auth/s//auth        sufficient  pam_fprintd.so\n&/' "$f"
 }
 
-enable_pam_fprintd(){
-  # Arch only. Fingerprint for sudo + lock screen (hyprlock) ONLY — never SDDM.
-  # SDDM's QtQuick greeter can't cancel the fprintd PAM conversation, so with
-  # fprintd in the shared system-auth stack a password login blocks ~30s waiting
-  # for the reader to time out. We therefore add fprintd directly to the sudo and
-  # hyprlock stacks instead of system-auth (which sddm/tty login include). Idempotent.
-  local sa=/etc/pam.d/system-auth
-  if grep -q pam_fprintd.so "$sa"; then
-    # Migrate older installs that put fprintd in system-auth: strip it so SDDM login is fast again.
-    log_info "Removing pam_fprintd from $sa (was slowing SDDM login)."
-    x sudo cp "$sa" "$sa.koompi.bak"
-    x sudo sed -i '/pam_fprintd.so/d' "$sa"
+# Strip pam_fprintd from a PAM stack (migration / cleanup). Idempotent.
+strip_pam_fprintd(){
+  local f=$1
+  [[ -f $f ]] || return 0
+  if grep -q pam_fprintd.so "$f"; then
+    log_info "Removing pam_fprintd from $f."
+    x sudo cp "$f" "$f.koompi.bak"
+    x sudo sed -i '/pam_fprintd.so/d' "$f"
   fi
+}
+
+# Ensure hyprlock.conf enables native, parallel fingerprint (hyprlock >= 0.6).
+# The shipped dotfile already carries this block; this is a safety net for installs
+# whose hyprlock.conf predates it. Idempotent. User-owned file, no sudo.
+enable_hyprlock_fingerprint(){
+  local conf="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprlock.conf"
+  if [[ ! -f $conf ]]; then
+    log_warning "hyprlock.conf not found at $conf; skipping native fingerprint config."
+    return 0
+  fi
+  if grep -q 'fingerprint {' "$conf"; then
+    log_info "hyprlock native fingerprint already configured."
+    return 0
+  fi
+  cat >> "$conf" <<'HYPRLOCK_FP'
+
+# Fingerprint + password run in parallel: scan your finger OR type your password,
+# whichever completes first unlocks. fprintd is reached directly (not pam_fprintd),
+# so a typed password never blocks on the reader.
+auth {
+    pam {
+        enabled = true
+        module = hyprlock
+    }
+    fingerprint {
+        enabled = true
+        ready_message = Scan fingerprint or enter password
+        present_message = Scanning fingerprint...
+        retry_delay = 250
+    }
+}
+HYPRLOCK_FP
+  log_info "Enabled hyprlock native fingerprint in $conf."
+}
+
+enable_pam_fprintd(){
+  # Arch only: sudo fingerprint via pam_fprintd, plus migrate older installs that put
+  # fprintd in system-auth (slowed SDDM login) or in /etc/pam.d/hyprlock (blocked a
+  # typed password — hyprlock now uses its own native fingerprint instead). Idempotent.
+  strip_pam_fprintd /etc/pam.d/system-auth
+  strip_pam_fprintd /etc/pam.d/hyprlock
   prepend_pam_fprintd /etc/pam.d/sudo
-  prepend_pam_fprintd /etc/pam.d/hyprlock
 }
 
 setup_fingerprint(){
@@ -129,15 +174,16 @@ setup_fingerprint(){
     [yY])
       x fprintd-enroll "$(whoami)"
       if ! fprintd-list "$(whoami)" 2>/dev/null | grep -qE "#[0-9]+:"; then
-        log_warning "No fingerprint was enrolled; leaving PAM untouched."
+        log_warning "No fingerprint was enrolled; leaving auth config untouched."
         return 0
       fi
+      enable_hyprlock_fingerprint   # hyprlock native, parallel, distro-independent
       if [[ "$OS_GROUP_ID" == "arch" ]]; then
         enable_pam_fprintd
-        log_success "Fingerprint enabled for lock screen and sudo (SDDM login stays password-only for speed)."
+        log_success "Fingerprint enabled: hyprlock (scan or type) and sudo. SDDM login stays password-only for speed."
       else
-        log_success "Fingerprint enrolled — the lock screen will use it."
-        log_warning "Non-Arch: to also use it for login/sudo, add 'auth sufficient pam_fprintd.so' to your PAM stack (Fedora: 'sudo authselect enable-feature with-fingerprint')."
+        log_success "Fingerprint enabled for the hyprlock lock screen (scan or type)."
+        log_warning "Non-Arch: to also use it for sudo, add 'auth sufficient pam_fprintd.so' to /etc/pam.d/sudo (Fedora: 'sudo authselect enable-feature with-fingerprint')."
       fi
       ;;
     *)
