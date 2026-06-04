@@ -1,6 +1,7 @@
 import qs.modules.common
 import qs.modules.common.widgets
 import qs.modules.common.functions
+import qs.services
 import QtQuick
 import QtQuick.Effects
 import Quickshell
@@ -13,7 +14,23 @@ LazyLoader {
     default property Item contentItem
     property real popupBackgroundMargin: 0
 
-    active: hoverTarget && hoverTarget.containsMouse
+    // Hover (default): popup follows the cursor over the bar item.
+    // Click: clicking the bar item pins the popup open; clicking the item
+    // again or anywhere outside closes it.
+    property bool clickToShow: Config.options.bar.tooltips.clickToShow
+    property bool pinned: false
+
+    active: clickToShow ? pinned : (hoverTarget && hoverTarget.containsMouse)
+
+    function toggle() { root.pinned = !root.pinned; }
+    function close() { root.pinned = false; }
+
+    // Named property so it isn't captured by the `contentItem` default property.
+    property Connections clickWatcher: Connections {
+        target: root.hoverTarget
+        enabled: root.clickToShow && root.hoverTarget !== null
+        function onClicked(mouse) { root.toggle(); }
+    }
 
     component: PanelWindow {
         id: popupWindow
@@ -36,7 +53,7 @@ LazyLoader {
         margins {
             left: {
                 if (!Config.options.bar.vertical) return root.QsWindow?.mapFromItem(
-                    root.hoverTarget, 
+                    root.hoverTarget,
                     (root.hoverTarget.width - popupBackground.implicitWidth) / 2, 0
                 ).x;
                 return Appearance.sizes.verticalBarWidth
@@ -44,7 +61,7 @@ LazyLoader {
             top: {
                 if (!Config.options.bar.vertical) return Appearance.sizes.barHeight;
                 return root.QsWindow?.mapFromItem(
-                    root.hoverTarget, 
+                    root.hoverTarget,
                     (root.hoverTarget.height - popupBackground.implicitHeight) / 2, 0
                 ).y;
             }
@@ -53,6 +70,20 @@ LazyLoader {
         }
         WlrLayershell.namespace: "quickshell:popup"
         WlrLayershell.layer: WlrLayer.Overlay
+
+        // Click mode: register with the shared focus grab so a click anywhere
+        // outside the popup dismisses it.
+        Component.onCompleted: {
+            if (root.clickToShow) GlobalFocusGrab.addDismissable(popupWindow);
+        }
+        Component.onDestruction: {
+            if (root.clickToShow) GlobalFocusGrab.removeDismissable(popupWindow);
+        }
+        Connections {
+            target: GlobalFocusGrab
+            enabled: root.clickToShow
+            function onDismissed() { root.close(); }
+        }
 
         StyledRectangularShadow {
             target: popupBackground
