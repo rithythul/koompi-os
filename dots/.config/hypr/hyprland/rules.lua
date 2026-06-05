@@ -49,20 +49,24 @@ hl.window_rule({match = {class = "^(Zotero)$" },                             flo
 hl.window_rule({match = {class = "^(Zotero)$" },                             size = {"(monitor_w*0.45)", "(monitor_h*0.45)"} })
 -- Chat-widget scratchpads (toggled via scripts/toggle_app_scratchpad.sh).
 -- Each app is pinned to its own special workspace by class, floated + centered.
+-- Height is keyed off monitor_w (not monitor_h) so all three are the SAME size
+-- across monitors of differing height (e.g. 1080 vs 1200) — on 16:9 it equals
+-- 0.8*h; the min() clamp keeps it on-screen for ultrawides. Don't "fix" to
+-- monitor_h: that makes the widgets differ per monitor. See keybinds App: *.
 -- Telegram: SUPER + B
 hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               workspace = "special:telegram silent"})
 hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               float = true})
-hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               size = {"(monitor_w*0.7)", "(monitor_h*0.8)"} })
+hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               size = {"(monitor_w*0.7)", "(min(monitor_w*0.45, monitor_h*0.8))"} })
 hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               center = true})
 -- Discord: SUPER + SHIFT + D
 hl.window_rule({match = {class = "^(discord)$" },                            workspace = "special:discord silent"})
 hl.window_rule({match = {class = "^(discord)$" },                            float = true})
-hl.window_rule({match = {class = "^(discord)$" },                            size = {"(monitor_w*0.7)", "(monitor_h*0.8)"} })
+hl.window_rule({match = {class = "^(discord)$" },                            size = {"(monitor_w*0.7)", "(min(monitor_w*0.45, monitor_h*0.8))"} })
 hl.window_rule({match = {class = "^(discord)$" },                            center = true})
 -- WhatsApp Web: SUPER + SHIFT + W (browser app-window; class contains web.whatsapp.com)
 hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               workspace = "special:whatsapp silent"})
 hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               float = true})
-hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               size = {"(monitor_w*0.7)", "(monitor_h*0.8)"} })
+hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               size = {"(monitor_w*0.7)", "(min(monitor_w*0.45, monitor_h*0.8))"} })
 hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               center = true})
 
 -- Move
