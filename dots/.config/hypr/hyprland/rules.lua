@@ -47,6 +47,23 @@ hl.window_rule({match = {class = "org.freedesktop.impl.portal.desktop.kde" }, fl
 hl.window_rule({match = {class = "org.freedesktop.impl.portal.desktop.kde" }, size = {"(monitor_w*0.60)", "(monitor_h*0.65)"} })
 hl.window_rule({match = {class = "^(Zotero)$" },                             float = true})
 hl.window_rule({match = {class = "^(Zotero)$" },                             size = {"(monitor_w*0.45)", "(monitor_h*0.45)"} })
+-- Chat-widget scratchpads (toggled via scripts/toggle_app_scratchpad.sh).
+-- Each app is pinned to its own special workspace by class, floated + centered.
+-- Telegram: SUPER + B
+hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               workspace = "special:telegram silent"})
+hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               float = true})
+hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               size = {"(monitor_w*0.55)", "(monitor_h*0.78)"} })
+hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               center = true})
+-- Discord: SUPER + SHIFT + D
+hl.window_rule({match = {class = "^(discord)$" },                            workspace = "special:discord silent"})
+hl.window_rule({match = {class = "^(discord)$" },                            float = true})
+hl.window_rule({match = {class = "^(discord)$" },                            size = {"(monitor_w*0.62)", "(monitor_h*0.80)"} })
+hl.window_rule({match = {class = "^(discord)$" },                            center = true})
+-- WhatsApp Web: SUPER + SHIFT + W (browser app-window; class contains web.whatsapp.com)
+hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               workspace = "special:whatsapp silent"})
+hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               float = true})
+hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               size = {"(monitor_w*0.50)", "(monitor_h*0.82)"} })
+hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               center = true})
 
 -- Move
 -- kde-material-you-colors spawns a window when changing dark/light theme. This is to make sure it doesn't interfere at all.
@@ -82,6 +99,9 @@ hl.window_rule({match = {float = 0 }, no_shadow = true})
 
 -- ######## Workspace rules ########
 hl.workspace_rule({ workspace = "special:special", gaps_out = 30 })
+hl.workspace_rule({ workspace = "special:telegram", gaps_out = 30 })
+hl.workspace_rule({ workspace = "special:discord", gaps_out = 30 })
+hl.workspace_rule({ workspace = "special:whatsapp", gaps_out = 30 })
 
 -- ######## Layer rules ########
 hl.layer_rule({ match = { namespace = ".*" }, xray = true})

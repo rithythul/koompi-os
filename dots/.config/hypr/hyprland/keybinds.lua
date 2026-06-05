@@ -6,6 +6,7 @@ end
 
 local qsScripts = "$HOME/.config/quickshell/$qsConfig/scripts"
 local hyprScripts = "$HOME/.config/hypr/hyprland/scripts"
+local appScratch = hyprScripts .. "/toggle_app_scratchpad.sh"
 local qsIpcCall = "qs -c $qsConfig ipc call"
 local qsIsAlive = qsIpcCall .. " TEST_ALIVE"
 
@@ -25,7 +26,9 @@ hl.bind("SUPER + V", hl.dsp.global("quickshell:overviewClipboardToggle"))
 hl.bind("SUPER + Period", hl.dsp.global("quickshell:overviewEmojiToggle"))
 hl.bind("SUPER + A", hl.dsp.global("quickshell:sidebarLeftToggle"), { description = "Shell: Toggle left sidebar" })
 hl.bind("SUPER + ALT + A", hl.dsp.global("quickshell:sidebarLeftToggleDetach"))
-hl.bind("SUPER + B", hl.dsp.global("quickshell:sidebarLeftToggle"))
+hl.bind("SUPER + B", hl.dsp.exec_cmd(appScratch .. " telegram 'org.telegram.desktop' Telegram"), { description = "Apps: Toggle Telegram chat widget" })
+hl.bind("SUPER + SHIFT + D", hl.dsp.exec_cmd(appScratch .. " discord 'discord' discord"), { description = "Apps: Toggle Discord chat widget" })
+hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd(appScratch .. " whatsapp 'web.whatsapp.com' " .. hyprScripts .. "/launch_whatsapp_web.sh"), { description = "Apps: Toggle WhatsApp chat widget" })
 hl.bind("SUPER + O", hl.dsp.global("quickshell:sidebarLeftToggle"))
 hl.bind("SUPER + N", hl.dsp.global("quickshell:sidebarRightToggle"), { description = "Shell: Toggle right sidebar" })
 hl.bind("SUPER + Slash", hl.dsp.global("quickshell:cheatsheetToggle"), { description = "Shell: Toggle cheatsheet" })
