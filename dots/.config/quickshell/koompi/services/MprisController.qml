@@ -18,7 +18,7 @@ Singleton {
 	id: root;
 	property list<MprisPlayer> players: Mpris.players.values.filter(player => isRealPlayer(player));
 	property MprisPlayer trackedPlayer: null;
-	property MprisPlayer activePlayer: trackedPlayer ?? Mpris.players.values[0] ?? null;
+	property MprisPlayer activePlayer: trackedPlayer ?? players[0] ?? null;
 	signal trackChanged(reverse: bool);
 
 	property bool __reverse: false;
@@ -97,7 +97,7 @@ Singleton {
 		}
 	}
 
-	onActivePlayerChanged: this.updateTrack();
+	onActivePlayerChanged: { this.updateTrack(); this.__resetStale(); }
 
 	function updateTrack() {
 		//console.log(`update: ${this.activePlayer?.trackTitle ?? ""} : ${this.activePlayer?.trackArtists}`)
@@ -114,6 +114,65 @@ Singleton {
 	}
 
 	property bool isPlaying: this.activePlayer && this.activePlayer.isPlaying;
+	// True only when the active player has a live session with real metadata.
+	// Browsers leave a Stopped player with stale title/art around after playback
+	// ends; UI should gate visibility on this rather than on a non-empty title.
+	readonly property bool hasActiveMedia: !!this.activePlayer
+		&& this.activePlayer.playbackState !== MprisPlaybackState.Stopped
+		&& (this.activePlayer.trackTitle ?? "").length > 0
+		&& !this.activePlayerStale;
+
+	// --- Stale plasma-browser-integration detection --------------------------
+	// plasma-browser-integration can stick reporting Playing with a *frozen*
+	// real position after a tab's media ends, leaving a phantom on the bar.
+	// Quickshell extrapolates MprisPlayer.position for anything it thinks is
+	// Playing, so the freeze is invisible in-process; we read the raw D-Bus
+	// position out-of-band (playerctl) and treat Playing-but-frozen as dead.
+	// Scoped to plasma only so native players (mpd/spotify) are never polled;
+	// if playerctl is absent the probe yields nothing and the phantom shows.
+	property bool activePlayerStale: false;
+	readonly property bool activeIsPlasma: (this.activePlayer?.dbusName ?? "")
+		.startsWith("org.mpris.MediaPlayer2.plasma-browser-integration");
+	property real __lastRealPos: -1;
+	property int __frozenPolls: 0;
+	function __resetStale() {
+		this.__lastRealPos = -1;
+		this.__frozenPolls = 0;
+		this.activePlayerStale = false;
+	}
+
+	Process {
+		id: realPositionProbe
+		property string busSuffix: ""
+		command: ["playerctl", "-p", busSuffix, "position"]
+		stdout: StdioCollector {
+			id: realPosCollector
+			onStreamFinished: {
+				const pos = parseFloat(realPosCollector.text.trim());
+				if (isNaN(pos)) return; // playerctl missing or no value -> leave as-is
+				if (!(root.activePlayer?.isPlaying ?? false)) { root.__resetStale(); return; }
+				if (root.__lastRealPos >= 0 && Math.abs(pos - root.__lastRealPos) < 0.05) {
+					root.__frozenPolls++;
+				} else {
+					root.__frozenPolls = 0;
+				}
+				root.__lastRealPos = pos;
+				root.activePlayerStale = root.__frozenPolls >= 2; // frozen across 3 polls (~9s)
+			}
+		}
+	}
+
+	Timer {
+		interval: 3000
+		repeat: true
+		running: root.activeIsPlasma && (root.activePlayer?.isPlaying ?? false)
+		onRunningChanged: if (!running) root.__resetStale();
+		onTriggered: {
+			realPositionProbe.busSuffix = root.activePlayer.dbusName.replace("org.mpris.MediaPlayer2.", "");
+			realPositionProbe.running = true;
+		}
+	}
+
 	property bool canTogglePlaying: this.activePlayer?.canTogglePlaying ?? false;
 	function togglePlaying() {
 		if (this.canTogglePlaying) this.activePlayer.togglePlaying();

@@ -108,6 +108,16 @@ Item { // Bar content region
         }
         spacing: 4
 
+        BarGroup { // Pomodoro, immediately left of workspaces
+            id: pomodoroGroup
+            anchors.verticalCenter: parent.verticalCenter
+            visible: root.useShortenedForm === 0
+
+            Pomodoro {
+                Layout.fillHeight: true
+            }
+        }
+
         BarGroup {
             id: middleCenterGroup
             anchors.verticalCenter: parent.verticalCenter
@@ -298,9 +308,11 @@ Item { // Bar content region
                 }
             }
 
-            Media { // Grouped on the right with the utilities; title elides so it stays short
-                visible: root.useShortenedForm < 2
+            Media { // Grouped on the right with the utilities; shrinks/elides so it never overruns workspaces
+                visible: root.useShortenedForm < 2 && MprisController.hasActiveMedia
                 Layout.leftMargin: 4
+                Layout.fillWidth: true
+                Layout.minimumWidth: 24 // icon-only floor when crowded
                 Layout.maximumWidth: 180
                 Layout.alignment: Qt.AlignVCenter
             }

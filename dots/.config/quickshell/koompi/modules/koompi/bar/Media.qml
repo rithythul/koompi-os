@@ -76,6 +76,7 @@ Item {
         StyledText { // Trimmed track title; hidden entirely when no player (icon only)
             visible: root.hasMedia
             Layout.alignment: Qt.AlignVCenter
+            Layout.fillWidth: true // shrink + elide when the bar constrains us, instead of overrunning
             Layout.maximumWidth: 150
             Layout.rightMargin: rowLayout.spacing
             elide: Text.ElideRight
