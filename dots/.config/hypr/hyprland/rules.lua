@@ -52,17 +52,17 @@ hl.window_rule({match = {class = "^(Zotero)$" },                             siz
 -- Telegram: SUPER + B
 hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               workspace = "special:telegram silent"})
 hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               float = true})
-hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               size = {"(monitor_w*0.7)", "(monitor_h*0.7)"} })
+hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               size = {"(monitor_w*0.7)", "(monitor_h*0.8)"} })
 hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               center = true})
 -- Discord: SUPER + SHIFT + D
 hl.window_rule({match = {class = "^(discord)$" },                            workspace = "special:discord silent"})
 hl.window_rule({match = {class = "^(discord)$" },                            float = true})
-hl.window_rule({match = {class = "^(discord)$" },                            size = {"(monitor_w*0.7)", "(monitor_h*0.7)"} })
+hl.window_rule({match = {class = "^(discord)$" },                            size = {"(monitor_w*0.7)", "(monitor_h*0.8)"} })
 hl.window_rule({match = {class = "^(discord)$" },                            center = true})
 -- WhatsApp Web: SUPER + SHIFT + W (browser app-window; class contains web.whatsapp.com)
 hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               workspace = "special:whatsapp silent"})
 hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               float = true})
-hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               size = {"(monitor_w*0.7)", "(monitor_h*0.7)"} })
+hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               size = {"(monitor_w*0.7)", "(monitor_h*0.8)"} })
 hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               center = true})
 
 -- Move
