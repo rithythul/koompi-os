@@ -1,0 +1,62 @@
+# koompi-branding — static, edition-agnostic KOOMPI OS brand assets installed to
+# system paths: wallpapers, logo, the Plymouth boot splash, the GRUB theme, and
+# the SDDM greeter theme + selector + enablement preset. Shared by both editions
+# and the live ISO.
+#
+# NOTE (os-release): the distro os-release is intentionally NOT shipped here — it
+# is owned by the `filesystem` package and a second owner collides at pacman time.
+# os-release is set in the archiso airootfs and written to the target by the
+# installer instead (see docs/os-build.md).
+#
+# NOTE (art): the Naga per-era visual identity (docs/naming.md) is not yet drawn.
+# The Plymouth/GRUB/SDDM themes here are functional skeletons; the SDDM selector
+# points at the safe stock `breeze` greeter until the koompi greeter art lands.
+groups=(koompi)
+pkgname=koompi-branding
+pkgver=1.0
+pkgrel=1
+pkgdesc='KOOMPI OS branding: wallpapers, logo, plymouth/grub/sddm themes, login enablement'
+arch=(any)
+url='https://github.com/rithythul/koompi-hyprland'
+license=('custom')
+depends=(sddm)
+optdepends=('breeze: stock SDDM/Plasma theme referenced by the interim greeter selector')
+
+package() {
+  local _repo_root _src
+  _repo_root="$(cd "$startdir/../../.." && pwd)"
+  _src="$startdir/files"
+
+  # Wallpapers (already in the repo) -> /usr/share/backgrounds/koompi
+  install -dm755 "$pkgdir/usr/share/backgrounds/koompi"
+  install -m644 "$_repo_root/wallpapers/"*.jpg "$pkgdir/usr/share/backgrounds/koompi/" 2>/dev/null || \
+    echo "koompi-branding: no wallpapers/*.jpg at repo root — skipping (clean-chroot build?)" >&2
+
+  # Logo / brand mark -> /usr/share/koompi
+  install -dm755 "$pkgdir/usr/share/koompi"
+  install -m644 "$_repo_root/dots/.config/quickshell/koompi/assets/icons/koompi-symbolic.svg" \
+    "$pkgdir/usr/share/koompi/koompi-symbolic.svg" 2>/dev/null || \
+    echo "koompi-branding: koompi-symbolic.svg not found — skipping logo" >&2
+
+  # Plymouth boot splash theme (script module; placeholder art, see header)
+  install -dm755 "$pkgdir/usr/share/plymouth/themes/koompi"
+  install -m644 "$_src/plymouth/koompi.plymouth" "$pkgdir/usr/share/plymouth/themes/koompi/"
+  install -m644 "$_src/plymouth/koompi.script"   "$pkgdir/usr/share/plymouth/themes/koompi/"
+
+  # GRUB theme (skeleton; placeholder art, see header)
+  install -dm755 "$pkgdir/usr/share/grub/themes/koompi"
+  install -m644 "$_src/grub/theme.txt" "$pkgdir/usr/share/grub/themes/koompi/"
+
+  # SDDM greeter: ship the koompi theme dir (skeleton) + an interim selector that
+  # points at the safe stock `breeze` theme until the koompi greeter art is done.
+  install -dm755 "$pkgdir/usr/share/sddm/themes/koompi"
+  install -m644 "$_src/sddm/theme.conf" "$pkgdir/usr/share/sddm/themes/koompi/"
+  install -Dm644 "$_src/sddm/10-koompi.conf" "$pkgdir/etc/sddm.conf.d/10-koompi.conf"
+
+  # Enable the login manager on fresh installs (the installer also enables it
+  # explicitly; this preset is belt-and-suspenders for `systemctl preset-all`).
+  install -Dm644 "$_src/90-koompi.preset" "$pkgdir/usr/lib/systemd/system-preset/90-koompi.preset"
+
+  # Asset / license note
+  install -Dm644 "$_src/README" "$pkgdir/usr/share/koompi/BRANDING-README"
+}

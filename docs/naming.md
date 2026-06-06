@@ -68,7 +68,7 @@ feels coherent without diluting the roster. (Proposed — adopt incrementally.)
 | Component            | Name        | Meaning / why |
 |----------------------|-------------|---------------|
 | Desktop shell        | **Bayon**   | the temple of faces → the face of the OS |
-| Installer            | **Tonle**   | the flow / great gateway |
+| Installer            | *koompi-installer* | named plainly — "installer" is already an active agent-noun; a passive place-name (Tonle) was rejected here |
 | Software store       | **Psar**    | Khmer for *market* — instantly legible to locals |
 | Welcome app          | **Suostei** | literally "hello" |
 | Settings / control   | **Reach**   | royal, "to rule" |

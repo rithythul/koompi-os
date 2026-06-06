@@ -97,6 +97,21 @@ metapkgs+=(./sdata/dist-arch/koompi-hyprland)
 metapkgs+=(./sdata/dist-arch/koompi-microtex-git)
 metapkgs+=(./sdata/dist-arch/koompi-quickshell-git)
 metapkgs+=(./sdata/dist-arch/koompi-bibata-modern-classic-bin)
+# Shared branding (wallpapers, plymouth/grub/sddm theming, sddm enablement preset).
+metapkgs+=(./sdata/dist-arch/koompi-branding)
+# DE-agnostic foundation — depends on the domain metas + koompi-branding + sddm above.
+metapkgs+=(./sdata/dist-arch/koompi-base)
+# Hyprland dotfiles into /etc/skel (conflicts the Plasma edition's koompi-kde-config).
+metapkgs+=(./sdata/dist-arch/koompi-hyprland-config)
+# Hyprland edition metapackage (the name the Hyprland ISO/installer pacstraps).
+metapkgs+=(./sdata/dist-arch/koompi-desktop-hyprland)
+# Transitional alias so existing `koompi-desktop` installs upgrade to the edition.
+metapkgs+=(./sdata/dist-arch/koompi-desktop)
+#
+# NOTE: the Plasma (KDE) edition packages — koompi-plasma, koompi-kde-config,
+# koompi-desktop-kde — are intentionally NOT built/installed by this local setup:
+# koompi-kde-config conflicts koompi-hyprland-config (one edition per machine).
+# They are built for the signed koompi repo + the KDE ISO; see docs/os-build.md.
 
 for i in "${metapkgs[@]}"; do
   metainstallflags="--needed"
