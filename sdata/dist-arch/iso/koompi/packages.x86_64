@@ -1,0 +1,40 @@
+# KOOMPI OS — LIVE-ISO package set.  *** SKELETON ***
+#
+# These packages go INTO the live/installer environment only.  The TARGET edition
+# the user picks at install time — koompi-desktop-hyprland OR koompi-desktop-kde —
+# is pacstrapped onto the disk BY the Zig installer (archinstall engine).  Do NOT
+# list the edition metas here; the live ISO stays small and DE-agnostic.
+#
+# One package per line.  Comments allowed.
+
+# --- Base system + kernel -----------------------------------------------------
+base
+linux
+linux-firmware
+mkinitcpio
+
+# --- Installer: FACE + ENGINE -------------------------------------------------
+# archinstall is the dangerous-20% engine (partition/LUKS/pacstrap/bootloader/btrfs).
+# PIN a known-good archinstall version on the ISO — its user_configuration.json
+# schema drifts between releases (locked decision).  Pinning is done at repo/build
+# level, not expressible in this flat list — see README.md.
+archinstall
+
+# The Zig FACE (libvaxis TUI) — a thin orchestrator that collects answers, emits
+# archinstall JSON, selects the KOOMPI profile, and runs the post-install hook.
+# PLACEHOLDER: this is built from installer/ in this repo and dropped into the
+# airootfs as /usr/local/bin/koompi-installer (it is NOT yet a packaged binary in
+# the [koompi] repo).  Once packaged, replace this comment with:  koompi-installer
+#koompi-installer
+
+# --- Live-environment tooling the installer needs -----------------------------
+git                 # fetch profiles / post-install assets
+networkmanager      # network in the live session (installer needs connectivity)
+btrfs-progs         # btrfs subvolume layout (@, @home, @var_log, @baseline ...)
+snapper             # snapshot mgmt on the target (semi-immutable / resettable)
+snap-pac            # auto pre/post pacman-txn snapshots (configured on target)
+grub                # target bootloader (grub-btrfs needs GRUB)
+grub-btrfs          # bootable snapshot menu in GRUB
+dosfstools          # mkfs.fat for the ESP
+sudo
+nano vim            # edit configs in the live session
