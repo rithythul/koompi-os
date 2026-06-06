@@ -32,10 +32,11 @@ every Angkor balustrade.
 | 10  | **Mekhala**  | lightning goddess (Moni Mekhala) | the spark — a bold leap |
 
 **Reserve pool** (genuine beings, for v11+ or substitutions): Kinnara (the male
-counterpart to the roster's Kinnari), Tevada (celestial deity), Erawan (three-
-headed divine elephant), Nandin (sacred bull), Gajasimha (elephant-lion), Sovann
-Maccha (golden mermaid), Ream Eyso (storm demon), Preah Thong & Neang Neak (the
-founding couple).
+counterpart to the roster's Kinnari), Vasuki (cosmic serpent — the churning-rope
+of the Ocean of Milk relief), Ananta (the cosmic serpent Vishnu reclines on),
+Tevada (celestial deity), Erawan (three-headed divine elephant), Nandin (sacred
+bull), Gajasimha (elephant-lion), Sovann Maccha (golden mermaid), Ream Eyso
+(storm demon), Preah Thong & Neang Neak (the founding couple).
 
 > Not eligible: words that are *qualities*, not beings — e.g. *Sovann* (gold)
 > alone. Keep the roster to actual mythological figures.
