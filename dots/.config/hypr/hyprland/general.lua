@@ -37,14 +37,6 @@ hl.gesture({
 })
 
 hl.config({
-    gestures = {
-        workspace_swipe_distance = 700,
-        workspace_swipe_cancel_ratio = 0.2,
-        workspace_swipe_min_speed_to_force = 5,
-        workspace_swipe_direction_lock = true,
-        workspace_swipe_direction_lock_threshold = 10,
-        workspace_swipe_create_new = true
-    },
     general = {
         -- Gaps and border
         gaps_in = 4,
@@ -267,6 +259,13 @@ hl.config({
             disable_while_typing = true,
             clickfinger_behavior = true,
             scroll_factor = 0.7
+        },
+
+        -- Bind the touchscreen digitizer to eDP-1. Without this the [[Auto]]
+        -- mapping spreads the touch surface across the whole layout span, and
+        -- since eDP-1 sits at layout pos (1920,1080) every touch lands offset.
+        touchdevice = {
+            output = "eDP-1"
         }
     },
 

@@ -95,7 +95,7 @@ ContentPage {
                 Layout.alignment: Qt.AlignVCenter
                 // spacing: 10
                 StyledText {
-                    text: Translation.tr("illogical-impulse")
+                    text: Translation.tr("Built on illogical-impulse")
                     font.pixelSize: Appearance.font.pixelSize.title
                 }
                 StyledText {
@@ -138,7 +138,7 @@ ContentPage {
             }
             RippleButtonWithIcon {
                 materialIcon: "favorite"
-                mainText: Translation.tr("Donate")
+                mainText: Translation.tr("Support end-4")
                 onClicked: {
                     Qt.openUrlExternally("https://github.com/sponsors/end-4")
                 }

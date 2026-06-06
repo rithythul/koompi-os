@@ -13,6 +13,15 @@ base
 linux
 linux-firmware
 mkinitcpio
+# archiso runtime initramfs hook — finds + mounts the live squashfs at boot
+mkinitcpio-archiso
+
+# --- Live-ISO bootloader + shell ----------------------------------------------
+# BIOS boot modules (isolinux.bin + *.c32) for the syslinux bootmodes; UEFI
+# systemd-boot comes from `base`. mkarchiso reads these from the airootfs.
+syslinux
+# live root shell — archiso autostarts the installer via root's ~/.zlogin (zsh)
+zsh
 
 # --- Installer: FACE + ENGINE -------------------------------------------------
 # archinstall is the dangerous-20% engine (partition/LUKS/pacstrap/bootloader/btrfs).

@@ -1,20 +1,22 @@
-# KOOMPI OS — archiso profile (SKELETON)
+# KOOMPI OS — archiso profile
 
 A minimal [archiso] profile for building the **KOOMPI OS** live/installer ISO.
 It mirrors Arch's official `releng` profile, trimmed to what KOOMPI needs.
-Everything here is scaffolding — see **What is stubbed** before expecting a clean
-build.
 
-Base: **Arch Linux only** (x86_64). Release era: **Naga** (v1, see
-`docs/naming.md`).
+**v1 builds a bootable ISO**: DE-agnostic stock Arch + `archinstall`, boots (BIOS +
+UEFI) to a networked root shell with the keyring initialized. The KOOMPI-*branded*
+path (pacstrap a `koompi-desktop-*` edition from the signed repo, autostart the Zig
+installer) is still deferred — see **Status** below.
+
+Base: **Arch Linux only** (x86_64). Release era: **Naga** (v1, see `docs/naming.md`).
 
 ## Where this sits in the ISO chain
 
 ```
-signed [koompi] pacman repo (repo-add + GPG)
+(later) signed [koompi] pacman repo (repo-add + GPG)
         ->  THIS archiso profile (profiledef.sh, packages.x86_64, pacman.conf, airootfs/)
         ->  mkarchiso
-        ->  the Zig installer on the live ISO  ->  archinstall  ->  installed KOOMPI
+        ->  (later) the Zig installer on the live ISO  ->  archinstall  ->  installed KOOMPI
 ```
 
 The live ISO is **DE-agnostic**. The TARGET edition the user picks at install time
@@ -26,57 +28,58 @@ disk by the installer (archinstall engine), **not** listed in `packages.x86_64`.
 | File | Purpose |
 |------|---------|
 | `profiledef.sh` | ISO identity, bootmodes (BIOS syslinux + UEFI systemd-boot), file permissions. |
-| `pacman.conf` | Build-time repos: standard Arch + the `[koompi]` repo (placeholder `Server=`). |
-| `packages.x86_64` | The live-ISO package set (base, kernel, archinstall, installer, btrfs/snapper/grub tooling). |
-| `airootfs/etc/os-release` | The KOOMPI os-release for the live env (installer writes the same to the target). |
-| `airootfs/root/.automated_script.sh` | Live-session installer autostart **stub** (does not auto-run yet). |
+| `pacman.conf` | Build-time repos: standard Arch. `[koompi]` is present but **commented out** for v1. |
+| `packages.x86_64` | Live-ISO set: base, kernel, `mkinitcpio-archiso`, `syslinux`, `zsh`, `archinstall`, btrfs/snapper/grub tooling. |
+| `syslinux/` | BIOS boot menu (from releng, rebranded; speech + memtest entries trimmed). |
+| `efiboot/loader/` | UEFI systemd-boot menu (main entry only). |
+| `airootfs/etc/mkinitcpio.conf.d/archiso.conf`, `…/mkinitcpio.d/linux.preset` | archiso runtime initramfs (mounts the live squashfs). |
+| `airootfs/etc/systemd/system/getty@tty1.service.d/autologin.conf` | Root autologin on tty1. |
+| `airootfs/root/.zlogin` | Fires `~/.automated_script.sh` on login. |
+| `airootfs/etc/passwd`, `…/shadow` | Live root (zsh shell, passwordless + autologin). |
+| `…/multi-user.target.wants/NetworkManager.service` | Networking in the live session. |
+| `…/pacman-init.service` + `etc-pacman.d-gnupg.mount` | Initializes the live pacman keyring so `archinstall` can verify packages. |
+| `airootfs/etc/os-release` | The KOOMPI os-release for the live env. |
+| `airootfs/root/.automated_script.sh` | Installer autostart **stub** (drops to a shell until the installer ships). |
 
 ## Prerequisites
 
 - `archiso` installed on the build host (`pacman -S archiso`).
 - Run as **root** (mkarchiso needs it).
-- **The signed `[koompi]` repo must already exist and be reachable.** `pacman.conf`
-  points `[koompi]` at a placeholder `Server=` URL; mkarchiso cannot sync packages
-  until that repo is real. Build the koompi-* packages from `sdata/dist-arch/*`,
-  `repo-add` + GPG-sign them, and host them (or point `Server=` at a local path).
+- Internet access (pacstraps the live root from the Arch mirrors). **No `[koompi]`
+  repo needed for v1** — it is commented out in `pacman.conf`.
 
 ## Build
 
 ```sh
-# from this directory (sdata/dist-arch/iso/koompi/)
-sudo mkarchiso -v -w /tmp/koompi-work -o /tmp/koompi-out .
+# from the repo root
+sudo mkarchiso -v -w /tmp/koompi-work -o /tmp/koompi-out sdata/dist-arch/iso/koompi/
 ```
 
-Output: `/tmp/koompi-out/koompi-YYYY.MM.DD-x86_64.iso`.
+Output: `/tmp/koompi-out/koompi-YYYY.MM.DD-x86_64.iso`. It boots (BIOS + UEFI) to a
+root shell with networking and `archinstall` available.
 
-## What is stubbed (this WILL NOT build clean as-is)
+## Status
 
-This is a deliberate skeleton. mkarchiso will fail until these land:
+**Wired (v1 builds + boots + installs via archinstall):** bootloader config dirs
+(syslinux + systemd-boot), archiso runtime initramfs, root autologin, live
+networking, pacman keyring init, stock-Arch package set.
 
-1. **`[koompi]` repo is a placeholder.** The `Server=` URL is fake and `SigLevel`
-   is the bootstrap stopgap `Optional TrustAll`. Stand up the signed repo, fix the
-   URL, then switch `pacman.conf`'s `[koompi]` `SigLevel` to
-   `Required DatabaseOptional`. Never ship a `TrustAll` build.
+**Still deferred (KOOMPI-branded ISO):**
 
-2. **Bootloader config dirs are missing.** `bootmodes` in `profiledef.sh` reference
-   systemd-boot (`efiboot/loader/…`) and syslinux (`syslinux/…`) config dirs that
-   this skeleton does **not** include. Copy them from `releng` and re-brand, or
-   mkarchiso aborts. (NOTE: this is the *live* ISO's bootloader; the *installed
-   target* uses GRUB for grub-btrfs — that's the installer's job.)
-
-3. **Zig installer binary.** `packages.x86_64` has `koompi-installer` commented
-   out; it is built from `installer/` and must be dropped into the airootfs at
-   `/usr/local/bin/koompi-installer` (or packaged into `[koompi]`).
-
-4. **Installer autostart wiring.** `airootfs/root/.automated_script.sh` does not run
-   on its own — archiso fires it via root's `~/.zlogin`. Add that `.zlogin` trigger
-   (or a systemd service) to actually launch the installer on boot.
-
-5. **Pin archinstall.** Its `user_configuration.json` schema drifts between
-   releases. Pin a known-good version at the repo/build level (not expressible in
-   the flat `packages.x86_64`).
-
-6. **Branding art.** Plymouth / GRUB / SDDM Naga themes are functional placeholders
-   (interim SDDM `Current=breeze`); see `koompi-branding`.
+1. **Signed `[koompi]` repo.** Commented out in `pacman.conf`. Build the koompi-*
+   packages (`repo/build-repo.sh`), GPG-sign + publish, then uncomment `[koompi]`,
+   set a real `Server=`, keep `SigLevel = Required`. Never ship `TrustAll`.
+2. **Zig installer binary.** `packages.x86_64` has `koompi-installer` commented out;
+   it is built from `installer/` and dropped into the airootfs at
+   `/usr/local/bin/koompi-installer` (or packaged into `[koompi]`). Until then the
+   live session drops to a shell (`.automated_script.sh` is a stub).
+3. **Edition pacstrap + repo trust.** Once `[koompi]` is live, the installer
+   pacstraps `koompi-desktop-hyprland`/`-kde`; the live env also needs the koompi
+   signing key + a `pacman-key` import hook to trust the repo.
+4. **Pin archinstall.** Its `user_configuration.json` schema drifts between releases;
+   pin a known-good version at the repo/build level.
+5. **Branding art.** Boot splash (still releng's `splash.png`), Plymouth / SDDM Naga
+   themes are interim placeholders; see `koompi-branding`. Microcode (`amd-ucode` /
+   `intel-ucode`) is not yet in the live set.
 
 [archiso]: https://gitlab.archlinux.org/archlinux/archiso

@@ -52,9 +52,6 @@ _Most stuff in the shell will work but not everything._
 - Quickshell-specific LSP setup: Run `touch ~/.config/quickshell/koompi/.qmlls.ini` for proper LSP support.
 - Hint for VSCode: Get the official "Qt Qml" extension, go to its settings and change custom exe path to `/usr/bin/qmlls6`.
 
-## Python
-If your changes involves using python package or script, please use the virtual environment created by uv as described in `sdata/uv/README.md`.
-
 # Running
 
 - Launch Hyprland (not the "uwsm-managed" one)

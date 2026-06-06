@@ -50,15 +50,16 @@ hl.window_rule({match = {class = "^(Zotero)$" },                             siz
 -- Chat-widget scratchpads (toggled via scripts/toggle_app_scratchpad.sh). Each
 -- app is pinned to its own special workspace by class and floated. Telegram and
 -- WhatsApp are LEFT-DOCKED tall side panels (mirror of the SUPER+grave terminal,
--- which is right-docked): 0.5w wide (wider than the terminal's 0.42w) x usable-
--- height with equal 16px gaps, anchored to the left edge (x=16). See the terminal
--- math (clearing the 63px top bar) and why fixed fractions are used. Discord is
+-- which is right-docked): 0.5w wide (wider than the terminal's 0.42w) x FULL
+-- height — they fill exactly the vertical band a maximized/tiled window gets, so a
+-- floating widget reads as "same window, just half width". Anchored to the left
+-- edge (x=16). See the terminal math for the full-height derivation. Discord is
 -- still wide + centered. See keybinds App: *.
 -- Telegram: SUPER + B  (left)
 hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               workspace = "special:telegram silent"})
 hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               float = true})
-hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               size = {"(monitor_w*0.5)", "(monitor_h-135)"} })
-hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               move = {"(16)", "(79)"} })
+hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               size = {"(monitor_w*0.5)", "(monitor_h-52)"} })
+hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               move = {"(16)", "(46)"} })
 -- Discord: SUPER + SHIFT + D
 hl.window_rule({match = {class = "^(discord)$" },                            workspace = "special:discord silent"})
 hl.window_rule({match = {class = "^(discord)$" },                            float = true})
@@ -67,8 +68,8 @@ hl.window_rule({match = {class = "^(discord)$" },                            cen
 -- WhatsApp Web: SUPER + SHIFT + W  (left; browser app-window, class contains web.whatsapp.com)
 hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               workspace = "special:whatsapp silent"})
 hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               float = true})
-hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               size = {"(monitor_w*0.5)", "(monitor_h-135)"} })
-hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               move = {"(16)", "(79)"} })
+hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               size = {"(monitor_w*0.5)", "(monitor_h-52)"} })
+hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               move = {"(16)", "(46)"} })
 -- Quick-fire scratchpads sharing the chat-widget pattern. Same launch-or-toggle
 -- script, same float/center/size convention; each uses a UNIQUE --class so it
 -- never collides with the normal SUPER + Return terminal.
@@ -78,15 +79,16 @@ hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               mov
 -- on the LEFT (x=16) with the same size + vertical math.
 hl.window_rule({match = {class = "^(term-scratch)$" },                       workspace = "special:term silent"})
 hl.window_rule({match = {class = "^(term-scratch)$" },                       float = true})
--- Vertical band fits BETWEEN the bars like a normal window: the top bar is 63px
--- tall (and does NOT reserve space — reserved top=0), the bottom reserves 40px.
--- Visible band is [63, monitor_h-40]; centering the panel in it with equal 16px
--- gaps gives y = 79 (63 + 16) and height = monitor_h-135 (63 bar + 40 reserved +
--- 16 top + 16 bottom). x = monitor_w*0.58-16 right-docks the 0.42w panel (16px
--- right gap). Fixed monitor_w/h math, NOT window_w/window_h — those evaluate
--- before the size rule and fall back to centered.
-hl.window_rule({match = {class = "^(term-scratch)$" },                       size = {"(monitor_w*0.42)", "(monitor_h-135)"} })
-hl.window_rule({match = {class = "^(term-scratch)$" },                       move = {"(monitor_w*0.58-16)", "(79)"} })
+-- FULL height — the panel fills exactly the band a maximized/tiled window gets, so
+-- it lines up edge-for-edge with a normal window (just narrower). Measured on
+-- eDP-1: reserved = [L,T,R,B] = [0,40,0,0] (the bar reserves 40px at the TOP, not
+-- the bottom), gaps_out = 5, border = 1. A tiled window therefore sits at top
+-- inset 46 (40 reserved + 5 gap + 1 border) and bottom inset 6 (5 gap + 1 border),
+-- giving y = 46 and height = monitor_h-52 (40 + 6 + 6). x = monitor_w*0.58-16
+-- right-docks the 0.42w panel (16px right gap). Fixed monitor_w/h math, NOT
+-- window_w/window_h — those evaluate before the size rule and fall back to centered.
+hl.window_rule({match = {class = "^(term-scratch)$" },                       size = {"(monitor_w*0.42)", "(monitor_h-52)"} })
+hl.window_rule({match = {class = "^(term-scratch)$" },                       move = {"(monitor_w*0.58-16)", "(46)"} })
 -- System monitor: SUPER + SHIFT + Escape (btop, falling back to htop/top)
 hl.window_rule({match = {class = "^(sysmon-scratch)$" },                     workspace = "special:sysmon silent"})
 hl.window_rule({match = {class = "^(sysmon-scratch)$" },                     float = true})
