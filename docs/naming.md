@@ -34,9 +34,11 @@ every Angkor balustrade.
 **Reserve pool** (genuine beings, for v11+ or substitutions): Kinnara (the male
 counterpart to the roster's Kinnari), Vasuki (cosmic serpent — the churning-rope
 of the Ocean of Milk relief), Ananta (the cosmic serpent Vishnu reclines on),
-Tevada (celestial deity), Erawan (three-headed divine elephant), Nandin (sacred
-bull), Gajasimha (elephant-lion), Sovann Maccha (golden mermaid), Ream Eyso
-(storm demon), Preah Thong & Neang Neak (the founding couple).
+Lokeshvara (bodhisattva of compassion — the four faces of the Bayon), Tevada
+(celestial deity), Erawan (three-headed divine elephant), Nandin (sacred bull),
+Gajasimha (elephant-lion), Sovann Maccha (golden mermaid), Ream Eyso (storm
+demon), Preah Thong & Neakareaj (the founding legend — the prince and the Naga
+King).
 
 > Not eligible: words that are *qualities*, not beings — e.g. *Sovann* (gold)
 > alone. Keep the roster to actual mythological figures.
