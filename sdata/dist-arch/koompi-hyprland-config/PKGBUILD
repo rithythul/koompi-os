@@ -1,8 +1,5 @@
 # koompi-hyprland-config — ships the KOOMPI Hyprland dotfiles into /etc/skel so a
-# freshly-created user inherits the whole desktop on first login. This is the
-# packaged form of `setup install-files`; the setup script stays as the path for
-# applying updates onto an already-running, customised home directory (it carries
-# the merge/backup logic a fresh /etc/skel copy does not need).
+# freshly-created user inherits the whole desktop on first login.
 #
 # BUILD NOTE: via the existing sdata/dist-arch flow (plain makepkg in-tree) this
 # reads ../../../dots through $startdir. For clean-chroot / repo builds (devtools,
