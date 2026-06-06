@@ -47,27 +47,71 @@ hl.window_rule({match = {class = "org.freedesktop.impl.portal.desktop.kde" }, fl
 hl.window_rule({match = {class = "org.freedesktop.impl.portal.desktop.kde" }, size = {"(monitor_w*0.60)", "(monitor_h*0.65)"} })
 hl.window_rule({match = {class = "^(Zotero)$" },                             float = true})
 hl.window_rule({match = {class = "^(Zotero)$" },                             size = {"(monitor_w*0.45)", "(monitor_h*0.45)"} })
--- Chat-widget scratchpads (toggled via scripts/toggle_app_scratchpad.sh).
--- Each app is pinned to its own special workspace by class, floated + centered.
--- Height is keyed off monitor_w (not monitor_h) so all three are the SAME size
--- across monitors of differing height (e.g. 1080 vs 1200) — on 16:9 it equals
--- 0.8*h; the min() clamp keeps it on-screen for ultrawides. Don't "fix" to
--- monitor_h: that makes the widgets differ per monitor. See keybinds App: *.
--- Telegram: SUPER + B
+-- Chat-widget scratchpads (toggled via scripts/toggle_app_scratchpad.sh). Each
+-- app is pinned to its own special workspace by class and floated. Telegram and
+-- WhatsApp are LEFT-DOCKED tall side panels (mirror of the SUPER+grave terminal,
+-- which is right-docked): 0.5w wide (wider than the terminal's 0.42w) x usable-
+-- height with equal 16px gaps, anchored to the left edge (x=16). See the terminal
+-- math (clearing the 63px top bar) and why fixed fractions are used. Discord is
+-- still wide + centered. See keybinds App: *.
+-- Telegram: SUPER + B  (left)
 hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               workspace = "special:telegram silent"})
 hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               float = true})
-hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               size = {"(monitor_w*0.7)", "(min(monitor_w*0.45, monitor_h*0.8))"} })
-hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               center = true})
+hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               size = {"(monitor_w*0.5)", "(monitor_h-135)"} })
+hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               move = {"(16)", "(79)"} })
 -- Discord: SUPER + SHIFT + D
 hl.window_rule({match = {class = "^(discord)$" },                            workspace = "special:discord silent"})
 hl.window_rule({match = {class = "^(discord)$" },                            float = true})
 hl.window_rule({match = {class = "^(discord)$" },                            size = {"(monitor_w*0.7)", "(min(monitor_w*0.45, monitor_h*0.8))"} })
 hl.window_rule({match = {class = "^(discord)$" },                            center = true})
--- WhatsApp Web: SUPER + SHIFT + W (browser app-window; class contains web.whatsapp.com)
+-- WhatsApp Web: SUPER + SHIFT + W  (left; browser app-window, class contains web.whatsapp.com)
 hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               workspace = "special:whatsapp silent"})
 hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               float = true})
-hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               size = {"(monitor_w*0.7)", "(min(monitor_w*0.45, monitor_h*0.8))"} })
-hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               center = true})
+hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               size = {"(monitor_w*0.5)", "(monitor_h-135)"} })
+hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               move = {"(16)", "(79)"} })
+-- Quick-fire scratchpads sharing the chat-widget pattern. Same launch-or-toggle
+-- script, same float/center/size convention; each uses a UNIQUE --class so it
+-- never collides with the normal SUPER + Return terminal.
+-- Terminal: SUPER + grave — RIGHT-docked panel (NOT centered like Discord),
+-- since SUPER + T already opens a terminal in the workspace. Tall + narrow so it
+-- reads as a side panel coming from the right. Telegram/WhatsApp above mirror it
+-- on the LEFT (x=16) with the same size + vertical math.
+hl.window_rule({match = {class = "^(term-scratch)$" },                       workspace = "special:term silent"})
+hl.window_rule({match = {class = "^(term-scratch)$" },                       float = true})
+-- Vertical band fits BETWEEN the bars like a normal window: the top bar is 63px
+-- tall (and does NOT reserve space — reserved top=0), the bottom reserves 40px.
+-- Visible band is [63, monitor_h-40]; centering the panel in it with equal 16px
+-- gaps gives y = 79 (63 + 16) and height = monitor_h-135 (63 bar + 40 reserved +
+-- 16 top + 16 bottom). x = monitor_w*0.58-16 right-docks the 0.42w panel (16px
+-- right gap). Fixed monitor_w/h math, NOT window_w/window_h — those evaluate
+-- before the size rule and fall back to centered.
+hl.window_rule({match = {class = "^(term-scratch)$" },                       size = {"(monitor_w*0.42)", "(monitor_h-135)"} })
+hl.window_rule({match = {class = "^(term-scratch)$" },                       move = {"(monitor_w*0.58-16)", "(79)"} })
+-- System monitor: SUPER + SHIFT + Escape (btop, falling back to htop/top)
+hl.window_rule({match = {class = "^(sysmon-scratch)$" },                     workspace = "special:sysmon silent"})
+hl.window_rule({match = {class = "^(sysmon-scratch)$" },                     float = true})
+hl.window_rule({match = {class = "^(sysmon-scratch)$" },                     size = {"(monitor_w*0.7)", "(min(monitor_w*0.45, monitor_h*0.8))"} })
+hl.window_rule({match = {class = "^(sysmon-scratch)$" },                     center = true})
+
+-- Browser home workspace. A link clicked inside a chat widget spawns a real
+-- browser window; with a special workspace focused, that window would be born on
+-- the special workspace — tiled, hidden behind the floating widget. Pinning the
+-- browser to ws 9 (non-silent, so it switches there) sends those link windows —
+-- and every browser window — to your real browser instead. Matches the NORMAL
+-- browser classes only, never the chrome --app widget class
+-- (chrome-web.whatsapp.com__-Default), so the WhatsApp/Telegram/Discord widgets
+-- stay on their special workspaces. See keybinds "App: * widget".
+hl.window_rule({match = {class = "^(google-chrome|google-chrome-stable|chromium|brave-browser|firefox|zen|zen-browser|microsoft-edge|opera|librewolf)$" }, workspace = "9"})
+
+-- Dolphin file manager: float-in-place for a quick file peek. Unlike the chat
+-- widgets above it is NOT sent to a special workspace — it floats + centers +
+-- sizes on the CURRENT workspace so SUPER + E still opens it normally (just
+-- floating), and SUPER + Q dismisses it. Dolphin has no per-window class
+-- override, so this applies to every Dolphin window. To make it a hide/restore
+-- scratchpad instead, pin it to a special workspace like the chat widgets.
+hl.window_rule({match = {class = "^(org.kde.dolphin)$" },                    float = true})
+hl.window_rule({match = {class = "^(org.kde.dolphin)$" },                    size = {"(monitor_w*0.6)", "(min(monitor_w*0.4, monitor_h*0.75))"} })
+hl.window_rule({match = {class = "^(org.kde.dolphin)$" },                    center = true})
 
 -- Move
 -- kde-material-you-colors spawns a window when changing dark/light theme. This is to make sure it doesn't interfere at all.
@@ -106,6 +150,8 @@ hl.workspace_rule({ workspace = "special:special", gaps_out = 30 })
 hl.workspace_rule({ workspace = "special:telegram", gaps_out = 30 })
 hl.workspace_rule({ workspace = "special:discord", gaps_out = 30 })
 hl.workspace_rule({ workspace = "special:whatsapp", gaps_out = 30 })
+hl.workspace_rule({ workspace = "special:term", gaps_out = 30 })
+hl.workspace_rule({ workspace = "special:sysmon", gaps_out = 30 })
 
 -- ######## Layer rules ########
 hl.layer_rule({ match = { namespace = ".*" }, xray = true})
