@@ -53,7 +53,7 @@ All packages live in `sdata/dist-arch/<name>/PKGBUILD`. "Kind" is one of:
 | `koompi-screencapture` | meta | Screen capture stack (domain meta). Covers capture for both editions. |
 | `koompi-toolkit` | meta | Input toolkit (domain meta). |
 | `koompi-widgets` | meta | Hyprland-only widget dependencies. |
-| `koompi-hyprland` | content | The Hyprland compositor build. |
+| `koompi-hyprland` | meta | Hyprland compositor + tools (depends `hyprland`, `hyprsunset`, `wl-clipboard`). |
 | `koompi-quickshell-git` | content | The Quickshell bar/shell + its Qt6/KDE-framework runtime. |
 | `koompi-microtex-git` | content | MicroTeX (math rendering) build. |
 | `koompi-bibata-modern-classic-bin` | content | Bibata cursor theme (prebuilt). |

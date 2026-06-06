@@ -29,7 +29,7 @@ const Edition = config.Edition;
 // document the verified schema, not a runnable config. (Upstream archinstall is
 // ~4.x as of 2026; pin the EXACT release you ship and regenerate from it.)
 // ─────────────────────────────────────────────────────────────────────────────
-pub const ARCHINSTALL_VERSION = "2.8.x"; // TODO: pin the exact release on the ISO
+pub const ARCHINSTALL_VERSION = "4.x"; // TODO: pin the exact release on the ISO
 
 /// The post-install chroot hook, kept as ONE source of truth via @embedFile so
 /// the shell script and this "string constant" can never drift apart.
@@ -262,7 +262,11 @@ pub fn runPostInstallHook(alloc: std.mem.Allocator) !void {
             &.{ "cp", HOOK_PATH, target_root ++ "/root/post_install.sh" },
             alloc,
         );
-        if (try cp.spawnAndWait() != .Exited) return error.CopyHookFailed;
+        const cp_term = try cp.spawnAndWait();
+        switch (cp_term) {
+            .Exited => |code| if (code != 0) return error.CopyHookFailed,
+            else => return error.CopyHookTerminatedAbnormally,
+        }
     }
 
     var chroot = std.process.Child.init(

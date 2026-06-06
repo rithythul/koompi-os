@@ -54,8 +54,9 @@ bootloader installation. That is the dangerous ~20% of an installer, and
    - `user_configuration.json` — disk layout (btrfs `@`, `@home`, … subvolumes),
      `bootloader = "Grub"`, locale/keyboard, and the **target package**
      (`koompi-desktop-hyprland` **or** `koompi-desktop-kde`, chosen by edition).
-   - `user_credentials.json` — root + user password. **Secret.** Written to
-     tmpfs, `chmod 600`, deleted right after `archinstall` exits, never logged.
+   - `user_credentials.json` — the primary user's password (root is left LOCKED;
+     admin is via the sudo user). **Secret.** Written to tmpfs, `chmod 600`,
+     deleted right after `archinstall` exits, never logged.
 3. **Run** — `archinstall --config … --creds … --silent` does the install.
 4. **Finish** — a post-install **chroot hook** (`src/post_install.sh`) pins the
    read-only `@baseline` snapshot, installs `snap-pac` + `grub-btrfs`, enables

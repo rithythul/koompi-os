@@ -22,10 +22,12 @@
 // archinstall present). Pin a STABLE zig + a matching libvaxis rev before
 // wiring this up; the src/ files target the 0.14 conventions deliberately.
 .{
-    // Zig 0.14 uses a string here. (Zig 0.16's libvaxis uses the enum-literal
-    // form `.name = .koompi_installer` + a required `.fingerprint` field; if you move to a
-    // newer toolchain, switch both.)
-    .name = "koompi_installer",
+    // Zig 0.14+ uses the enum-literal name form `.name = .koompi_installer`
+    // plus a required `.fingerprint` field. (Pre-0.14 / 0.13.x used a quoted
+    // string `.name = "koompi_installer"` with no fingerprint; if you ever pin
+    // an older toolchain, switch both.)
+    .name = .koompi_installer,
+    .fingerprint = 0x07b1b58585e0597d,
     .version = "0.0.0-scaffold",
     .minimum_zig_version = "0.14.0",
 

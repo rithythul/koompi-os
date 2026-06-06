@@ -5,7 +5,8 @@
 # is pacstrapped onto the disk BY the Zig installer (archinstall engine).  Do NOT
 # list the edition metas here; the live ISO stays small and DE-agnostic.
 #
-# One package per line.  Comments allowed.
+# One package per line.  Full-line comments only (inline `# ...` leaves trailing
+# whitespace in the package name and breaks pacstrap).
 
 # --- Base system + kernel -----------------------------------------------------
 base
@@ -28,13 +29,23 @@ archinstall
 #koompi-installer
 
 # --- Live-environment tooling the installer needs -----------------------------
-git                 # fetch profiles / post-install assets
-networkmanager      # network in the live session (installer needs connectivity)
-btrfs-progs         # btrfs subvolume layout (@, @home, @var_log, @baseline ...)
-snapper             # snapshot mgmt on the target (semi-immutable / resettable)
-snap-pac            # auto pre/post pacman-txn snapshots (configured on target)
-grub                # target bootloader (grub-btrfs needs GRUB)
-grub-btrfs          # bootable snapshot menu in GRUB
-dosfstools          # mkfs.fat for the ESP
+# fetch profiles / post-install assets
+git
+# network in the live session (installer needs connectivity)
+networkmanager
+# btrfs subvolume layout (@, @home, @var_log, @baseline ...)
+btrfs-progs
+# snapshot mgmt on the target (semi-immutable / resettable)
+snapper
+# auto pre/post pacman-txn snapshots (configured on target)
+snap-pac
+# target bootloader (grub-btrfs needs GRUB)
+grub
+# bootable snapshot menu in GRUB
+grub-btrfs
+# mkfs.fat for the ESP
+dosfstools
 sudo
-nano vim            # edit configs in the live session
+# edit configs in the live session
+nano
+vim

@@ -47,7 +47,7 @@ disk by the installer (archinstall engine), **not** listed in `packages.x86_64`.
 sudo mkarchiso -v -w /tmp/koompi-work -o /tmp/koompi-out .
 ```
 
-Output: `/tmp/koompi-out/koompi-naga-YYYY.MM.DD-x86_64.iso`.
+Output: `/tmp/koompi-out/koompi-YYYY.MM.DD-x86_64.iso`.
 
 ## What is stubbed (this WILL NOT build clean as-is)
 
