@@ -7,6 +7,8 @@
 #
 # Responsibilities (the ~last 5% archinstall doesn't do for us):
 #   1. snapper config for `/`, wired to archinstall's existing @ / @snapshots
+#   1b. unpin `/` from subvol=@ in fstab so `snapper rollback` actually boots
+#   1c. enable the marker-gated offline /home-wipe unit (Full Factory Reset)
 #   2. the un-prunable @baseline snapshot = "factory reset to original install"
 #   3. snap-pac  (auto pre/post snapshot per pacman transaction)
 #   4. grub-btrfs (bootable snapshot submenu in GRUB) + the grub-btrfs-overlayfs
@@ -16,10 +18,14 @@
 #   6. write /etc/os-release (NOT shipped by any package — filesystem owns the
 #      stock one; we overwrite with KOOMPI identity)
 #
-# FACTORY RESET (user-facing): roll back to @baseline with
-#   `sudo snapper -c root rollback <N>` (N = the @baseline number from
-#   `snapper -c root list`) then reboot — or pick @baseline from the grub-btrfs
-#   boot menu. (The desktop-only reset is the /etc/skel reseed, handled elsewhere.)
+# FACTORY RESET (user-facing): `koompi-restore` (installer/src/restore_main.zig)
+#   wraps this — `koompi-restore` keeps /home, `koompi-restore --full` also wipes
+#   it. Under the hood it is `snapper -c root rollback <@baseline N>` + reboot
+#   (or pick @baseline from the grub-btrfs boot menu). For that rollback to
+#   actually boot, BOTH subvol pins on `/` must be cleared: the fstab pin
+#   (fix_root_subvol_mount() below handles it) AND grub-mkconfig's
+#   `rootflags=subvol=@` kernel cmdline (STILL OPEN — see that function's REVIEW).
+#   Clearing fstab alone is necessary but NOT sufficient.
 #
 # Idempotent: safe to re-run. Each step checks before it acts.
 
@@ -86,6 +92,65 @@ setup_snapper() {
   # boot). snapper-cleanup auto-prunes, but @baseline is created with NO cleanup
   # algorithm (see pin_baseline) so it is exempt.
   systemctl enable snapper-timeline.timer snapper-cleanup.timer || true
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 1b. Make `snapper rollback` actually boot the rollback. snapper rollback only
+#     changes the boot target by flipping the btrfs DEFAULT subvolume — but
+#     genfstab pins `/` with `subvol=/@` (+subvolid=), which OVERRIDES the
+#     default subvolume, so a rollback would SILENTLY no-op. We strip the pin
+#     from the `/` entry ONLY (other entries keep their subvol=), then make @ the
+#     default subvolume. This is the install-side half of koompi-restore — see
+#     installer/src/reset.zig ensureRootUnpinned().
+#     REVIEW: validate the sed/awk against the pinned archinstall's genfstab.
+#
+#     ⚠️ SECOND LEG — STILL OPEN. The fstab pin is only ONE of two overrides.
+#     grub-mkconfig's 10_linux typically bakes `rootflags=subvol=@` onto the
+#     kernel cmdline in grub.cfg, which boots @ explicitly regardless of the
+#     btrfs default subvolume — so even with fstab clean, `snapper rollback` can
+#     still no-op at the GRUB layer. This function does NOT yet handle it.
+#     TODO (VM-test first): grep /boot/grub/grub.cfg for `rootflags=subvol=`; if
+#     present, either drop GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_ON_BTRFS-style
+#     rootflags from /etc/default/grub + the 10_linux generator, OR route restore
+#     exclusively through the grub-btrfs "boot into @baseline" menu entry (which
+#     sets the correct rootflags itself) instead of relying on the default-subvol
+#     flip. Until verified, treat the fstab unpin as necessary-but-insufficient.
+# ─────────────────────────────────────────────────────────────────────────────
+fix_root_subvol_mount() {
+  log "unpinning / from subvol=@ so snapper rollback boots the rollback"
+  if [ -f /etc/fstab ]; then
+    awk '
+      /^[[:space:]]*#/ { print; next }
+      ($2=="/" && $3=="btrfs") {
+        gsub(/[[:space:]]*subvol=[^, \t]*/, "", $4)
+        gsub(/[[:space:]]*subvolid=[0-9]+/, "", $4)
+        gsub(/,+/, ",", $4); gsub(/^,|,$/, "", $4)
+        if ($4=="") $4="defaults"
+      }
+      { print }
+    ' OFS='\t' /etc/fstab > /etc/fstab.koompi && mv /etc/fstab.koompi /etc/fstab
+  fi
+  # Make @ (mounted at /) the btrfs default subvolume.
+  btrfs subvolume set-default / 2>/dev/null \
+    || log "WARNING: could not set @ as default subvolume; rollback may not boot"
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 1c. Bake the Full-Factory-Reset offline /home-wipe unit into the baseline.
+#     The wipe runs offline at boot (before home.mount) and is gated by a marker
+#     `koompi-restore --full` drops on the rollback-proof top-level subvol. The
+#     unit MUST be enabled in the BASELINE, because `snapper rollback` replaces @
+#     on reboot — a unit on the live @ would vanish. The binary + script + unit
+#     ship in the koompi-restore package; here we only enable the unit if present.
+# ─────────────────────────────────────────────────────────────────────────────
+install_home_reset_unit() {
+  if [ -f /usr/local/lib/koompi/reset_home.sh ] \
+     && [ -f /etc/systemd/system/koompi-factory-reset-home.service ]; then
+    log "enabling koompi-factory-reset-home.service (marker-gated; no-op without marker)"
+    systemctl enable koompi-factory-reset-home.service || true
+  else
+    log "koompi-restore offline-home-reset unit not installed yet (skipping enable)"
+  fi
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -186,12 +251,14 @@ EOF
 main() {
   log "KOOMPI OS post-install hook starting (SCAFFOLD)"
   ensure_pkgs
-  setup_snapper       # snapper config + restore archinstall's @snapshots subvol
-  enable_login        # enable sddm BEFORE the baseline so it captures it
-  write_os_release    # bake KOOMPI identity into the baseline too
-  setup_snapshot_boot # grub-btrfs-overlayfs initramfs hook (bootable snapshots)
-  pin_baseline        # snapshot the FINISHED install (un-prunable factory reset)
-  setup_grub_btrfs    # LAST: grub-mkconfig enumerates @baseline into the 1st menu
+  setup_snapper          # snapper config + restore archinstall's @snapshots subvol
+  fix_root_subvol_mount  # unpin / from subvol=@ so `snapper rollback` boots
+  enable_login           # enable sddm BEFORE the baseline so it captures it
+  write_os_release       # bake KOOMPI identity into the baseline too
+  install_home_reset_unit # enable the gated offline /home-wipe in the baseline
+  setup_snapshot_boot    # grub-btrfs-overlayfs initramfs hook (bootable snapshots)
+  pin_baseline           # snapshot the FINISHED install (un-prunable factory reset)
+  setup_grub_btrfs       # LAST: grub-mkconfig enumerates @baseline into the 1st menu
   log "post-install hook done"
 }
 

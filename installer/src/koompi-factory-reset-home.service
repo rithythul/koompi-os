@@ -1,0 +1,25 @@
+# koompi-factory-reset-home.service — offline /home wipe for Full Factory Reset.
+#
+# ⚠️ SCAFFOLD — UNTESTED. Ordered BEFORE home.mount so @home is not yet mounted
+#    when reset_home.sh replaces it. The script self-gates on the rollback-proof
+#    marker, so this unit is harmless to leave ENABLED in the baseline (it no-ops
+#    every normal boot). It MUST live in the baseline — `snapper rollback` wipes
+#    @ on reboot, so a unit written only to the live @ would vanish.
+#
+# REVIEW: validate the ordering on a real target. `home.mount` is generated from
+# the baseline's fstab; Before=home.mount must win against local-fs ordering.
+
+[Unit]
+Description=KOOMPI Full Factory Reset — offline /home wipe (marker-gated)
+DefaultDependencies=no
+After=local-fs-pre.target
+Before=home.mount local-fs.target shutdown.target
+Conflicts=shutdown.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/lib/koompi/reset_home.sh run
+RemainAfterExit=no
+
+[Install]
+WantedBy=local-fs.target
