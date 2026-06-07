@@ -15,7 +15,7 @@
 //! event handling are marked TODO where they go.
 
 const std = @import("std");
-const vaxis = @import("vaxis"); // libvaxis — see build.zig.zon (placeholder hash)
+const Io = std.Io;
 
 const config = @import("config.zig");
 const InstallConfig = config.InstallConfig;
@@ -83,6 +83,7 @@ const Step = enum {
 /// Whole-app state: where we are + everything we've collected so far.
 const App = struct {
     alloc: std.mem.Allocator,
+    io: Io, // 0.16 Io handle, from std.process.Init; threaded to draw/archinstall
     step: Step = .welcome,
     cfg: InstallConfig = .{},
     should_quit: bool = false,
@@ -174,7 +175,9 @@ fn handleEncrypt(app: *App) void {
 // inspectable without a terminal.
 // ─────────────────────────────────────────────────────────────────────────────
 fn draw(app: *App) void {
-    const out = std.io.getStdOut().writer();
+    var obuf: [1024]u8 = undefined;
+    var fw = std.Io.File.stdout().writerStreaming(app.io, &obuf);
+    const out = &fw.interface;
     out.print("\n── {s} ──\n", .{app.step.title()}) catch {};
 
     switch (app.step) {
@@ -214,6 +217,7 @@ fn draw(app: *App) void {
         .run => out.print("Running archinstall + post-install hook… (see logs)\n", .{}) catch {},
         .done => out.print("Installation complete. Reboot into KOOMPI OS.\n", .{}) catch {},
     }
+    out.flush() catch {};
 }
 
 fn drawReview(app: *App, out: anytype) void {
@@ -262,7 +266,7 @@ fn step(app: *App) !void {
         // ⚠️ DESTRUCTIVE. Only reachable after the Review screen confirmed.
         if (!app.cfg.isComplete()) return error.IncompleteConfig;
         // TODO/REVIEW: gate this behind the actual Review keypress, not just flow.
-        try archinstall.run(app.alloc, app.cfg);
+        try archinstall.run(app.io, app.cfg);
         app.goNext(); // -> done
         return;
     }
@@ -280,12 +284,15 @@ fn step(app: *App) !void {
     }
 }
 
-pub fn main() !void {
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-    defer _ = gpa.deinit();
-    const alloc = gpa.allocator();
+pub fn main(init: std.process.Init) !void {
+    // The 0.16 runtime constructs the allocator + Io implementation and hands
+    // them to us via std.process.Init — no manual GeneralPurposeAllocator.
+    const alloc = init.gpa;
+    const io = init.io;
 
-    // TODO: initialize libvaxis here in a real build:
+    // TODO: initialize libvaxis here in a real build. libvaxis was dropped from
+    // build.zig.zon while the TUI is stubbed (it was an unused import); re-add a
+    // 0.16-compatible revision when wiring the real event loop:
     //   var tty = try vaxis.Tty.init();
     //   defer tty.deinit();
     //   var vx = try vaxis.init(alloc, .{});
@@ -294,9 +301,8 @@ pub fn main() !void {
     //   try loop.init(); try loop.start(); defer loop.stop();
     //   try vx.enterAltScreen(tty.anyWriter());
     // (Event handling then replaces the `nextAction` stub.)
-    _ = vaxis; // silence unused import in the skeleton
 
-    var app = App{ .alloc = alloc };
+    var app = App{ .alloc = alloc, .io = io };
 
     // The main loop: advance the state machine until we quit.
     // In a real build each iteration blocks on a vaxis event and redraws.

@@ -20,15 +20,18 @@
 //!   (1) the offline-reset unit + script must live in the BASELINE (installed +
 //!       enabled by post_install.sh install_home_reset_unit(), so they're present
 //!       AFTER the rollback), and
-//!   (2) the "do it now" MARKER is placed on the btrfs TOP-LEVEL subvolume
+//!   (2) the "do it now" MARKER is placed on the btrfs TOP-LEVEL subvol
 //!       (subvolid=5), which the root-config rollback never touches — so it
 //!       survives to the next boot. reset_home.sh `arm` writes it; the gated boot
 //!       unit (reset_home.sh `run`) consumes it.
 //!
-//! ⚠️ SCAFFOLD — UNTESTED. Needs a pinned zig (targets 0.14) + a real
-//! btrfs+snapper install. Every snapper / btrfs / reboot line is a REVIEW point.
+//! ⚠️ SCAFFOLD — UNTESTED. Needs a real btrfs+snapper install. Every snapper /
+//! btrfs / reboot line is a REVIEW point. Zig 0.16 conventions: an `io: std.Io`
+//! handle (from `std.process.Init`) is threaded through every fs / process / I/O
+//! call.
 
 const std = @import("std");
+const Io = std.Io;
 const proc = @import("proc.zig");
 const snapper = @import("snapper.zig");
 
@@ -55,13 +58,15 @@ const RESET_HOME_SH_PATH = "/usr/local/lib/koompi/reset_home.sh";
 const RESET_HOME_UNIT_PATH = "/etc/systemd/system/koompi-factory-reset-home.service";
 const RESET_HOME_UNIT_NAME = "koompi-factory-reset-home.service";
 
-pub fn run(alloc: std.mem.Allocator, mode: Mode, opts: Options) !void {
-    const out = std.io.getStdOut().writer();
+pub fn run(io: Io, alloc: std.mem.Allocator, mode: Mode, opts: Options) !void {
+    var obuf: [1024]u8 = undefined;
+    var fw = std.Io.File.stdout().writerStreaming(io, &obuf);
+    const out = &fw.interface;
 
     try ensureRoot();
-    try ensureRootUnpinned(alloc);
+    try ensureRootUnpinned(io, alloc);
 
-    const baseline = try snapper.findBaseline(alloc);
+    const baseline = try snapper.findBaseline(io, alloc);
 
     out.print(
         \\
@@ -82,10 +87,12 @@ pub fn run(alloc: std.mem.Allocator, mode: Mode, opts: Options) !void {
             "dry-run: would roll @ back to #{d}{s}, then reboot. Nothing changed.\n",
             .{ baseline, if (mode == .full) " and arm the offline /home wipe" else "" },
         ) catch {};
+        out.flush() catch {};
         return;
     }
 
-    if (!opts.assume_yes) try confirm(mode);
+    out.flush() catch {}; // show the plan before the prompt reads stdin
+    if (!opts.assume_yes) try confirm(io, mode);
 
     // Roll back FIRST, then (for --full) arm the /home wipe with the rollback's
     // NEW snapshot number. reset_home.sh run() refuses to delete @home unless the
@@ -98,12 +105,13 @@ pub fn run(alloc: std.mem.Allocator, mode: Mode, opts: Options) !void {
     // leg is still OPEN, so `--full` MUST NOT run on real hardware until both are
     // settled (roadmap B4). The guard makes a no-op boot non-destructive; it does
     // not make the rollback succeed.
-    const new_snap = try snapper.rollback(alloc, baseline);
-    if (mode == .full) try armHomeReset(alloc, new_snap);
+    const new_snap = try snapper.rollback(io, alloc, baseline);
+    if (mode == .full) try armHomeReset(io, new_snap);
 
     out.print("rolled @ back → new root snapshot #{d}. Rebooting…\n", .{new_snap}) catch {};
+    out.flush() catch {};
 
-    try proc.run(alloc, &.{ "systemctl", "reboot" });
+    try proc.run(io, &.{ "systemctl", "reboot" });
 }
 
 fn ensureRoot() Error!void {
@@ -127,8 +135,8 @@ fn ensureRoot() Error!void {
 ///
 /// We read the fstab entry (not `findmnt`, which reports the RESOLVED subvol even
 /// when nothing was pinned). Best-effort: an unreadable / non-btrfs `/` passes.
-fn ensureRootUnpinned(alloc: std.mem.Allocator) !void {
-    const fstab = std.fs.cwd().readFileAlloc(alloc, "/etc/fstab", 1 << 20) catch return;
+fn ensureRootUnpinned(io: Io, alloc: std.mem.Allocator) !void {
+    const fstab = std.Io.Dir.cwd().readFileAlloc(io, "/etc/fstab", alloc, .limited(1 << 20)) catch return;
     defer alloc.free(fstab);
 
     var lines = std.mem.tokenizeScalar(u8, fstab, '\n');
@@ -153,15 +161,19 @@ fn ensureRootUnpinned(alloc: std.mem.Allocator) !void {
     }
 }
 
-fn confirm(mode: Mode) !void {
-    const out = std.io.getStdOut().writer();
-    const in = std.io.getStdIn().reader();
-    var buf: [64]u8 = undefined;
+fn confirm(io: Io, mode: Mode) !void {
+    var obuf: [256]u8 = undefined;
+    var fw = std.Io.File.stdout().writerStreaming(io, &obuf);
+    const out = &fw.interface;
+    var rbuf: [256]u8 = undefined;
+    var fr = std.Io.File.stdin().readerStreaming(io, &rbuf);
+    const in = &fr.interface;
 
     switch (mode) {
         .system => {
             out.print("Proceed with System Restore? Files in /home are kept. [y/N] ", .{}) catch {};
-            const line = (in.readUntilDelimiterOrEof(&buf, '\n') catch null) orelse return Error.Aborted;
+            out.flush() catch {};
+            const line = (in.takeDelimiter('\n') catch null) orelse return Error.Aborted;
             const a = std.mem.trim(u8, line, " \t\r");
             if (!std.mem.eql(u8, a, "y") and !std.mem.eql(u8, a, "Y")) return Error.Aborted;
         },
@@ -169,7 +181,8 @@ fn confirm(mode: Mode) !void {
             // Type-to-confirm: this erases every user's files. A bare [y/N] is too
             // easy to fat-finger on a fleet of student laptops.
             out.print("FULL FACTORY RESET erases ALL files in /home. Type RESET to confirm: ", .{}) catch {};
-            const line = (in.readUntilDelimiterOrEof(&buf, '\n') catch null) orelse return Error.Aborted;
+            out.flush() catch {};
+            const line = (in.takeDelimiter('\n') catch null) orelse return Error.Aborted;
             const a = std.mem.trim(u8, line, " \t\r");
             if (!std.mem.eql(u8, a, "RESET")) return Error.Aborted;
         },
@@ -193,26 +206,27 @@ fn confirm(mode: Mode) !void {
 /// path can be exercised on an UNPACKAGED dev box (run the unit manually, no
 /// rollback). On a real install they are redundant; on a dev box they're a
 /// convenience. Best-effort — failures here must not block the marker.
-fn armHomeReset(alloc: std.mem.Allocator, new_snap: u32) !void {
+fn armHomeReset(io: Io, new_snap: u32) !void {
     // -- non-load-bearing (manual-test convenience on an unpackaged dev box) --
     blk: {
-        std.fs.cwd().makePath(std.fs.path.dirname(RESET_HOME_SH_PATH).?) catch break :blk;
-        {
-            const f = std.fs.cwd().createFile(RESET_HOME_SH_PATH, .{ .truncate = true, .mode = 0o755 }) catch break :blk;
-            defer f.close();
-            f.writeAll(RESET_HOME_SH) catch break :blk;
-        }
-        {
-            const f = std.fs.cwd().createFile(RESET_HOME_UNIT_PATH, .{ .truncate = true, .mode = 0o644 }) catch break :blk;
-            defer f.close();
-            f.writeAll(RESET_HOME_UNIT) catch break :blk;
-        }
-        proc.run(alloc, &.{ "systemctl", "enable", RESET_HOME_UNIT_NAME }) catch {};
+        const cwd = std.Io.Dir.cwd();
+        cwd.createDirPath(io, std.fs.path.dirname(RESET_HOME_SH_PATH).?) catch break :blk;
+        cwd.writeFile(io, .{
+            .sub_path = RESET_HOME_SH_PATH,
+            .data = RESET_HOME_SH,
+            .flags = .{ .truncate = true, .permissions = .fromMode(0o755) },
+        }) catch break :blk;
+        cwd.writeFile(io, .{
+            .sub_path = RESET_HOME_UNIT_PATH,
+            .data = RESET_HOME_UNIT,
+            .flags = .{ .truncate = true, .permissions = .fromMode(0o644) },
+        }) catch break :blk;
+        proc.run(io, &.{ "systemctl", "enable", RESET_HOME_UNIT_NAME }) catch {};
     }
 
     // -- load-bearing: arm the rollback-proof marker WITH the snapshot number, so
     //    the boot-time guard only wipes /home if we actually booted snapshot N --
     var buf: [16]u8 = undefined;
     const n = std.fmt.bufPrint(&buf, "{d}", .{new_snap}) catch unreachable; // u32 ≤ 10 digits
-    try proc.run(alloc, &.{ RESET_HOME_SH_PATH, "arm", n });
+    try proc.run(io, &.{ RESET_HOME_SH_PATH, "arm", n });
 }

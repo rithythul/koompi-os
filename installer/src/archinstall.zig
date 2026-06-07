@@ -10,6 +10,7 @@
 //! disk or a secret is marked TODO/REVIEW.
 
 const std = @import("std");
+const Io = std.Io;
 const config = @import("config.zig");
 const InstallConfig = config.InstallConfig;
 const Edition = config.Edition;
@@ -60,17 +61,18 @@ const HOOK_PATH = "/tmp/koompi/post_install.sh";
 /// subvolume list, the `disk_config`/`disk_layouts` key, and the package field
 /// name are exactly the parts that drift. Treat the literal below as a template
 /// to diff against the pinned archinstall's own example config.
-pub fn writeUserConfiguration(alloc: std.mem.Allocator, cfg: InstallConfig) !void {
-    try std.fs.cwd().makePath(std.fs.path.dirname(CONFIG_PATH).?);
-    const file = try std.fs.cwd().createFile(CONFIG_PATH, .{ .truncate = true });
-    defer file.close();
-    var bw = std.io.bufferedWriter(file.writer());
-    const w = bw.writer();
+pub fn writeUserConfiguration(io: Io, cfg: InstallConfig) !void {
+    const cwd = std.Io.Dir.cwd();
+    try cwd.createDirPath(io, std.fs.path.dirname(CONFIG_PATH).?);
+    const file = try cwd.createFile(io, CONFIG_PATH, .{ .truncate = true });
+    defer file.close(io);
+    var fbuf: [4096]u8 = undefined;
+    var fw = file.writer(io, &fbuf);
+    const w = &fw.interface;
 
     // TODO: replace this hand-written blob with archinstall's real schema for the
     // pinned version. The structure below is illustrative, not verified.
     const pkg = targetPackage(cfg.edition);
-    _ = alloc;
 
     try w.print(
         \\{{
@@ -151,7 +153,7 @@ pub fn writeUserConfiguration(alloc: std.mem.Allocator, cfg: InstallConfig) !voi
         pkg,
     });
 
-    try bw.flush();
+    try w.flush();
 }
 
 /// Emit user_credentials.json. **SECRET.** Root + user passwords.
@@ -162,15 +164,15 @@ pub fn writeUserConfiguration(alloc: std.mem.Allocator, cfg: InstallConfig) !voi
 ///
 /// TODO(security): the password currently rides on InstallConfig as a plain
 /// slice. Replace with a locked/zeroed secret buffer and pass it directly here.
-pub fn writeUserCredentials(alloc: std.mem.Allocator, cfg: InstallConfig) !void {
-    _ = alloc;
-    const file = try std.fs.cwd().createFile(CREDS_PATH, .{
+pub fn writeUserCredentials(io: Io, cfg: InstallConfig) !void {
+    const file = try std.Io.Dir.cwd().createFile(io, CREDS_PATH, .{
         .truncate = true,
-        .mode = 0o600, // owner read/write only
+        .permissions = .fromMode(0o600), // owner read/write only
     });
-    defer file.close();
-    var bw = std.io.bufferedWriter(file.writer());
-    const w = bw.writer();
+    defer file.close(io);
+    var fbuf: [2048]u8 = undefined;
+    var fw = file.writer(io, &fbuf);
+    const w = &fw.interface;
 
     // KEYS — verified against archinstall source (these are easy to get wrong):
     //   * a user's plaintext key is "!password", NOT "password". A bare
@@ -196,14 +198,14 @@ pub fn writeUserCredentials(alloc: std.mem.Allocator, cfg: InstallConfig) !void 
         \\
     , .{ cfg.username, cfg.password });
 
-    try bw.flush();
+    try w.flush();
 }
 
 /// Shred the credentials file. Call in a `defer` right after the archinstall
 /// exec so a secret never survives the process — even on an error path.
 /// TODO: overwrite-then-unlink (or rely on tmpfs being RAM-only) before delete.
-pub fn cleanupCredentials() void {
-    std.fs.cwd().deleteFile(CREDS_PATH) catch {};
+pub fn cleanupCredentials(io: Io) void {
+    std.Io.Dir.cwd().deleteFile(io, CREDS_PATH) catch {};
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -213,22 +215,18 @@ pub fn cleanupCredentials() void {
 /// Run `archinstall --config … --creds … --silent`. This is the call that does
 /// the destructive install. ⚠️ TODO/REVIEW: guarded behind the Review screen in
 /// main.zig; must not be reachable without an explicit confirmation.
-pub fn runArchinstall(alloc: std.mem.Allocator) !void {
-    var child = std.process.Child.init(&.{
+pub fn runArchinstall(io: Io) !void {
+    // `spawn` defaults all three std streams to `.inherit`.
+    var child = try std.process.spawn(io, .{ .argv = &.{
         "archinstall",
         "--config",
         CONFIG_PATH,
         "--creds",
         CREDS_PATH,
         "--silent",
-    }, alloc);
-    child.stdin_behavior = .Inherit;
-    child.stdout_behavior = .Inherit;
-    child.stderr_behavior = .Inherit;
-
-    const term = try child.spawnAndWait();
-    switch (term) {
-        .Exited => |code| if (code != 0) return error.ArchinstallFailed,
+    } });
+    switch (try child.wait(io)) {
+        .exited => |code| if (code != 0) return error.ArchinstallFailed,
         else => return error.ArchinstallTerminatedAbnormally,
     }
 }
@@ -243,43 +241,29 @@ pub fn runArchinstall(alloc: std.mem.Allocator) !void {
 ///
 /// ⚠️ TODO/REVIEW: hard-codes the target mount at /mnt (archinstall's default).
 /// Confirm the actual mountpoint for the pinned archinstall before trusting it.
-pub fn runPostInstallHook(alloc: std.mem.Allocator) !void {
-    try std.fs.cwd().makePath(std.fs.path.dirname(HOOK_PATH).?);
-    {
-        const f = try std.fs.cwd().createFile(HOOK_PATH, .{
-            .truncate = true,
-            .mode = 0o755,
-        });
-        defer f.close();
-        try f.writeAll(POST_INSTALL_HOOK); // single source of truth (@embedFile)
-    }
+pub fn runPostInstallHook(io: Io) !void {
+    const cwd = std.Io.Dir.cwd();
+    try cwd.createDirPath(io, std.fs.path.dirname(HOOK_PATH).?);
+    try cwd.writeFile(io, .{
+        .sub_path = HOOK_PATH,
+        .data = POST_INSTALL_HOOK, // single source of truth (@embedFile)
+        .flags = .{ .truncate = true, .permissions = .fromMode(0o755) },
+    });
 
     // Copy the script into the target and run it under chroot.
     // REVIEW: target root assumed at /mnt; script path inside target is /root/.
     const target_root = "/mnt";
     {
-        var cp = std.process.Child.init(
-            &.{ "cp", HOOK_PATH, target_root ++ "/root/post_install.sh" },
-            alloc,
-        );
-        const cp_term = try cp.spawnAndWait();
-        switch (cp_term) {
-            .Exited => |code| if (code != 0) return error.CopyHookFailed,
+        var cp = try std.process.spawn(io, .{ .argv = &.{ "cp", HOOK_PATH, target_root ++ "/root/post_install.sh" } });
+        switch (try cp.wait(io)) {
+            .exited => |code| if (code != 0) return error.CopyHookFailed,
             else => return error.CopyHookTerminatedAbnormally,
         }
     }
 
-    var chroot = std.process.Child.init(
-        &.{ "arch-chroot", target_root, "/bin/bash", "/root/post_install.sh" },
-        alloc,
-    );
-    chroot.stdin_behavior = .Inherit;
-    chroot.stdout_behavior = .Inherit;
-    chroot.stderr_behavior = .Inherit;
-
-    const term = try chroot.spawnAndWait();
-    switch (term) {
-        .Exited => |code| if (code != 0) return error.PostInstallFailed,
+    var chroot = try std.process.spawn(io, .{ .argv = &.{ "arch-chroot", target_root, "/bin/bash", "/root/post_install.sh" } });
+    switch (try chroot.wait(io)) {
+        .exited => |code| if (code != 0) return error.PostInstallFailed,
         else => return error.PostInstallTerminatedAbnormally,
     }
 }
@@ -290,24 +274,24 @@ pub fn runPostInstallHook(alloc: std.mem.Allocator) !void {
 
 /// The whole destructive sequence, in order, with the credential file shredded
 /// no matter how we leave. ⚠️ Only call after an explicit Review confirmation.
-pub fn run(alloc: std.mem.Allocator, cfg: InstallConfig) !void {
-    try writeUserConfiguration(alloc, cfg);
+pub fn run(io: Io, cfg: InstallConfig) !void {
+    try writeUserConfiguration(io, cfg);
 
     // Register the shred BEFORE the creds write. A Zig `defer` only fires if
     // control actually reached it — if writeUserCredentials throws AFTER
     // createFile (e.g. a flush fails mid-write), a defer placed after it would
     // never register and the plaintext file would persist on tmpfs. Placing it
     // first makes "the credential file is shredded no matter how we leave" true.
-    defer cleanupCredentials();
-    try writeUserCredentials(alloc, cfg);
+    defer cleanupCredentials(io);
+    try writeUserCredentials(io, cfg);
 
-    try runArchinstall(alloc); // ⚠️ destructive — archinstall owns it
+    try runArchinstall(io); // ⚠️ destructive — archinstall owns it
 
     // archinstall is the ONLY consumer of the creds file; shred it eagerly the
     // moment it exits so the plaintext's RAM lifetime ends here — NOT minutes
     // later after the chroot hook. cleanupCredentials() swallows ENOENT, so this
     // is idempotent and the defer above stays as a backstop for the error paths.
-    cleanupCredentials();
+    cleanupCredentials(io);
 
-    try runPostInstallHook(alloc); // finishing touches in the chroot
+    try runPostInstallHook(io); // finishing touches in the chroot
 }

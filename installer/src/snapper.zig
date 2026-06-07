@@ -24,10 +24,11 @@
 //! reset.zig's ensureRootUnpinned() checks leg (a) only — leg (b) needs a real
 //! install to observe.
 //!
-//! ⚠️ SCAFFOLD — UNTESTED (needs a pinned zig + a real btrfs+snapper install).
-//! Zig 0.14 conventions.
+//! ⚠️ SCAFFOLD — UNTESTED (needs a real btrfs+snapper install). Zig 0.16
+//! conventions: `io` is threaded through to proc.runCapture.
 
 const std = @import("std");
+const Io = std.Io;
 const proc = @import("proc.zig");
 
 pub const Error = error{ BaselineNotFound, BadSnapperOutput };
@@ -46,8 +47,8 @@ pub const CONFIG = "root";
 /// vs string) was UNVERIFIED at write time.
 ///   snapper -c root --csvout --separator '|' --no-headers list \
 ///     --columns number,userdata
-pub fn findBaseline(alloc: std.mem.Allocator) !u32 {
-    const out = try proc.runCapture(alloc, &.{
+pub fn findBaseline(io: Io, alloc: std.mem.Allocator) !u32 {
+    const out = try proc.runCapture(io, alloc, &.{
         "snapper",         "-c",          CONFIG,
         "--csvout",        "--separator", "|",
         "--no-headers",    "list",        "--columns",
@@ -69,10 +70,10 @@ pub fn findBaseline(alloc: std.mem.Allocator) !u32 {
 /// Roll the root subvolume back to snapshot `number`. Effective after reboot.
 /// Returns the number of the new read-write snapshot snapper creates (via
 /// `--print-number`), useful for a log / audit trail.
-pub fn rollback(alloc: std.mem.Allocator, number: u32) !u32 {
+pub fn rollback(io: Io, alloc: std.mem.Allocator, number: u32) !u32 {
     var buf: [16]u8 = undefined;
     const n = std.fmt.bufPrint(&buf, "{d}", .{number}) catch return Error.BadSnapperOutput;
-    const out = try proc.runCapture(alloc, &.{
+    const out = try proc.runCapture(io, alloc, &.{
         "snapper", "-c", CONFIG, "rollback", "--print-number", n,
     });
     defer alloc.free(out);

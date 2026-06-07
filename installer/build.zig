@@ -1,8 +1,10 @@
-// KOOMPI installer — build script (Zig 0.14.x).
+// KOOMPI installer — build script (Zig 0.16.x).
 //
-// SCAFFOLD: declares the `koompi-installer` TUI (wires in libvaxis) and the
-// `koompi-restore` factory-reset CLI (no libvaxis). Idiomatic, minimal. See
-// build.zig.zon for the dependency + placeholder hash.
+// SCAFFOLD: builds the `koompi-installer` TUI skeleton and the `koompi-restore`
+// factory-reset CLI. libvaxis was DROPPED while the TUI event loop is stubbed —
+// it was an unused import (`_ = vaxis`), and pinning a 0.16-compatible revision
+// + hash for a dependency nothing references yet is wasted churn. Re-add it to
+// build.zig.zon when the real event loop is wired (see main.zig's TODO sketch).
 
 const std = @import("std");
 
@@ -10,24 +12,16 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    // Pull in the libvaxis dependency declared in build.zig.zon.
-    // `.module("vaxis")` is the module name libvaxis exposes (verified against
-    // its build.zig: `b.addModule("vaxis", ...)`).
-    const vaxis = b.dependency("vaxis", .{
-        .target = target,
-        .optimize = optimize,
-    });
-
+    // 0.16: addExecutable takes a `root_module` (created via b.createModule)
+    // rather than a bare root_source_file/target/optimize triple.
     const exe = b.addExecutable(.{
         .name = "koompi-installer",
-        .root_source_file = b.path("src/main.zig"),
-        .target = target,
-        .optimize = optimize,
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/main.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
     });
-
-    // Downstream code does `@import("vaxis")`.
-    exe.root_module.addImport("vaxis", vaxis.module("vaxis"));
-
     b.installArtifact(exe);
 
     // `zig build run` → launch the (skeleton) TUI.
@@ -39,16 +33,15 @@ pub fn build(b: *std.Build) void {
     run_step.dependOn(&run_cmd.step);
 
     // ── koompi-restore — factory-reset / restore-to-@baseline CLI ──────────────
-    // Deliberately does NOT import libvaxis: a plain stdin/stdout confirmation
-    // CLI, so it is decoupled from the TUI installer's libvaxis dependency. It is
-    // still SCAFFOLD and targets the same 0.14 conventions, so it builds under the
-    // SAME prerequisite as the installer — a pinned stable zig (see build.zig.zon's
-    // Writergate note); it does not build on a 0.16-dev toolchain.
+    // A plain stdin/stdout confirmation CLI (no libvaxis), so it is independent of
+    // the TUI installer.
     const restore = b.addExecutable(.{
         .name = "koompi-restore",
-        .root_source_file = b.path("src/restore_main.zig"),
-        .target = target,
-        .optimize = optimize,
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/restore_main.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
     });
     b.installArtifact(restore);
 

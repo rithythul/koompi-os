@@ -150,13 +150,24 @@ disk_config, then VM-test. That's the work.
   before `--full` runs on real hardware:** VM-verify the running-subvol detection
   AND close the GRUB `rootflags=subvol=@` leg (the guard makes a no-op boot
   non-destructive, but does not make the rollback succeed).
-  **Remaining:** pin zig 0.14 to compile (shared blocker with the installer — see
-  §5); close the GRUB `rootflags=subvol=@` leg (strip it, or route restore through
-  the grub-btrfs "boot into @baseline" entry); package it (`koompi-restore`
-  PKGBUILD + polkit policy + a Settings/GUI button); VM-test both modes end-to-end
-  (depends on A5). Facts to verify on a real target before shipping: the actual
-  genfstab `subvol=` form, whether grub.cfg carries `rootflags=subvol=@`, and
-  snapper's `--jsonout` userdata shape (we parse `--csvout` to sidestep the latter).
+  **Builds (2026-06-07):** the whole installer — `koompi-restore` AND
+  `koompi-installer` — was migrated off the 0.14 conventions onto the zig 0.16
+  `Io`-as-parameter API (an `io` handle from `std.process.Init` threaded through
+  every fs/process/stdio call; `std.process.{spawn,run}` for exec;
+  `Dir.createDirPath`/`writeFile`; `File.Writer.interface`). `zig build` now
+  produces both binaries on the box's 0.16.0. `koompi-restore --help` is
+  byte-identical to a reference 0.14 build, and the arg/root-guard paths run
+  correctly; the installer compiles + walks its stubbed state machine (its exec
+  path is still gated at main.zig, so it is verified compile-only). libvaxis was
+  dropped from build.zig.zon (it was an unused `_ = vaxis` import) — re-add a
+  0.16-compatible revision when the real TUI event loop is wired.
+  **Remaining:** close the GRUB `rootflags=subvol=@` leg (strip it, or route
+  restore through the grub-btrfs "boot into @baseline" entry); package it
+  (`koompi-restore` PKGBUILD + polkit policy + a Settings/GUI button); VM-test
+  both modes end-to-end (depends on A5). Facts to verify on a real target before
+  shipping: the actual genfstab `subvol=` form, whether grub.cfg carries
+  `rootflags=subvol=@`, and snapper's `--jsonout` userdata shape (we parse
+  `--csvout` to sidestep the latter).
 
 ### Track C — Identity polish (cheap, high-signal)
 
@@ -187,5 +198,7 @@ then:                                                       B2, B3, B4, C2
   upstream, diverge on identity surfaces. Not tech debt.
 - **Bare-environment app policy** — chosen; ship shell + system tools, users install
   apps.
-- **Zig installer paused for zig 0.16** — known; not abandoned.
+- **Zig installer migrated to zig 0.16** (2026-06-07) — the installer +
+  `koompi-restore` compile and build with `zig build` on the box's 0.16.0 (Io-as-
+  parameter API). No longer a blocker. libvaxis dropped while the TUI is stubbed.
 - **Multi-distro packaging dropped** — Arch-only by decision (v1 = Arch + archiso).
