@@ -67,7 +67,7 @@
     <!-- Source rows, all OFF -->
     <div style="display:flex;flex-direction:column;gap:8px;">
       <div style="display:flex;align-items:center;gap:14px;background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:12px 16px;">
-        <span style="font-size:18px;width:24px;text-align:center;">📄</span>
+        <span style="font-size:18px;width:24px;text-align:center;"><i class="fa-solid fa-file-lines"></i></span>
         <div style="flex:1;">
           <div style="font-size:13px;font-weight:600;color:var(--text);">Documents</div>
           <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">~/Documents · indexed by koompi-contextd → local SQLite + vectors</div>
@@ -77,7 +77,7 @@
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:14px;background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:12px 16px;">
-        <span style="font-size:18px;width:24px;text-align:center;">🖼</span>
+        <span style="font-size:18px;width:24px;text-align:center;"><i class="fa-solid fa-image"></i></span>
         <div style="flex:1;">
           <div style="font-size:13px;font-weight:600;color:var(--text);">Photos &amp; Screenshots</div>
           <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">~/Pictures · on-device caption + OCR, no upload</div>
@@ -87,7 +87,7 @@
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:14px;background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:12px 16px;">
-        <span style="font-size:18px;width:24px;text-align:center;">✉</span>
+        <span style="font-size:18px;width:24px;text-align:center;"><i class="fa-solid fa-envelope"></i></span>
         <div style="flex:1;">
           <div style="font-size:13px;font-weight:600;color:var(--text);">Messages &amp; Mail</div>
           <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">Telegram, IMAP · metadata + body, stays on device</div>
@@ -97,7 +97,7 @@
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:14px;background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:12px 16px;">
-        <span style="font-size:18px;width:24px;text-align:center;">🕐</span>
+        <span style="font-size:18px;width:24px;text-align:center;"><i class="fa-solid fa-clock"></i></span>
         <div style="flex:1;">
           <div style="font-size:13px;font-weight:600;color:var(--text);">App &amp; window activity</div>
           <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">what you use &amp; when · powers Daily Briefing</div>
@@ -109,7 +109,7 @@
     </div>
 
     <div style="display:flex;align-items:center;gap:10px;margin-top:16px;background:var(--amber-glow);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:11px 14px;">
-      <span style="font-size:14px;">⚠</span>
+      <span style="font-size:14px;"><i class="fa-solid fa-triangle-exclamation"></i></span>
       <div style="font-size:11px;color:var(--text);line-height:1.55;">
         <strong style="color:#B45309;">The only amber moment in setup.</strong> Turning a source on is a deliberate consent action — it never happens automatically, and the toggle turns <span style="color:#047857;font-weight:600;">emerald</span> only after you confirm <em>where</em> the index lives and that it can be wiped from the Privacy Dashboard in one click. You can come back and grant access months later; KOOMPI will simply index from that day forward.
       </div>
@@ -124,7 +124,7 @@
       <!-- Local-only -->
       <div style="border:1.5px solid var(--emerald);background:var(--surface);border-radius:12px;padding:20px;">
         <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px;">
-          <span style="font-size:18px;">🔒</span>
+          <span style="font-size:18px;"><i class="fa-solid fa-lock"></i></span>
           <span style="font-size:14px;font-weight:700;color:var(--text);">Stay local-only</span>
           <span style="font-size:10px;background:var(--emerald-glow);color:#047857;padding:2px 8px;border-radius:20px;margin-left:auto;">No account</span>
         </div>
@@ -188,7 +188,7 @@
       <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">On a weaker device?</div>
       <div style="font-size:11px;color:var(--text-muted);margin-bottom:14px;">KOOMPI does not refuse to run. It steps down gracefully and tells you the trade-off in plain language.</div>
       <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:12px 14px;margin-bottom:10px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);line-height:1.9;">
-        <div>ram&nbsp;&nbsp;&nbsp;4 GB&nbsp;&nbsp;<span style="color:#B45309;">⚠ tight</span></div>
+        <div>ram&nbsp;&nbsp;&nbsp;4 GB&nbsp;&nbsp;<span style="color:#B45309;"><i class="fa-solid fa-triangle-exclamation"></i> tight</span></div>
         <div>gpu&nbsp;&nbsp;&nbsp;none · CPU inference</div>
       </div>
       <div style="background:var(--amber-glow);border:1px solid rgba(245,158,11,0.3);border-radius:9px;padding:13px;">
@@ -202,7 +202,7 @@
   <!-- ── 8 · Offline / no-network first boot ─────────────────────────────── -->
   <div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:18px 22px;margin-bottom:16px;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-      <span style="font-size:16px;">📡</span>
+      <span style="font-size:16px;"><i class="fa-solid fa-satellite-dish"></i></span>
       <span style="font-size:14px;font-weight:700;color:var(--text);">Edge case · No network at first boot</span>
       <span style="font-size:10px;background:var(--amber-glow);color:#B45309;padding:2px 9px;border-radius:20px;margin-left:auto;">offline</span>
     </div>
@@ -239,7 +239,7 @@
 
     <!-- Single guided next action -->
     <div style="display:flex;align-items:center;gap:14px;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.3);border-radius:11px;padding:16px 18px;">
-      <span style="font-size:22px;">👋</span>
+      <span style="font-size:22px;"><i class="fa-solid fa-hand"></i></span>
       <div style="flex:1;">
         <div style="font-size:13px;font-weight:700;color:#fff;">One thing to try first</div>
         <div style="font-size:11px;color:var(--text-subtle);">Press <span style="font-family:var(--font-mono);background:rgba(255,255,255,0.1);padding:1px 6px;border-radius:4px;color:#fff;">Super</span> and ask KOOMPI anything — in Khmer or English. That's the whole tour.</div>

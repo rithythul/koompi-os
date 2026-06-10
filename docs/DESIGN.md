@@ -43,6 +43,10 @@ Color is semantic first: never use an accent decoratively where its state meanin
 - Desktop sim: wallpaper layer, window chrome (tiled/floating), sidebars, popups, OSD, overview, launcher (`desktop-sim.css`)
 - Brainstorm sections: `.section-header` + `.tag`, `.desc`, `.callout-group`, `.tool-code`, `.state-chip`, `.badge`
 
+## Iconography
+
+Font Awesome 6 (CDN), never emoji — emoji read as childish and low-value (standing rule). `fa-solid` for UI, `fa-brands` for app logos; icons inherit size/color from context; white on gradient app tiles. Typographic glyphs are fine and intentional: ✦ (the AI brand mark), ✓ ✕ ✗, arrows, ★, ☰. Inside SVG `<text>`, use FA font glyphs (`font-family:'Font Awesome 6 Free'; font-weight:900` + codepoint), since HTML `<i>` does not render in SVG.
+
 ## Motion
 
 - 150–280ms transitions, ease-out (quart/quint/expo family); no bounce, no elastic

@@ -96,7 +96,7 @@
         <div style="font-size:11px;color:var(--text);line-height:1.5;"><strong>Crisp.</strong> 150% maps the 3840-px panel to a 2560-px logical surface. Wayland clients render natively at scale 1.5 — no GPU-upscale blur. Toolkit-aware: Qt/GTK apps get the integer-buffer hint; legacy XWayland apps fall back to bilinear and are flagged below.</div>
       </div>
       <div style="margin-top:10px;display:flex;gap:8px;align-items:flex-start;padding:10px 12px;background:var(--amber-glow);border:1px solid var(--amber);border-radius:8px;">
-        <span style="font-size:13px;flex-shrink:0;">⚠</span>
+        <span style="font-size:13px;flex-shrink:0;"><i class="fa-solid fa-triangle-exclamation"></i></span>
         <div style="font-size:11px;color:var(--text);line-height:1.5;"><strong>1 app may blur:</strong> <span style="font-family:var(--font-mono);">Zoom (XWayland)</span> does not honor fractional scale. KOOMPI renders it at 100% + composited upscale to stay sharp on text.</div>
       </div>
     </div>
@@ -280,7 +280,7 @@
       <div style="flex:1;min-width:260px;padding:18px;">
         <span style="font-size:12px;font-weight:700;color:var(--text);">Mirror DP-1 → eDP-1</span>
         <div style="margin-top:12px;display:flex;gap:8px;align-items:flex-start;padding:11px 13px;background:var(--amber-glow);border:1px solid var(--amber);border-radius:8px;">
-          <span style="font-size:13px;flex-shrink:0;">⚠</span>
+          <span style="font-size:13px;flex-shrink:0;"><i class="fa-solid fa-triangle-exclamation"></i></span>
           <div style="font-size:11px;color:var(--text);line-height:1.5;"><strong>Workspaces 6–8 will move to DP-1.</strong> 4 open windows on eDP-1 re-flow. Mirroring forces a shared mode — KOOMPI picks the <em>greatest common resolution</em> (2880×1800→matched to 1.5×) and warns that eDP-1's 90Hz drops to 60Hz to sync. <span style="color:var(--text-muted);">Nothing is lost; revert timer applies.</span></div>
         </div>
         <div style="margin-top:10px;display:flex;gap:8px;">

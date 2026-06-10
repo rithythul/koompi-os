@@ -14,14 +14,14 @@
     <!-- Pairing ceremony with SAS -->
     <div style="flex:1; min-width:320px; background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-xl); overflow:hidden;">
       <div style="display:flex; align-items:center; gap:8px; padding:12px 16px; border-bottom:1px solid var(--border2); background:var(--surface2);">
-        <span style="font-size:13px;">🤝</span>
+        <span style="font-size:13px;"><i class="fa-solid fa-handshake"></i></span>
         <span style="font-size:13px; font-weight:700; flex:1;">Pair a Device</span>
         <span class="state-chip priv-state" style="font-size:9px; padding:2px 8px;">NO CLOUD</span>
       </div>
       <div style="padding:16px;">
         <div style="display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:16px;">
           <div style="text-align:center;">
-            <div style="font-size:26px;">🖥</div>
+            <div style="font-size:26px;"><i class="fa-solid fa-desktop"></i></div>
             <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">rithy-workstation</div>
           </div>
           <div style="display:flex; flex-direction:column; align-items:center; gap:2px;">
@@ -30,7 +30,7 @@
             <span style="font-size:9px; color:var(--text-subtle); font-family:var(--font-mono);">mDNS · :7842</span>
           </div>
           <div style="text-align:center;">
-            <div style="font-size:26px;">📱</div>
+            <div style="font-size:26px;"><i class="fa-solid fa-mobile-screen"></i></div>
             <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">rithy-pixel</div>
           </div>
         </div>
@@ -54,7 +54,7 @@
           <div style="flex:1; text-align:center; padding:9px; border:1.5px solid var(--border2); background:var(--surface2); color:var(--text-muted); border-radius:var(--radius); font-size:12px;">✕ Cancel</div>
         </div>
         <div class="tool-privacy-note" style="margin-top:12px; margin-bottom:0;">
-          🔒 Keys generated on-device. Mesh identity is bound to your Selendra DID — devices change, identity persists for decades.
+          <i class="fa-solid fa-lock"></i> Keys generated on-device. Mesh identity is bound to your Selendra DID — devices change, identity persists for decades.
         </div>
       </div>
     </div>
@@ -64,7 +64,7 @@
       <!-- Live mesh -->
       <div style="background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-xl); overflow:hidden;">
         <div style="display:flex; align-items:center; gap:8px; padding:12px 16px; border-bottom:1px solid var(--border2); background:var(--surface2);">
-          <span style="font-size:13px;">📡</span>
+          <span style="font-size:13px;"><i class="fa-solid fa-satellite-dish"></i></span>
           <span style="font-size:13px; font-weight:700; flex:1;">Mesh Transport</span>
           <span class="state-chip priv-state" style="font-size:9px; padding:2px 8px;">LINK UP</span>
         </div>
@@ -83,7 +83,7 @@
       <!-- Out of range / degraded -->
       <div style="background:var(--surface); border:1px solid var(--amber); border-radius:var(--radius-xl); overflow:hidden;">
         <div style="display:flex; align-items:center; gap:8px; padding:12px 16px; border-bottom:1px solid var(--border2); background:var(--amber-glow);">
-          <span style="font-size:13px;">⚠</span>
+          <span style="font-size:13px;"><i class="fa-solid fa-triangle-exclamation"></i></span>
           <span style="font-size:13px; font-weight:700; flex:1; color:#B45309;">Phone out of range</span>
           <span style="font-size:9px; padding:2px 8px; background:var(--amber); color:#fff; border-radius:10px; font-weight:700;">QUEUED</span>
         </div>
@@ -106,7 +106,7 @@
   <!-- ░░░ ROW 2: HANDOFF CAPSULE WITH HONEST BOUNDARY ░░░ -->
   <div style="background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-xl); overflow:hidden; margin-bottom:16px;">
     <div style="display:flex; align-items:center; gap:8px; padding:12px 16px; border-bottom:1px solid var(--border2); background:var(--surface2);">
-      <span style="font-size:13px;">🜂</span>
+      <span style="font-size:13px;"><i class="fa-solid fa-fire-flame-curved"></i></span>
       <span style="font-size:13px; font-weight:700; flex:1;">Handoff Capsule → rithy-pixel</span>
       <span class="state-chip priv-state" style="font-size:9px; padding:2px 8px;">E2E · MESH</span>
     </div>
@@ -117,13 +117,13 @@
         <div class="card-label" style="margin-bottom:10px; color:#047857;">✓ Serialized &amp; transferring</div>
         <div style="display:flex; flex-direction:column; gap:7px;">
           <div style="display:flex; align-items:center; gap:9px; font-size:12px; padding:8px 10px; background:var(--surface2); border-radius:var(--radius-sm);">
-            <span style="color:#0E7490;">📄</span><span style="flex:1;">5 files <span style="color:var(--text-subtle);">(content + cursor pos)</span></span><span style="font-size:10px; color:var(--text-subtle); font-family:var(--font-mono);">BarContent.qml +4</span>
+            <span style="color:#0E7490;"><i class="fa-solid fa-file-lines"></i></span><span style="flex:1;">5 files <span style="color:var(--text-subtle);">(content + cursor pos)</span></span><span style="font-size:10px; color:var(--text-subtle); font-family:var(--font-mono);">BarContent.qml +4</span>
           </div>
           <div style="display:flex; align-items:center; gap:9px; font-size:12px; padding:8px 10px; background:var(--surface2); border-radius:var(--radius-sm);">
             <span style="color:var(--accent);">✦</span><span style="flex:1;">AI conversation window</span><span style="font-size:10px; color:var(--text-subtle); font-family:var(--font-mono);">3,400 tok</span>
           </div>
           <div style="display:flex; align-items:center; gap:9px; font-size:12px; padding:8px 10px; background:var(--surface2); border-radius:var(--radius-sm);">
-            <span style="color:#047857;">✉</span><span style="flex:1;">1 draft email <span style="color:var(--text-subtle);">(unsent buffer)</span></span><span style="font-size:10px; color:var(--text-subtle); font-family:var(--font-mono);">to: board</span>
+            <span style="color:#047857;"><i class="fa-solid fa-envelope"></i></span><span style="flex:1;">1 draft email <span style="color:var(--text-subtle);">(unsent buffer)</span></span><span style="font-size:10px; color:var(--text-subtle); font-family:var(--font-mono);">to: board</span>
           </div>
         </div>
         <div style="margin-top:14px;">
@@ -141,12 +141,12 @@
         <div class="card-label" style="margin-bottom:10px; color:#B45309;">⊘ Stays on this device — cannot serialize</div>
         <div style="display:flex; flex-direction:column; gap:7px;">
           <div style="display:flex; align-items:center; gap:9px; font-size:12px; padding:8px 10px; background:var(--surface); border:1px dashed var(--amber); border-radius:var(--radius-sm);">
-            <span style="color:#B45309;">⚙</span>
+            <span style="color:#B45309;"><i class="fa-solid fa-gear"></i></span>
             <span style="flex:1; text-decoration:line-through; text-decoration-color:var(--text-subtle); color:var(--text-muted);">dev-server <span style="font-size:10px;">:5173</span></span>
             <span style="font-size:9px; color:#B45309; font-family:var(--font-mono);">PID 28411</span>
           </div>
           <div style="display:flex; align-items:center; gap:9px; font-size:12px; padding:8px 10px; background:var(--surface); border:1px dashed var(--amber); border-radius:var(--radius-sm);">
-            <span style="color:#B45309;">⚙</span>
+            <span style="color:#B45309;"><i class="fa-solid fa-gear"></i></span>
             <span style="flex:1; text-decoration:line-through; text-decoration-color:var(--text-subtle); color:var(--text-muted);">vite --watch</span>
             <span style="font-size:9px; color:#B45309; font-family:var(--font-mono);">PID 28419</span>
           </div>
@@ -170,14 +170,14 @@
 
         <div style="font-size:9px; color:#94A3B8; text-transform:uppercase; letter-spacing:0.4px; margin-bottom:6px;">What arrived</div>
         <div style="display:flex; flex-direction:column; gap:5px; font-size:11px; margin-bottom:12px;">
-          <div style="display:flex; gap:6px;"><span style="color:#22D3EE;">📄</span> 5 files restored</div>
+          <div style="display:flex; gap:6px;"><span style="color:#22D3EE;"><i class="fa-solid fa-file-lines"></i></span> 5 files restored</div>
           <div style="display:flex; gap:6px;"><span style="color:#A5B4FC;">✦</span> AI context · 3,400 tok</div>
-          <div style="display:flex; gap:6px;"><span style="color:#34D399;">✉</span> draft to board</div>
+          <div style="display:flex; gap:6px;"><span style="color:#34D399;"><i class="fa-solid fa-envelope"></i></span> draft to board</div>
         </div>
 
         <!-- model mismatch honesty -->
         <div style="background:rgba(245,158,11,0.14); border:1px solid rgba(245,158,11,0.4); border-radius:10px; padding:9px 10px; font-size:10px; line-height:1.45; color:#FCD34D;">
-          ⚠ Rehydrated into <strong>Llama 3.1 8B</strong>. Desktop ran 70B — phrasing may differ; ask it to re-explain if needed.
+          <i class="fa-solid fa-triangle-exclamation"></i> Rehydrated into <strong>Llama 3.1 8B</strong>. Desktop ran 70B — phrasing may differ; ask it to re-explain if needed.
         </div>
         <div style="margin-top:10px; font-size:9px; opacity:0.5; line-height:1.4;">
           ⊘ dev-server &amp; watcher did not transfer — tap to start them here.
@@ -211,7 +211,7 @@
     <!-- Cross-device clipboard receipt -->
     <div style="flex:1; min-width:300px; background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-xl); overflow:hidden;">
       <div style="display:flex; align-items:center; gap:8px; padding:12px 16px; border-bottom:1px solid var(--border2); background:var(--surface2);">
-        <span style="font-size:13px;">📋</span>
+        <span style="font-size:13px;"><i class="fa-solid fa-clipboard"></i></span>
         <span style="font-size:13px; font-weight:700; flex:1;">Clipboard pushed</span>
         <span class="state-chip priv-state" style="font-size:9px; padding:2px 8px;">RECEIPT</span>
       </div>
@@ -226,7 +226,7 @@
           <div style="display:flex; gap:8px;"><span style="width:64px; color:var(--text-subtle);">Path</span><span style="color:#047857;">direct mesh · not logged off-device</span></div>
         </div>
         <div class="tool-privacy-note" style="margin-top:12px; margin-bottom:0;">
-          🔒 Every push leaves a receipt. You can see exactly what crossed — no silent clipboard sync.
+          <i class="fa-solid fa-lock"></i> Every push leaves a receipt. You can see exactly what crossed — no silent clipboard sync.
         </div>
       </div>
     </div>
@@ -234,14 +234,14 @@
     <!-- Trusted device list with revocation -->
     <div style="flex:1; min-width:300px; background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-xl); overflow:hidden;">
       <div style="display:flex; align-items:center; gap:8px; padding:12px 16px; border-bottom:1px solid var(--border2); background:var(--surface2);">
-        <span style="font-size:13px;">🔑</span>
+        <span style="font-size:13px;"><i class="fa-solid fa-key"></i></span>
         <span style="font-size:13px; font-weight:700; flex:1;">Trusted Devices</span>
         <span style="font-size:9px; color:var(--text-subtle); font-family:var(--font-mono);">3 paired</span>
       </div>
       <div style="padding:8px 12px;">
         <!-- this device -->
         <div style="display:flex; align-items:center; gap:10px; padding:9px 8px; border-bottom:1px solid var(--border2);">
-          <span style="font-size:16px;">🖥</span>
+          <span style="font-size:16px;"><i class="fa-solid fa-desktop"></i></span>
           <div style="flex:1;">
             <div style="font-size:12px; font-weight:600;">rithy-workstation <span style="font-size:9px; color:var(--accent); font-weight:700;">THIS</span></div>
             <div style="font-size:9px; color:var(--text-subtle); font-family:var(--font-mono);">fp 4A·2C·91 · paired 2024</div>
@@ -249,7 +249,7 @@
         </div>
         <!-- phone -->
         <div style="display:flex; align-items:center; gap:10px; padding:9px 8px; border-bottom:1px solid var(--border2);">
-          <span style="font-size:16px;">📱</span>
+          <span style="font-size:16px;"><i class="fa-solid fa-mobile-screen"></i></span>
           <div style="flex:1;">
             <div style="font-size:12px; font-weight:600;">rithy-pixel</div>
             <div style="font-size:9px; color:var(--text-subtle); font-family:var(--font-mono);">fp 7E·1B·33 · seen 4m ago</div>
@@ -258,7 +258,7 @@
         </div>
         <!-- lost tablet -->
         <div style="display:flex; align-items:center; gap:10px; padding:9px 8px; opacity:0.7;">
-          <span style="font-size:16px;">📋</span>
+          <span style="font-size:16px;"><i class="fa-solid fa-clipboard"></i></span>
           <div style="flex:1;">
             <div style="font-size:12px; font-weight:600; color:var(--text-muted);">old-tablet <span style="font-size:9px; color:#B91C1C; font-weight:700;">LOST</span></div>
             <div style="font-size:9px; color:var(--text-subtle); font-family:var(--font-mono);">fp 0C·9F·A2 · seen 11 days ago</div>

@@ -17,7 +17,7 @@ function barHTML(pomColor, pomStroke, pomIcon, pomTime, privacy, privColor, aiLa
             <circle cx="11" cy="11" r="9" fill="none" stroke="${pomColor}" stroke-width="2"
               stroke-dasharray="42" stroke-dashoffset="${pomStroke}"
               stroke-linecap="round" transform="rotate(-90 11 11)"/>
-            <text x="11" y="14.5" text-anchor="middle" font-size="8" fill="${pomColor}">${pomIcon}</text>
+            <text x="11" y="14" text-anchor="middle" font-size="7" font-family="'Font Awesome 6 Free'" font-weight="900" fill="${pomColor}">${pomIcon}</text>
           </svg>
         </div>
         <span style="font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace;color:${pomColor};">${pomTime}</span>
@@ -118,12 +118,12 @@ function panelBar() {
     </div>
     <div class="win-divider-v"></div>
     <div class="win-apps">
-      <div class="win-app active"   title="Firefox">🦊</div>
-      <div class="win-app running"  title="VS Code">💻</div>
-      <div class="win-app"          title="Files">📁</div>
-      <div class="win-app"          title="Terminal">⬛</div>
+      <div class="win-app active"   title="Firefox"><i class="fa-brands fa-firefox-browser"></i></div>
+      <div class="win-app running"  title="VS Code"><i class="fa-solid fa-laptop-code"></i></div>
+      <div class="win-app"          title="Files"><i class="fa-solid fa-folder"></i></div>
+      <div class="win-app"          title="Terminal"><i class="fa-solid fa-terminal"></i></div>
       <div class="win-app"          title="KOOMPI AI">✦</div>
-      <div class="win-app"          title="Settings">⚙️</div>
+      <div class="win-app"          title="Settings"><i class="fa-solid fa-gear"></i></div>
     </div>
   </div>
 
@@ -194,7 +194,7 @@ function toggleTheme(btn) {
     d.classList.toggle('theme-dark', darkMode);
     d.classList.toggle('theme-light', !darkMode);
   });
-  btn.textContent = darkMode ? '🌙 Dark' : '☀️ Light';
+  btn.innerHTML = darkMode ? '<i class="fa-solid fa-moon"></i> Dark' : '<i class="fa-solid fa-sun"></i> Light';
   document.querySelectorAll('.desktop-clock').forEach(function(c) {
     c.style.color = darkMode ? 'rgba(255,255,255,0.85)' : 'rgba(26,34,53,0.8)';
   });
@@ -207,7 +207,7 @@ window.toggleTheme = toggleTheme;
 // ── Init bar (fill hug + taskbar after sections loaded) ──────
 function initBar() {
   var hugEl = document.getElementById('tb-hug');
-  if (hugEl) hugEl.innerHTML = barHTML('#EF4444','14','🔥','18:33','LOCAL','#10B981','✦ AI');
+  if (hugEl) hugEl.innerHTML = barHTML('#EF4444','14','\uf06d','18:33','LOCAL','#10B981','✦ AI');
   var taskbarEl = document.getElementById('tb-taskbar');
   if (taskbarEl) taskbarEl.innerHTML = panelBar();
 }
