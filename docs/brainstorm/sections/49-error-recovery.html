@@ -15,12 +15,12 @@
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1.5L11 10.5H1L6 1.5Z" stroke="white" stroke-width="1.3" stroke-linejoin="round"/><line x1="6" y1="5" x2="6" y2="7.5" stroke="white" stroke-width="1.3" stroke-linecap="round"/><circle cx="6" cy="9" r=".7" fill="white"/></svg>
       </div>
       <div style="font-size:14px;font-weight:700;color:var(--text);">Writer stopped responding</div>
-      <div style="margin-left:auto;font-family:monospace;font-size:11px;color:var(--text-subtle);">SIGSEGV · 14:32:07</div>
+      <div style="margin-left:auto;font-family:var(--font-mono);font-size:11px;color:var(--text-subtle);">SIGSEGV · 14:32:07</div>
     </div>
     <!-- body -->
     <div style="padding:18px 20px;">
       <p style="font-size:13px;line-height:1.6;color:var(--text);margin:0 0 14px;">
-        Writer closed unexpectedly while saving <span style="font-family:monospace;color:var(--accent);">~/Documents/Q4-Report.odt</span>. This is not your fault — the app ran out of memory rendering a large embedded image.
+        Writer closed unexpectedly while saving <span style="font-family:var(--font-mono);color:var(--accent);">~/Documents/Q4-Report.odt</span>. This is not your fault — the app ran out of memory rendering a large embedded image.
       </p>
       <!-- recovered work card -->
       <div style="background:var(--surface2);border:1px solid var(--emerald);border-radius:10px;padding:12px 14px;margin-bottom:16px;display:flex;align-items:center;gap:12px;">
@@ -31,7 +31,7 @@
           <div style="font-size:12.5px;font-weight:600;color:var(--text);">Your work is safe</div>
           <div style="font-size:11.5px;color:var(--text-muted);">Autosaved 11 seconds before the crash · 0 keystrokes lost</div>
         </div>
-        <span style="font-size:10px;font-weight:600;color:var(--emerald);background:rgba(16,185,129,.12);padding:3px 8px;border-radius:20px;">RECOVERED</span>
+        <span style="font-size:10px;font-weight:600;color:#047857;background:rgba(16,185,129,.12);padding:3px 8px;border-radius:20px;">RECOVERED</span>
       </div>
       <!-- controls -->
       <div style="display:flex;align-items:center;gap:10px;">
@@ -52,7 +52,7 @@
     <div style="background:var(--surface);border:1px solid var(--border2);border-radius:14px;overflow:hidden;">
       <div style="display:flex;align-items:center;gap:8px;padding:11px 15px;background:var(--surface2);border-bottom:1px solid var(--border2);">
         <span style="font-size:13px;font-weight:700;color:var(--text);">Storage is nearly full</span>
-        <span style="margin-left:auto;font-family:monospace;font-size:11px;color:var(--amber);">2.1 GB free of 512 GB</span>
+        <span style="margin-left:auto;font-family:var(--font-mono);font-size:11px;color:#B45309;">2.1 GB free of 512 GB</span>
       </div>
       <div style="padding:14px 15px;">
         <!-- fill bar -->
@@ -66,18 +66,18 @@
         <div style="display:flex;flex-direction:column;gap:7px;">
           <div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:8px 10px;">
             <div style="width:8px;height:8px;border-radius:2px;background:var(--cyan);flex-shrink:0;"></div>
-            <div style="flex:1;min-width:0;"><div style="font-size:12px;color:var(--text);">Old AI model snapshots</div><div style="font-size:10.5px;color:var(--text-subtle);font-family:monospace;">~/.cache/koompi/models · Llama-3.1-8B v2,v3</div></div>
-            <span style="font-size:11px;font-weight:700;color:var(--emerald);">18.4 GB</span>
+            <div style="flex:1;min-width:0;"><div style="font-size:12px;color:var(--text);">Old AI model snapshots</div><div style="font-size:10.5px;color:var(--text-subtle);font-family:var(--font-mono);">~/.cache/koompi/models · Llama-3.1-8B v2,v3</div></div>
+            <span style="font-size:11px;font-weight:700;color:#047857;">18.4 GB</span>
           </div>
           <div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:8px 10px;">
             <div style="width:8px;height:8px;border-radius:2px;background:var(--accent);flex-shrink:0;"></div>
-            <div style="flex:1;min-width:0;"><div style="font-size:12px;color:var(--text);">BTRFS snapshots &gt; 90 days</div><div style="font-size:10.5px;color:var(--text-subtle);font-family:monospace;">4 snapshots · keeps the 3 most recent</div></div>
-            <span style="font-size:11px;font-weight:700;color:var(--emerald);">9.7 GB</span>
+            <div style="flex:1;min-width:0;"><div style="font-size:12px;color:var(--text);">BTRFS snapshots &gt; 90 days</div><div style="font-size:10.5px;color:var(--text-subtle);font-family:var(--font-mono);">4 snapshots · keeps the 3 most recent</div></div>
+            <span style="font-size:11px;font-weight:700;color:#047857;">9.7 GB</span>
           </div>
           <div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:8px 10px;">
             <div style="width:8px;height:8px;border-radius:2px;background:var(--text-subtle);flex-shrink:0;"></div>
-            <div style="flex:1;min-width:0;"><div style="font-size:12px;color:var(--text);">Browser &amp; thumbnail cache</div><div style="font-size:10.5px;color:var(--text-subtle);font-family:monospace;">regenerates automatically</div></div>
-            <span style="font-size:11px;font-weight:700;color:var(--emerald);">3.2 GB</span>
+            <div style="flex:1;min-width:0;"><div style="font-size:12px;color:var(--text);">Browser &amp; thumbnail cache</div><div style="font-size:10.5px;color:var(--text-subtle);font-family:var(--font-mono);">regenerates automatically</div></div>
+            <span style="font-size:11px;font-weight:700;color:#047857;">3.2 GB</span>
           </div>
         </div>
         <button style="width:100%;margin-top:12px;border:none;background:var(--accent);color:white;font-size:12px;font-weight:600;padding:9px;border-radius:8px;cursor:pointer;">Review &amp; reclaim 31.3 GB</button>
@@ -88,7 +88,7 @@
     <div style="background:var(--surface);border:1px solid var(--border2);border-radius:14px;overflow:hidden;">
       <div style="display:flex;align-items:center;gap:8px;padding:11px 15px;background:var(--surface2);border-bottom:1px solid var(--border2);">
         <span style="font-size:13px;font-weight:700;color:var(--text);">Action blocked</span>
-        <span style="margin-left:auto;font-size:10px;font-weight:600;color:var(--amber);background:rgba(245,158,11,.12);padding:3px 8px;border-radius:20px;">PERMISSION</span>
+        <span style="margin-left:auto;font-size:10px;font-weight:600;color:#B45309;background:rgba(245,158,11,.12);padding:3px 8px;border-radius:20px;">PERMISSION</span>
       </div>
       <div style="padding:14px 15px;">
         <p style="font-size:12.5px;line-height:1.6;color:var(--text);margin:0 0 12px;">
@@ -99,7 +99,7 @@
           <div style="display:flex;align-items:center;gap:9px;">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="5" width="9" height="6.5" rx="1.5" stroke="var(--text-muted)" stroke-width="1.2"/><path d="M11 7L14 5.5V11L11 9.5" stroke="var(--text-muted)" stroke-width="1.2" stroke-linejoin="round"/></svg>
             <span style="font-size:12px;font-weight:600;color:var(--text);">Camera</span>
-            <span style="margin-left:auto;font-size:11px;color:var(--amber);font-weight:600;">Not granted</span>
+            <span style="margin-left:auto;font-size:11px;color:#B45309;font-weight:600;">Not granted</span>
           </div>
           <div style="font-size:10.5px;color:var(--text-subtle);margin-top:6px;line-height:1.5;">
             Granting this opens the camera <em>only while Telegram is in front</em>. Revoke any time in App Permissions.
@@ -118,8 +118,8 @@
   <div style="background:#1A2235;border-radius:14px;overflow:hidden;margin-bottom:18px;border:1px solid #2D3652;">
     <div style="padding:7px 14px;background:#0F1626;display:flex;align-items:center;gap:8px;border-bottom:1px solid #2D3652;">
       <div style="width:9px;height:9px;border-radius:50%;background:#EF4444;"></div>
-      <span style="font-family:monospace;font-size:11px;color:#94A3B8;">koompi-recovery · pre-boot · tty1</span>
-      <span style="margin-left:auto;font-family:monospace;font-size:11px;color:#64748B;">boot attempt 2 of 3</span>
+      <span style="font-family:var(--font-mono);font-size:11px;color:#94A3B8;">koompi-recovery · pre-boot · tty1</span>
+      <span style="margin-left:auto;font-family:var(--font-mono);font-size:11px;color:#64748B;">boot attempt 2 of 3</span>
     </div>
     <div style="padding:20px 22px;">
       <div style="font-size:15px;font-weight:700;color:#F0F2F7;margin-bottom:6px;">Last startup didn't finish</div>
@@ -131,20 +131,20 @@
         <div style="flex:1;padding:12px 14px;border-right:1px solid #2D3652;">
           <div style="font-size:10px;color:#64748B;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Roll back to</div>
           <div style="font-size:12.5px;color:#10B981;font-weight:600;">@snapshot_pre-update</div>
-          <div style="font-family:monospace;font-size:10.5px;color:#64748B;margin-top:3px;">Today 09:14 · kernel 6.9.3 · last known good</div>
+          <div style="font-family:var(--font-mono);font-size:10.5px;color:#64748B;margin-top:3px;">Today 09:14 · kernel 6.9.3 · last known good</div>
         </div>
         <div style="display:flex;align-items:center;padding:0 14px;color:#475569;">→</div>
         <div style="flex:1;padding:12px 14px;background:rgba(239,68,68,.06);">
           <div style="font-size:10px;color:#64748B;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Failing now</div>
           <div style="font-size:12.5px;color:#EF4444;font-weight:600;">@current</div>
-          <div style="font-family:monospace;font-size:10.5px;color:#64748B;margin-top:3px;">Today 18:02 · kernel 6.9.4 · panic: VFS</div>
+          <div style="font-family:var(--font-mono);font-size:10.5px;color:#64748B;margin-top:3px;">Today 18:02 · kernel 6.9.4 · panic: VFS</div>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
         <button style="border:none;background:#10B981;color:white;font-size:12.5px;font-weight:700;padding:10px 20px;border-radius:8px;cursor:pointer;">Roll back &amp; restart  →  §30</button>
         <button style="border:1px solid #2D3652;background:transparent;color:#94A3B8;font-size:12.5px;padding:10px 16px;border-radius:8px;cursor:pointer;">Enter recovery shell</button>
         <button style="border:1px solid #2D3652;background:transparent;color:#64748B;font-size:12.5px;padding:10px 16px;border-radius:8px;cursor:pointer;">Try current boot again</button>
-        <span style="margin-left:auto;font-size:10.5px;color:#64748B;">Auto rolls back in <span style="color:#F59E0B;font-family:monospace;">0:18</span> if no choice — see §39</span>
+        <span style="margin-left:auto;font-size:10.5px;color:#64748B;">Auto rolls back in <span style="color:#F59E0B;font-family:var(--font-mono);">0:18</span> if no choice — see §39</span>
       </div>
     </div>
   </div>
@@ -160,7 +160,7 @@
       </div>
       <div style="padding:14px 15px;">
         <p style="font-size:12.5px;line-height:1.6;color:var(--text);margin:0 0 12px;">
-          <span style="font-family:monospace;color:var(--accent);">koompi-contextd</span> — the local file-meaning engine — crashed and is restarting. Until it's back, search matches file names but not their content or meaning.
+          <span style="font-family:var(--font-mono);color:var(--accent);">koompi-contextd</span> — the local file-meaning engine — crashed and is restarting. Until it's back, search matches file names but not their content or meaning.
         </p>
         <!-- what still works / what's paused -->
         <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
@@ -178,10 +178,10 @@
     <!-- 6. recovery-mode minimal shell -->
     <div style="background:#0F1626;border:1px solid #2D3652;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;">
       <div style="padding:9px 14px;background:#0A0F1C;border-bottom:1px solid #2D3652;display:flex;align-items:center;gap:8px;">
-        <span style="font-family:monospace;font-size:11px;color:#10B981;">●</span>
-        <span style="font-family:monospace;font-size:11px;color:#94A3B8;">KOOMPI Recovery Shell</span>
+        <span style="font-family:var(--font-mono);font-size:11px;color:#10B981;">●</span>
+        <span style="font-family:var(--font-mono);font-size:11px;color:#94A3B8;">KOOMPI Recovery Shell</span>
       </div>
-      <div style="padding:14px;flex:1;font-family:monospace;font-size:11.5px;color:#94A3B8;line-height:1.7;">
+      <div style="padding:14px;flex:1;font-family:var(--font-mono);font-size:11.5px;color:#94A3B8;line-height:1.7;">
         <div style="color:#64748B;">minimal shell — no compositor, no network</div>
         <div style="margin:10px 0;display:flex;flex-direction:column;gap:6px;">
           <div style="color:#F0F2F7;">[1] <span style="color:#10B981;">Roll back to last good snapshot</span></div>
@@ -201,13 +201,13 @@
     <div style="display:flex;align-items:center;gap:9px;padding:12px 16px;background:rgba(16,185,129,.06);border-bottom:1px solid var(--border2);">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5l5.5 2.3v3.6c0 3.4-2.3 5.6-5.5 6.6-3.2-1-5.5-3.2-5.5-6.6V3.8L8 1.5Z" stroke="var(--emerald)" stroke-width="1.2" stroke-linejoin="round"/></svg>
       <span style="font-size:13px;font-weight:700;color:var(--text);">Review crash report before anything is sent</span>
-      <span style="margin-left:auto;font-size:10px;font-weight:600;color:var(--emerald);background:rgba(16,185,129,.12);padding:3px 8px;border-radius:20px;">STAYS LOCAL UNTIL YOU SAY SO</span>
+      <span style="margin-left:auto;font-size:10px;font-weight:600;color:#047857;background:rgba(16,185,129,.12);padding:3px 8px;border-radius:20px;">STAYS LOCAL UNTIL YOU SAY SO</span>
     </div>
     <div style="padding:16px 18px;">
       <p style="font-size:12.5px;line-height:1.6;color:var(--text-muted);margin:0 0 14px;">
         This report was written to your disk only. We will never send it without your consent. Read exactly what it contains — and redact any line — before you decide.
       </p>
-      <div style="background:#1A2235;border-radius:10px;padding:12px 14px;font-family:monospace;font-size:11px;color:#94A3B8;line-height:1.7;margin-bottom:14px;">
+      <div style="background:#1A2235;border-radius:10px;padding:12px 14px;font-family:var(--font-mono);font-size:11px;color:#94A3B8;line-height:1.7;margin-bottom:14px;">
         <div><span style="color:#64748B;">signal&nbsp;&nbsp;</span> SIGSEGV in libwriter.so+0x3f2a</div>
         <div><span style="color:#64748B;">kernel&nbsp;&nbsp;</span> 6.9.4-koompi · x86_64</div>
         <div><span style="color:#64748B;">app&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> writer 7.6.2</div>
@@ -268,7 +268,7 @@
     </div>
     <div class="callout">
       <div class="callout-title">Degraded, not dead</div>
-      <p>When <span style="font-family:monospace;">koompi-contextd</span> or <span style="font-family:monospace;">koompi-agent-memd</span> crash, the desktop keeps working — search falls back to filenames, the AI sidebar pauses cleanly, daemons auto-restart and re-index silently. A Principal-Engineer detail: the watchdog uses exponential backoff and surfaces the degraded banner only after the second failed restart, so a single transient crash never nags the user.</p>
+      <p>When <span style="font-family:var(--font-mono);">koompi-contextd</span> or <span style="font-family:var(--font-mono);">koompi-agent-memd</span> crash, the desktop keeps working — search falls back to filenames, the AI sidebar pauses cleanly, daemons auto-restart and re-index silently. A Principal-Engineer detail: the watchdog uses exponential backoff and surfaces the degraded banner only after the second failed restart, so a single transient crash never nags the user.</p>
     </div>
     <div class="callout">
       <div class="callout-title">Recovery that survives decades</div>

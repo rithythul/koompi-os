@@ -18,3 +18,4 @@ __pycache__/
 
 # Playwright MCP browser session artifacts
 /.playwright-mcp/
+/docs/brainstorm/_view.html

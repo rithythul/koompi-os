@@ -40,7 +40,7 @@
         <div style="font-size:11px;color:rgba(255,255,255,.45);margin-bottom:10px;">Child · age 9</div>
         <div style="display:inline-flex;align-items:center;gap:5px;background:var(--amber-glow);border-radius:20px;padding:3px 9px;">
           <div style="width:6px;height:6px;border-radius:50%;background:var(--amber);"></div>
-          <span style="font-size:10px;color:var(--amber);font-weight:600;">Guardrails · 47m left</span>
+          <span style="font-size:10px;color:#B45309;font-weight:600;">Guardrails · 47m left</span>
         </div>
       </div>
       <!-- Guest -->
@@ -52,11 +52,11 @@
         <div style="font-size:11px;color:rgba(255,255,255,.45);margin-bottom:10px;">Ephemeral</div>
         <div style="display:inline-flex;align-items:center;gap:5px;background:var(--cyan-glow);border-radius:20px;padding:3px 9px;">
           <div style="width:6px;height:6px;border-radius:50%;background:var(--cyan);"></div>
-          <span style="font-size:10px;color:var(--cyan);font-weight:600;">Nothing remembered</span>
+          <span style="font-size:10px;color:#0E7490;font-weight:600;">Nothing remembered</span>
         </div>
       </div>
     </div>
-    <div style="margin-top:22px;font-size:11px;color:rgba(255,255,255,.35);font-family:monospace;">greetd · koompi-greeter.qml — type a hidden username to reach a profile not shown here ⟶ see §8</div>
+    <div style="margin-top:22px;font-size:11px;color:rgba(255,255,255,.35);font-family:var(--font-mono);">greetd · koompi-greeter.qml — type a hidden username to reach a profile not shown here ⟶ see §8</div>
   </div>
 
   <!-- ════════ 2 · FAST USER SWITCH ════════ -->
@@ -64,7 +64,7 @@
   <div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:16px 18px;margin-bottom:24px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
       <div style="font-size:13px;font-weight:600;color:var(--text);">Switch User <span style="font-size:11px;color:var(--text-subtle);font-weight:400;">— Super+L then ⟶</span></div>
-      <span style="font-size:11px;color:var(--emerald);background:var(--emerald-glow);border-radius:20px;padding:2px 10px;">Current session stays warm</span>
+      <span style="font-size:11px;color:#047857;background:var(--emerald-glow);border-radius:20px;padding:2px 10px;">Current session stays warm</span>
     </div>
     <div style="display:flex;gap:12px;">
       <!-- active session card -->
@@ -87,12 +87,12 @@
         </div>
         <div style="font-size:11px;color:var(--text-muted);line-height:1.6;">
           Session held since 21:14 · 6 windows<br>
-          Memory store <span style="color:var(--emerald);">remains sealed</span> until her unlock<br>
+          Memory store <span style="color:#047857;">remains sealed</span> until her unlock<br>
           <span style="color:var(--text-subtle);">Enter password to resume →</span>
         </div>
       </div>
     </div>
-    <div style="margin-top:12px;font-size:11px;color:var(--text-subtle);font-family:monospace;">No model unload — VRAM is keyed; Rithy's KV-cache is never visible to Sophea's inference context.</div>
+    <div style="margin-top:12px;font-size:11px;color:var(--text-subtle);font-family:var(--font-mono);">No model unload — VRAM is keyed; Rithy's KV-cache is never visible to Sophea's inference context.</div>
   </div>
 
   <!-- ════════ 3 · GUEST MODE + 6 · HANDOFF (split row) ════════ -->
@@ -107,14 +107,14 @@
         </div>
         <div style="font-size:12px;color:var(--text-muted);line-height:1.7;">
           ✓ Home mounted on RAM-backed overlay<br>
-          ✓ agent-memd started with <code style="font-family:monospace;color:var(--cyan);">--no-persist</code><br>
+          ✓ agent-memd started with <code style="font-family:var(--font-mono);color:#0E7490;">--no-persist</code><br>
           ✓ contextd indexing disabled<br>
           ✓ No Selendra DID attached
         </div>
       </div>
       <div style="margin-top:12px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text);">
         <div style="width:18px;height:18px;border-radius:50%;border:2px solid var(--emerald);display:flex;align-items:center;justify-content:center;"><svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5L3.5 6.5L7 2.5" stroke="var(--emerald)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        On logout: overlay discarded, RAM zeroed. <strong style="color:var(--emerald);">0 bytes written to disk.</strong>
+        On logout: overlay discarded, RAM zeroed. <strong style="color:#047857;">0 bytes written to disk.</strong>
       </div>
     </div>
     <!-- 6 Handoff -->
@@ -124,7 +124,7 @@
         <div style="position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:var(--border);"></div>
         <div style="position:relative;margin-bottom:12px;">
           <div style="position:absolute;left:-17px;top:3px;width:10px;height:10px;border-radius:50%;background:var(--accent);"></div>
-          <div style="font-size:12px;color:var(--text);"><strong>21:40</strong> Rithy locks. agent-memd dumps working set → <code style="font-family:monospace;font-size:11px;">sealed</code></div>
+          <div style="font-size:12px;color:var(--text);"><strong>21:40</strong> Rithy locks. agent-memd dumps working set → <code style="font-family:var(--font-mono);font-size:11px;">sealed</code></div>
         </div>
         <div style="position:relative;margin-bottom:12px;">
           <div style="position:absolute;left:-17px;top:3px;width:10px;height:10px;border-radius:50%;background:var(--amber);"></div>
@@ -135,7 +135,7 @@
           <div style="font-size:12px;color:var(--text);"><strong>21:41</strong> AI greets <em>Sophea</em>. Zero carry-over: it does not know Rithy's investor call exists.</div>
         </div>
       </div>
-      <div style="margin-top:12px;font-size:11px;color:var(--text-subtle);font-family:monospace;background:var(--surface2);border-radius:6px;padding:8px;">cold-context guarantee: prompt assembly reads only $XDG_RUNTIME_DIR/$UID/memd.sock</div>
+      <div style="margin-top:12px;font-size:11px;color:var(--text-subtle);font-family:var(--font-mono);background:var(--surface2);border-radius:6px;padding:8px;">cold-context guarantee: prompt assembly reads only $XDG_RUNTIME_DIR/$UID/memd.sock</div>
     </div>
   </div>
 
@@ -147,26 +147,26 @@
         <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#F59E0B,#EC4899);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:700;">ដ</div>
         <div><div style="font-size:13px;font-weight:600;color:var(--text);">Dara · age 9</div><div style="font-size:11px;color:var(--text-muted);">Managed by Rithy &amp; Sophea</div></div>
       </div>
-      <span style="font-size:11px;color:var(--amber);font-weight:600;">Guardrails enforced in-kernel (eBPF)</span>
+      <span style="font-size:11px;color:#B45309;font-weight:600;">Guardrails enforced in-kernel (eBPF)</span>
     </div>
     <div style="padding:16px 18px;display:flex;gap:18px;flex-wrap:wrap;">
       <div style="flex:1;min-width:200px;">
         <div style="font-size:11px;color:var(--text-subtle);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Screen time — today</div>
         <div style="height:8px;background:var(--surface3);border-radius:4px;overflow:hidden;margin-bottom:6px;"><div style="width:73%;height:100%;background:linear-gradient(90deg,#10B981,#F59E0B);"></div></div>
-        <div style="font-size:12px;color:var(--text-muted);">1h 13m of 2h 00m · <strong style="color:var(--amber);">47m left</strong> · winds down at 20:00</div>
+        <div style="font-size:12px;color:var(--text-muted);">1h 13m of 2h 00m · <strong style="color:#B45309;">47m left</strong> · winds down at 20:00</div>
         <div style="margin-top:10px;font-size:11px;color:var(--text-subtle);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Content posture</div>
         <div style="display:flex;flex-direction:column;gap:6px;">
-          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text);"><span>Web filter</span><span style="color:var(--emerald);">SafeSearch · curated</span></div>
-          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text);"><span>App installs</span><span style="color:var(--amber);">Ask a parent</span></div>
-          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text);"><span>AI assistant</span><span style="color:var(--emerald);">Khmer tutor mode</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text);"><span>Web filter</span><span style="color:#047857;">SafeSearch · curated</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text);"><span>App installs</span><span style="color:#B45309;">Ask a parent</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text);"><span>AI assistant</span><span style="color:#047857;">Khmer tutor mode</span></div>
         </div>
       </div>
       <div style="flex:1;min-width:200px;background:var(--surface2);border-radius:10px;padding:12px;">
         <div style="font-size:11px;color:var(--text-subtle);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Local AI — age-shaped</div>
         <div style="font-size:12px;color:var(--text-muted);line-height:1.7;">
-          The on-device model answers in <strong style="color:var(--text);">informal Khmer register</strong>, refuses adult topics locally — no cloud call, no log shipped to a parent dashboard. Dara's chats are <strong style="color:var(--emerald);">private to Dara</strong>; parents set <em>rules</em>, not surveillance.
+          The on-device model answers in <strong style="color:var(--text);">informal Khmer register</strong>, refuses adult topics locally — no cloud call, no log shipped to a parent dashboard. Dara's chats are <strong style="color:#047857;">private to Dara</strong>; parents set <em>rules</em>, not surveillance.
         </div>
-        <div style="margin-top:10px;font-size:11px;color:var(--amber);background:var(--amber-glow);border-radius:6px;padding:8px;">Parents see aggregate time &amp; categories — never message contents. Guardrails ≠ a wiretap.</div>
+        <div style="margin-top:10px;font-size:11px;color:#B45309;background:var(--amber-glow);border-radius:6px;padding:8px;">Parents see aggregate time &amp; categories — never message contents. Guardrails ≠ a wiretap.</div>
       </div>
     </div>
   </div>
@@ -178,7 +178,7 @@
       <!-- Rithy island -->
       <div style="flex:1;min-width:200px;border:2px solid var(--accent);border-radius:12px;padding:14px;background:var(--accent-glow);">
         <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px;">🔒 Rithy's Palace</div>
-        <div style="font-size:11px;font-family:monospace;color:var(--text-muted);line-height:1.7;">
+        <div style="font-size:11px;font-family:var(--font-mono);color:var(--text-muted);line-height:1.7;">
           ~/.local/memd/rithy.vault<br>
           key = Argon2id(passwd, hw-TPM)<br>
           contextd embeddings: 41,802<br>
@@ -193,8 +193,8 @@
       </div>
       <!-- Sophea island -->
       <div style="flex:1;min-width:200px;border:2px solid var(--emerald);border-radius:12px;padding:14px;background:var(--emerald-glow);">
-        <div style="font-size:12px;font-weight:700;color:var(--emerald);margin-bottom:8px;">🔒 Sophea's Palace</div>
-        <div style="font-size:11px;font-family:monospace;color:var(--text-muted);line-height:1.7;">
+        <div style="font-size:12px;font-weight:700;color:#047857;margin-bottom:8px;">🔒 Sophea's Palace</div>
+        <div style="font-size:11px;font-family:var(--font-mono);color:var(--text-muted);line-height:1.7;">
           ~/.local/memd/sophea.vault<br>
           key = Argon2id(passwd, hw-TPM)<br>
           contextd embeddings: 12,440<br>
@@ -203,7 +203,7 @@
       </div>
     </div>
     <div style="margin-top:14px;font-size:12px;color:var(--text-muted);text-align:center;line-height:1.7;">
-      Even <code style="font-family:monospace;color:var(--text);">root</code> reads only ciphertext at rest. The key lives in the <strong style="color:var(--text);">kernel keyring of the unlocked session</strong> and is dropped on lock. koompi-agent-memd and koompi-contextd run <strong>per-UID, never shared</strong>. There is no global memory.
+      Even <code style="font-family:var(--font-mono);color:var(--text);">root</code> reads only ciphertext at rest. The key lives in the <strong style="color:var(--text);">kernel keyring of the unlocked session</strong> and is dropped on lock. koompi-agent-memd and koompi-contextd run <strong>per-UID, never shared</strong>. There is no global memory.
     </div>
   </div>
 
@@ -214,37 +214,37 @@
       <div style="font-size:12px;font-weight:600;color:var(--text-subtle);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;">7 · Per-profile model &amp; data footprint</div>
       <!-- Rithy row -->
       <div style="margin-bottom:14px;">
-        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text);margin-bottom:6px;"><span style="font-weight:600;">Rithy</span><span style="font-family:monospace;color:var(--text-muted);">58.4 GB</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text);margin-bottom:6px;"><span style="font-weight:600;">Rithy</span><span style="font-family:var(--font-mono);color:var(--text-muted);">58.4 GB</span></div>
         <div style="height:10px;border-radius:5px;overflow:hidden;display:flex;">
           <div style="width:36%;background:var(--accent);" title="Models"></div>
           <div style="width:30%;background:var(--cyan);" title="Memory + index"></div>
           <div style="width:34%;background:var(--surface4);" title="Files"></div>
         </div>
-        <div style="font-size:10px;color:var(--text-subtle);margin-top:4px;font-family:monospace;">Llama 3.1 8B Q5 21GB · palace+index 17GB · files 20GB</div>
+        <div style="font-size:10px;color:var(--text-subtle);margin-top:4px;font-family:var(--font-mono);">Llama 3.1 8B Q5 21GB · palace+index 17GB · files 20GB</div>
       </div>
       <!-- Sophea row -->
       <div style="margin-bottom:14px;">
-        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text);margin-bottom:6px;"><span style="font-weight:600;">Sophea</span><span style="font-family:monospace;color:var(--text-muted);">9.1 GB</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text);margin-bottom:6px;"><span style="font-weight:600;">Sophea</span><span style="font-family:var(--font-mono);color:var(--text-muted);">9.1 GB</span></div>
         <div style="height:10px;border-radius:5px;overflow:hidden;display:flex;background:var(--surface3);">
           <div style="width:8%;background:var(--accent);"></div>
           <div style="width:22%;background:var(--cyan);"></div>
           <div style="width:30%;background:var(--surface4);"></div>
         </div>
-        <div style="font-size:10px;color:var(--text-subtle);margin-top:4px;font-family:monospace;">shares Rithy's base model (dedup) · palace 2GB · files 5GB</div>
+        <div style="font-size:10px;color:var(--text-subtle);margin-top:4px;font-family:var(--font-mono);">shares Rithy's base model (dedup) · palace 2GB · files 5GB</div>
       </div>
       <!-- Dara row -->
       <div>
-        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text);margin-bottom:6px;"><span style="font-weight:600;">Dara <span style="font-size:10px;color:var(--amber);">· child</span></span><span style="font-family:monospace;color:var(--text-muted);">3.2 GB</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text);margin-bottom:6px;"><span style="font-weight:600;">Dara <span style="font-size:10px;color:#B45309;">· child</span></span><span style="font-family:var(--font-mono);color:var(--text-muted);">3.2 GB</span></div>
         <div style="height:10px;border-radius:5px;overflow:hidden;display:flex;background:var(--surface3);">
           <div style="width:6%;background:var(--accent);"></div>
           <div style="width:14%;background:var(--cyan);"></div>
           <div style="width:20%;background:var(--surface4);"></div>
         </div>
-        <div style="font-size:10px;color:var(--text-subtle);margin-top:4px;font-family:monospace;">tutor LoRA 0.4GB · palace 0.8GB · files 2GB</div>
+        <div style="font-size:10px;color:var(--text-subtle);margin-top:4px;font-family:var(--font-mono);">tutor LoRA 0.4GB · palace 0.8GB · files 2GB</div>
       </div>
       <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border2);display:flex;justify-content:space-between;font-size:11px;color:var(--text-subtle);">
         <span>Base model shared via CoW dedup · counted once.</span>
-        <span style="font-family:monospace;">Disk 512GB · 71GB used · 441GB free</span>
+        <span style="font-family:var(--font-mono);">Disk 512GB · 71GB used · 441GB free</span>
       </div>
     </div>
 
@@ -259,10 +259,10 @@
         <div>✗ Not a greyed slot in the picker</div>
         <div>✗ No "1 hidden account" count anywhere</div>
         <div>✗ Storage view (§7) shows <strong style="color:#fff;">no unaccounted GB</strong> — its volume is indistinguishable from free space</div>
-        <div>✗ <code style="font-family:monospace;color:#93C5FD;">/etc/passwd</code> entry suppressed from enumeration</div>
+        <div>✗ <code style="font-family:var(--font-mono);color:#93C5FD;">/etc/passwd</code> entry suppressed from enumeration</div>
         <div>✓ Optional <span style="color:#FCD34D;">decoy passphrase</span> → opens a plausible empty profile (ties to §41 Duress)</div>
       </div>
-      <div style="margin-top:12px;font-size:10px;color:rgba(255,255,255,.35);font-family:monospace;">Deniability is binary: the system cannot confirm or deny the profile exists without the credential.</div>
+      <div style="margin-top:12px;font-size:10px;color:rgba(255,255,255,.35);font-family:var(--font-mono);">Deniability is binary: the system cannot confirm or deny the profile exists without the credential.</div>
     </div>
   </div>
 

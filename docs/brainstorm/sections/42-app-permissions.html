@@ -6,6 +6,7 @@
   <p class="desc">
     Per-app capability grants and sandboxing tiers for conventional GUI apps — Firefox, Telegram, GIMP, the software you already know. This is the legacy-app counterpart to <strong>§11 Tool Approval</strong>: §11 governs the <em>AI agent</em> earning tool calls; §42 governs <em>ordinary apps</em> earning OS capabilities. One mechanism, two consumers. The default is <strong>deny</strong>. Every grant is visible, scoped, time-stamped, and revocable from a single surface — closing the gap the §11 audit flagged: standing app grants that nothing could review or revoke. Camera, mic, location, files, network, removable media: your data is never assumed-available.
   </p>
+  <div style="display:inline-flex;align-items:center;gap:7px;margin:-16px 0 24px;font-size:11px;color:var(--accent);background:var(--accent-glow);border:1px solid rgba(99,102,241,.25);padding:4px 12px;border-radius:20px;">⊕ Becomes the <b>Permissions</b> tab of Privacy Center · rules live in the one Policy Engine · <a href="#system-map" style="color:var(--accent);font-weight:600;">System Map</a></div>
 
   <!-- ============ PANEL 1: PER-APP PERMISSION MATRIX ============ -->
   <div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;overflow:hidden;margin-bottom:18px;">
@@ -14,7 +15,7 @@
         <div style="font-size:15px;font-weight:700;color:var(--text);">Capability Matrix</div>
         <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">What each installed app is allowed to touch — read down a column to audit one capability</div>
       </div>
-      <div style="font-size:11px;color:var(--emerald);background:var(--emerald-glow);padding:4px 10px;border-radius:20px;font-weight:600;">Default: deny all</div>
+      <div style="font-size:11px;color:#047857;background:var(--emerald-glow);padding:4px 10px;border-radius:20px;font-weight:600;">Default: deny all</div>
     </div>
 
     <!-- Matrix header row -->
@@ -36,11 +37,11 @@
           <div style="font-size:10px;color:var(--text-subtle);">org.mozilla.firefox</div>
         </div>
       </div>
-      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--amber-glow);color:var(--amber);">ask</span></div>
-      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--amber-glow);color:var(--amber);">ask</span></div>
+      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--amber-glow);color:#B45309;">ask</span></div>
+      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--amber-glow);color:#B45309;">ask</span></div>
       <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--surface3);color:var(--text-subtle);">denied</span></div>
-      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--cyan-glow);color:var(--cyan);">~/Downloads</span></div>
-      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--emerald-glow);color:var(--emerald);">allowed</span></div>
+      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--cyan-glow);color:#0E7490;">~/Downloads</span></div>
+      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--emerald-glow);color:#047857;">allowed</span></div>
     </div>
 
     <!-- Telegram -->
@@ -52,11 +53,11 @@
           <div style="font-size:10px;color:var(--text-subtle);">org.telegram.desktop</div>
         </div>
       </div>
-      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--emerald-glow);color:var(--emerald);">allowed</span></div>
-      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--emerald-glow);color:var(--emerald);">allowed</span></div>
+      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--emerald-glow);color:#047857;">allowed</span></div>
+      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--emerald-glow);color:#047857;">allowed</span></div>
       <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--surface3);color:var(--text-subtle);">denied</span></div>
-      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--cyan-glow);color:var(--cyan);">portal</span></div>
-      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--emerald-glow);color:var(--emerald);">allowed</span></div>
+      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--cyan-glow);color:#0E7490;">portal</span></div>
+      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--emerald-glow);color:#047857;">allowed</span></div>
     </div>
 
     <!-- GIMP -->
@@ -71,7 +72,7 @@
       <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--surface3);color:var(--text-subtle);">denied</span></div>
       <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--surface3);color:var(--text-subtle);">denied</span></div>
       <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--surface3);color:var(--text-subtle);">denied</span></div>
-      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--cyan-glow);color:var(--cyan);">portal</span></div>
+      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--cyan-glow);color:#0E7490;">portal</span></div>
       <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--surface3);color:var(--text-subtle);">denied</span></div>
     </div>
 
@@ -80,18 +81,18 @@
       <div style="display:flex;align-items:center;gap:10px;">
         <div style="width:26px;height:26px;border-radius:7px;background:#2D8CFF;display:flex;align-items:center;justify-content:center;font-size:12px;">📹</div>
         <div>
-          <div style="font-size:13px;font-weight:600;color:var(--text);">Zoom <span style="font-size:9px;color:var(--amber);font-weight:700;">⚠ unconfined</span></div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);">Zoom <span style="font-size:9px;color:#B45309;font-weight:700;">⚠ unconfined</span></div>
           <div style="font-size:10px;color:var(--text-subtle);">us.zoom.Zoom · /opt (non-Flatpak .deb)</div>
         </div>
       </div>
-      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--emerald-glow);color:var(--emerald);">allowed</span></div>
-      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--emerald-glow);color:var(--emerald);">allowed</span></div>
-      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--amber-glow);color:var(--amber);">ask</span></div>
-      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--amber-glow);color:var(--amber);">full home</span></div>
-      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--emerald-glow);color:var(--emerald);">allowed</span></div>
+      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--emerald-glow);color:#047857;">allowed</span></div>
+      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--emerald-glow);color:#047857;">allowed</span></div>
+      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--amber-glow);color:#B45309;">ask</span></div>
+      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--amber-glow);color:#B45309;">full home</span></div>
+      <div style="text-align:center;"><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:var(--emerald-glow);color:#047857;">allowed</span></div>
     </div>
     <div style="padding:8px 18px;font-size:11px;color:var(--text-muted);background:var(--surface2);border-top:1px solid var(--border2);">
-      Legend — <span style="color:var(--emerald);font-weight:600;">allowed</span> standing grant · <span style="color:var(--amber);font-weight:600;">ask</span> prompts each session · <span style="color:var(--cyan);font-weight:600;">portal</span> file picker only, no standing FS · <span style="color:var(--text-subtle);font-weight:600;">denied</span> default
+      Legend — <span style="color:#047857;font-weight:600;">allowed</span> standing grant · <span style="color:#B45309;font-weight:600;">ask</span> prompts each session · <span style="color:#0E7490;font-weight:600;">portal</span> file picker only, no standing FS · <span style="color:var(--text-subtle);font-weight:600;">denied</span> default
     </div>
   </div>
 
@@ -109,11 +110,11 @@
       </div>
       <div style="padding:14px 20px;">
         <!-- Khmer-native, formal register -->
-        <div style="font-size:13px;color:var(--text);line-height:1.7;padding:10px 12px;background:var(--surface2);border-radius:8px;border-left:3px solid var(--accent);">
+        <div style="font-size:13px;color:var(--text);line-height:1.7;padding:10px 12px;background:var(--accent-glow);border-radius:8px;border:1px solid rgba(99,102,241,.30);">
           <span lang="km" style="font-size:14px;">កម្មវិធី Firefox សុំការអនុញ្ញាតប្រើមីក្រូហ្វូន។</span><br>
           <span style="font-size:11px;color:var(--text-subtle);">Formal register · the system addresses you as សុំ (request), not a command — register-aware, not machine-translated.</span>
         </div>
-        <div style="margin-top:12px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--emerald);background:var(--emerald-glow);padding:8px 12px;border-radius:8px;">
+        <div style="margin-top:12px;display:flex;align-items:center;gap:8px;font-size:12px;color:#047857;background:var(--emerald-glow);padding:8px 12px;border-radius:8px;">
           🔒 Audio is captured by the app directly. KOOMPI does not record or route it anywhere.
         </div>
       </div>
@@ -126,7 +127,7 @@
         <div style="display:flex;gap:8px;">
           <div style="flex:1;text-align:center;padding:9px;border:1px solid var(--border2);border-radius:8px;font-size:13px;color:var(--text-muted);cursor:pointer;">Allow once</div>
           <div style="flex:1;text-align:center;padding:9px;border:1px solid var(--border2);border-radius:8px;font-size:13px;color:var(--text-muted);cursor:pointer;">Always allow</div>
-          <div style="flex:1;text-align:center;padding:9px;border:1px solid rgba(239,68,68,.3);border-radius:8px;font-size:13px;color:#EF4444;background:rgba(239,68,68,.06);cursor:pointer;">Deny</div>
+          <div style="flex:1;text-align:center;padding:9px;border:1px solid rgba(239,68,68,.3);border-radius:8px;font-size:13px;color:#B91C1C;background:rgba(239,68,68,.06);cursor:pointer;">Deny</div>
         </div>
       </div>
     </div>
@@ -140,17 +141,17 @@
       <div style="padding:14px 18px;display:flex;flex-direction:column;gap:12px;">
         <!-- Sandboxed -->
         <div style="display:flex;gap:12px;align-items:flex-start;">
-          <div style="margin-top:2px;flex-shrink:0;padding:3px 9px;border-radius:6px;font-size:10px;font-weight:700;background:var(--emerald-glow);color:var(--emerald);">SANDBOXED</div>
+          <div style="margin-top:2px;flex-shrink:0;padding:3px 9px;border-radius:6px;font-size:10px;font-weight:700;background:var(--emerald-glow);color:#047857;">SANDBOXED</div>
           <div style="font-size:12px;color:var(--text-muted);line-height:1.5;"><strong style="color:var(--text);">Flatpak + bubblewrap.</strong> No host FS, no host sockets. Every capability flows through xdg-desktop-portal. The OS can prove what it cannot reach. <em>Telegram, GIMP.</em></div>
         </div>
         <!-- Portal-mediated -->
         <div style="display:flex;gap:12px;align-items:flex-start;">
-          <div style="margin-top:2px;flex-shrink:0;padding:3px 9px;border-radius:6px;font-size:10px;font-weight:700;background:var(--cyan-glow);color:var(--cyan);">PORTAL</div>
+          <div style="margin-top:2px;flex-shrink:0;padding:3px 9px;border-radius:6px;font-size:10px;font-weight:700;background:var(--cyan-glow);color:#0E7490;">PORTAL</div>
           <div style="font-size:12px;color:var(--text-muted);line-height:1.5;"><strong style="color:var(--text);">Native + PipeWire/portal.</strong> Runs on the host but camera, mic and screen-capture are brokered through PipeWire — device access is per-grant, not ambient. <em>Firefox.</em></div>
         </div>
         <!-- Unconfined -->
         <div style="display:flex;gap:12px;align-items:flex-start;">
-          <div style="margin-top:2px;flex-shrink:0;padding:3px 9px;border-radius:6px;font-size:10px;font-weight:700;background:var(--amber-glow);color:var(--amber);">UNCONFINED</div>
+          <div style="margin-top:2px;flex-shrink:0;padding:3px 9px;border-radius:6px;font-size:10px;font-weight:700;background:var(--amber-glow);color:#B45309;">UNCONFINED</div>
           <div style="font-size:12px;color:var(--text-muted);line-height:1.5;"><strong style="color:var(--text);">Vendor .deb / AppImage.</strong> Full ambient authority — we <em>cannot</em> enforce, only observe and warn. KOOMPI labels honestly rather than pretending. <em>Zoom.</em></div>
         </div>
         <div style="margin-top:4px;padding:9px 12px;background:var(--surface2);border-radius:8px;font-size:11px;color:var(--text-subtle);line-height:1.5;">
@@ -164,10 +165,10 @@
   <div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;overflow:hidden;margin-bottom:18px;">
     <div style="padding:14px 18px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;background:var(--surface2);">
       <div>
-        <div style="font-size:15px;font-weight:700;color:var(--text);">Standing Grants — Review &amp; Revoke <span style="font-size:10px;color:var(--emerald);background:var(--emerald-glow);padding:2px 8px;border-radius:10px;font-weight:700;vertical-align:middle;">fills §11 audit gap</span></div>
+        <div style="font-size:15px;font-weight:700;color:var(--text);">Standing Grants — Review &amp; Revoke <span style="font-size:10px;color:#047857;background:var(--emerald-glow);padding:2px 8px;border-radius:10px;font-weight:700;vertical-align:middle;">fills §11 audit gap</span></div>
         <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Every permission any app currently holds, in one place. Revoke signals the running app live — it does not just flip a row in a database.</div>
       </div>
-      <div style="font-size:12px;color:#EF4444;border:1px solid rgba(239,68,68,.3);padding:6px 12px;border-radius:8px;font-weight:600;cursor:pointer;">Revoke all standing</div>
+      <div style="font-size:12px;color:#B91C1C;border:1px solid rgba(239,68,68,.3);padding:6px 12px;border-radius:8px;font-weight:600;cursor:pointer;">Revoke all standing</div>
     </div>
 
     <!-- Grant row: Telegram mic -->
@@ -177,7 +178,7 @@
         <div style="font-size:13px;color:var(--text);"><strong>Telegram</strong> · Microphone</div>
         <div style="font-size:11px;color:var(--text-subtle);">granted 12 Mar 2026 · last used 41 min ago · 312 times total</div>
       </div>
-      <div style="padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;background:var(--emerald-glow);color:var(--emerald);">portal-mediated</div>
+      <div style="padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;background:var(--emerald-glow);color:#047857;">portal-mediated</div>
       <div style="font-size:12px;color:var(--text-muted);border:1px solid var(--border2);padding:5px 12px;border-radius:7px;cursor:pointer;">Revoke</div>
     </div>
 
@@ -185,11 +186,11 @@
     <div style="display:flex;align-items:center;gap:14px;padding:12px 18px;border-bottom:1px solid var(--border2);background:var(--amber-glow);">
       <div style="width:24px;height:24px;border-radius:6px;background:#2D8CFF;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;">📹</div>
       <div style="flex:1;min-width:0;">
-        <div style="font-size:13px;color:var(--text);"><strong>Zoom</strong> · Full home directory <span style="font-size:10px;color:var(--amber);font-weight:700;">broad scope</span></div>
+        <div style="font-size:13px;color:var(--text);"><strong>Zoom</strong> · Full home directory <span style="font-size:10px;color:#B45309;font-weight:700;">broad scope</span></div>
         <div style="font-size:11px;color:var(--text-subtle);">granted 02 Jan 2026 · last used 67 days ago · narrow this to ~/Documents?</div>
       </div>
-      <div style="padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;background:var(--amber-glow);color:var(--amber);">unconfined</div>
-      <div style="font-size:12px;color:#EF4444;border:1px solid rgba(239,68,68,.3);padding:5px 12px;border-radius:7px;cursor:pointer;">Revoke</div>
+      <div style="padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;background:var(--amber-glow);color:#B45309;">unconfined</div>
+      <div style="font-size:12px;color:#B91C1C;border:1px solid rgba(239,68,68,.3);padding:5px 12px;border-radius:7px;cursor:pointer;">Revoke</div>
     </div>
 
     <!-- Grant row: hash changed — re-consent -->
@@ -220,10 +221,10 @@
         <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">GIMP wants to save a file — grant the folder, not the home directory</div>
       </div>
       <div style="padding:14px 18px;">
-        <div style="font-family:monospace;font-size:12px;color:var(--text);background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;margin-bottom:12px;">/home/userx/Pictures/Edits/</div>
+        <div style="font-family:var(--font-mono);font-size:12px;color:var(--text);background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;margin-bottom:12px;">/home/userx/Pictures/Edits/</div>
         <div style="display:flex;flex-direction:column;gap:8px;">
           <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border:1.5px solid var(--emerald);border-radius:8px;background:var(--emerald-glow);cursor:pointer;">
-            <span style="font-size:13px;font-weight:600;color:var(--emerald);">✓ This folder only</span>
+            <span style="font-size:13px;font-weight:600;color:#047857;">✓ This folder only</span>
             <span style="font-size:11px;color:var(--text-muted);">~/Pictures/Edits/</span>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border:1px solid var(--border2);border-radius:8px;cursor:pointer;">
@@ -231,8 +232,8 @@
             <span style="font-size:11px;color:var(--text-subtle);">sunset.xcf</span>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border:1px solid rgba(245,158,11,.3);border-radius:8px;cursor:pointer;">
-            <span style="font-size:13px;color:var(--amber);">All of ~/Pictures</span>
-            <span style="font-size:11px;color:var(--amber);">⚠ broader</span>
+            <span style="font-size:13px;color:#B45309;">All of ~/Pictures</span>
+            <span style="font-size:11px;color:#B45309;">⚠ broader</span>
           </div>
         </div>
         <div style="margin-top:12px;font-size:11px;color:var(--text-subtle);line-height:1.5;">
@@ -252,18 +253,18 @@
           <div style="width:32px;height:32px;border-radius:8px;background:var(--surface4);display:flex;align-items:center;justify-content:center;font-size:16px;">💾</div>
           <div style="flex:1;">
             <div style="font-size:13px;font-weight:600;color:var(--text);">SanDisk Ultra · 64 GB</div>
-            <div style="font-size:11px;color:var(--text-subtle);font-family:monospace;">VID:0781 PID:5591 · sda1 · exFAT</div>
+            <div style="font-size:11px;color:var(--text-subtle);font-family:var(--font-mono);">VID:0781 PID:5591 · sda1 · exFAT</div>
           </div>
-          <span style="font-size:10px;font-weight:700;color:var(--amber);background:var(--amber-glow);padding:3px 8px;border-radius:10px;">untrusted</span>
+          <span style="font-size:10px;font-weight:700;color:#B45309;background:var(--amber-glow);padding:3px 8px;border-radius:10px;">untrusted</span>
         </div>
         <div style="display:flex;gap:8px;margin-bottom:12px;">
-          <div style="flex:1;text-align:center;padding:9px;border:1.5px solid var(--emerald);border-radius:8px;font-size:12px;font-weight:600;color:var(--emerald);background:var(--emerald-glow);cursor:pointer;">Mount read-only</div>
+          <div style="flex:1;text-align:center;padding:9px;border:1.5px solid var(--emerald);border-radius:8px;font-size:12px;font-weight:600;color:#047857;background:var(--emerald-glow);cursor:pointer;">Mount read-only</div>
           <div style="flex:1;text-align:center;padding:9px;border:1px solid var(--border2);border-radius:8px;font-size:12px;color:var(--text-muted);cursor:pointer;">Read-write</div>
           <div style="flex:1;text-align:center;padding:9px;border:1px solid var(--border2);border-radius:8px;font-size:12px;color:var(--text-subtle);cursor:pointer;">Eject</div>
         </div>
         <!-- egress-style record -->
-        <div style="font-size:11px;color:var(--text-subtle);font-family:monospace;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;line-height:1.6;">
-          <span style="color:var(--cyan);">▸ media-event</span> 09 Jun 14:22 · sda1 attached<br>
+        <div style="font-size:11px;color:var(--text-subtle);font-family:var(--font-mono);background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;line-height:1.6;">
+          <span style="color:#0E7490;">▸ media-event</span> 09 Jun 14:22 · sda1 attached<br>
           <span style="color:var(--text-subtle);">  recorded to §28 Egress Ledger · awaiting decision</span>
         </div>
         <div style="margin-top:10px;font-size:11px;color:var(--text-subtle);line-height:1.5;">
@@ -294,25 +295,25 @@
         <!-- timeline rows -->
         <div style="display:flex;flex-direction:column;gap:0;">
           <div style="display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border2);">
-            <span style="font-size:11px;color:var(--text-subtle);font-family:monospace;width:42px;">11:03</span>
+            <span style="font-size:11px;color:var(--text-subtle);font-family:var(--font-mono);width:42px;">11:03</span>
             <span style="width:8px;height:8px;border-radius:50%;background:var(--emerald);flex-shrink:0;"></span>
             <span style="font-size:12px;color:var(--text);flex:1;">Microphone opened</span>
             <span style="font-size:11px;color:var(--text-subtle);">42 min</span>
           </div>
           <div style="display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border2);">
-            <span style="font-size:11px;color:var(--text-subtle);font-family:monospace;width:42px;">11:48</span>
+            <span style="font-size:11px;color:var(--text-subtle);font-family:var(--font-mono);width:42px;">11:48</span>
             <span style="width:8px;height:8px;border-radius:50%;background:var(--emerald);flex-shrink:0;"></span>
             <span style="font-size:12px;color:var(--text);flex:1;">Microphone opened</span>
             <span style="font-size:11px;color:var(--text-subtle);">6 min</span>
           </div>
           <div style="display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border2);">
-            <span style="font-size:11px;color:var(--text-subtle);font-family:monospace;width:42px;">13:20</span>
+            <span style="font-size:11px;color:var(--text-subtle);font-family:var(--font-mono);width:42px;">13:20</span>
             <span style="width:8px;height:8px;border-radius:50%;background:var(--cyan);flex-shrink:0;"></span>
             <span style="font-size:12px;color:var(--text);flex:1;">~/Downloads read · invoice.pdf</span>
             <span style="font-size:11px;color:var(--text-subtle);">portal</span>
           </div>
           <div style="display:flex;gap:12px;align-items:center;padding:8px 0;">
-            <span style="font-size:11px;color:var(--text-subtle);font-family:monospace;width:42px;">14:01</span>
+            <span style="font-size:11px;color:var(--text-subtle);font-family:var(--font-mono);width:42px;">14:01</span>
             <span style="width:8px;height:8px;border-radius:50%;background:var(--emerald);flex-shrink:0;"></span>
             <span style="font-size:12px;color:var(--text);flex:1;">Microphone opened</span>
             <span style="font-size:11px;color:var(--text-subtle);">2 min</span>
@@ -335,16 +336,16 @@
           <div style="width:36px;height:36px;border-radius:9px;background:var(--surface3);display:flex;align-items:center;justify-content:center;font-size:18px;">📦</div>
           <div>
             <div style="font-size:13px;font-weight:600;color:var(--text);">videodownloader.AppImage</div>
-            <div style="font-size:11px;color:var(--text-subtle);font-family:monospace;">~/Downloads · unsigned · unconfined</div>
+            <div style="font-size:11px;color:var(--text-subtle);font-family:var(--font-mono);">~/Downloads · unsigned · unconfined</div>
           </div>
         </div>
         <div style="font-size:12px;color:var(--text-muted);line-height:1.6;background:var(--surface2);border-radius:8px;padding:10px 12px;margin-bottom:12px;">
           Downloaded 4 min ago from an unknown source. No Selendra signature, no Flatpak sandbox. If you run it, it starts with <strong style="color:var(--text);">zero grants</strong> — deny is still the floor, even outside the sandbox.
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;">
-          <div style="text-align:center;padding:9px;border:1.5px solid var(--emerald);border-radius:8px;font-size:12px;font-weight:600;color:var(--emerald);background:var(--emerald-glow);cursor:pointer;">Run sandboxed (recommended)</div>
+          <div style="text-align:center;padding:9px;border:1.5px solid var(--emerald);border-radius:8px;font-size:12px;font-weight:600;color:#047857;background:var(--emerald-glow);cursor:pointer;">Run sandboxed (recommended)</div>
           <div style="display:flex;gap:8px;">
-            <div style="flex:1;text-align:center;padding:9px;border:1px solid rgba(245,158,11,.4);border-radius:8px;font-size:12px;color:var(--amber);cursor:pointer;">Run unconfined</div>
+            <div style="flex:1;text-align:center;padding:9px;border:1px solid rgba(245,158,11,.4);border-radius:8px;font-size:12px;color:#B45309;cursor:pointer;">Run unconfined</div>
             <div style="flex:1;text-align:center;padding:9px;border:1px solid var(--border2);border-radius:8px;font-size:12px;color:var(--text-subtle);cursor:pointer;">Delete</div>
           </div>
         </div>

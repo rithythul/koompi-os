@@ -6,6 +6,7 @@
   <p class="desc">
     An append-only, tamper-evident log of every byte that has left your device. Inspired by financial ledgers — every outbound data event is recorded with origin, destination, size, and consent reference.
   </p>
+  <div style="display:inline-flex;align-items:center;gap:7px;margin:-16px 0 24px;font-size:11px;color:var(--accent);background:var(--accent-glow);border:1px solid rgba(99,102,241,.25);padding:4px 12px;border-radius:20px;">⊕ Becomes the <b>Ledger</b> tab of Privacy Center · <a href="#system-map" style="color:var(--accent);font-weight:600;">System Map</a></div>
 
   <!-- Summary bar -->
   <div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:20px 24px;margin-bottom:16px;">
@@ -16,19 +17,19 @@
     </div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
       <div style="background:var(--surface2);border-radius:8px;padding:12px;">
-        <div style="font-size:20px;font-weight:700;color:var(--cyan);font-family:monospace;">1.52 MB</div>
+        <div style="font-size:20px;font-weight:700;color:#0E7490;font-family:var(--font-mono);">1.52 MB</div>
         <div style="font-size:11px;color:var(--text-subtle);margin-top:2px;">Total Egress Today</div>
       </div>
       <div style="background:var(--surface2);border-radius:8px;padding:12px;">
-        <div style="font-size:20px;font-weight:700;color:var(--emerald);font-family:monospace;">23</div>
+        <div style="font-size:20px;font-weight:700;color:#047857;font-family:var(--font-mono);">23</div>
         <div style="font-size:11px;color:var(--text-subtle);margin-top:2px;">Events Logged</div>
       </div>
       <div style="background:var(--surface2);border-radius:8px;padding:12px;">
-        <div style="font-size:20px;font-weight:700;color:var(--amber);font-family:monospace;">2</div>
+        <div style="font-size:20px;font-weight:700;color:#B45309;font-family:var(--font-mono);">2</div>
         <div style="font-size:11px;color:var(--text-subtle);margin-top:2px;">Blocked Attempts</div>
       </div>
       <div style="background:var(--surface2);border-radius:8px;padding:12px;">
-        <div style="font-size:20px;font-weight:700;color:var(--accent);font-family:monospace;">100%</div>
+        <div style="font-size:20px;font-weight:700;color:var(--accent);font-family:var(--font-mono);">100%</div>
         <div style="font-size:11px;color:var(--text-subtle);margin-top:2px;">Consented</div>
       </div>
     </div>
@@ -46,52 +47,52 @@
     <!-- Entries -->
     <div style="display:flex;flex-direction:column;gap:4px;font-size:12px;">
       <div style="display:grid;grid-template-columns:80px 120px 1fr 80px 90px 90px;gap:8px;align-items:center;padding:8px 6px;background:var(--surface2);border-radius:6px;">
-        <span style="font-family:monospace;color:var(--text-subtle);">14:23:01</span>
+        <span style="font-family:var(--font-mono);color:var(--text-subtle);">14:23:01</span>
         <span style="color:var(--text);">Telegram</span>
-        <span style="color:var(--text-muted);font-family:monospace;font-size:11px;">149.154.167.51 (DC4)</span>
+        <span style="color:var(--text-muted);font-family:var(--font-mono);font-size:11px;">149.154.167.51 (DC4)</span>
         <span style="color:var(--text-subtle);">Messages</span>
-        <span style="font-family:monospace;text-align:right;color:var(--text-muted);">84.2 KB</span>
-        <span style="text-align:center;"><span style="font-size:10px;background:var(--emerald-glow);color:var(--emerald);padding:2px 7px;border-radius:20px;">Sent</span></span>
+        <span style="font-family:var(--font-mono);text-align:right;color:var(--text-muted);">84.2 KB</span>
+        <span style="text-align:center;"><span style="font-size:10px;background:var(--emerald-glow);color:#047857;padding:2px 7px;border-radius:20px;">Sent</span></span>
       </div>
       <div style="display:grid;grid-template-columns:80px 120px 1fr 80px 90px 90px;gap:8px;align-items:center;padding:8px 6px;background:var(--surface2);border-radius:6px;">
-        <span style="font-family:monospace;color:var(--text-subtle);">14:20:48</span>
+        <span style="font-family:var(--font-mono);color:var(--text-subtle);">14:20:48</span>
         <span style="color:var(--text);">Firefox</span>
-        <span style="color:var(--text-muted);font-family:monospace;font-size:11px;">sync.services.mozilla.com</span>
+        <span style="color:var(--text-muted);font-family:var(--font-mono);font-size:11px;">sync.services.mozilla.com</span>
         <span style="color:var(--text-subtle);">Bookmarks</span>
-        <span style="font-family:monospace;text-align:right;color:var(--text-muted);">12.1 KB</span>
-        <span style="text-align:center;"><span style="font-size:10px;background:var(--amber-glow);color:var(--amber);padding:2px 7px;border-radius:20px;">Consented</span></span>
+        <span style="font-family:var(--font-mono);text-align:right;color:var(--text-muted);">12.1 KB</span>
+        <span style="text-align:center;"><span style="font-size:10px;background:var(--amber-glow);color:#B45309;padding:2px 7px;border-radius:20px;">Consented</span></span>
       </div>
-      <div style="display:grid;grid-template-columns:80px 120px 1fr 80px 90px 90px;gap:8px;align-items:center;padding:8px 6px;background:rgba(239,68,68,0.07);border-radius:6px;border-left:2px solid #ef4444;">
-        <span style="font-family:monospace;color:var(--text-subtle);">13:58:22</span>
+      <div style="display:grid;grid-template-columns:80px 120px 1fr 80px 90px 90px;gap:8px;align-items:center;padding:8px 6px;background:rgba(239,68,68,0.07);border-radius:6px;border:1px solid rgba(239,68,68,.35);">
+        <span style="font-family:var(--font-mono);color:var(--text-subtle);">13:58:22</span>
         <span style="color:var(--text);">VSCode</span>
-        <span style="color:var(--text-muted);font-family:monospace;font-size:11px;">dc.services.visualstudio.com</span>
+        <span style="color:var(--text-muted);font-family:var(--font-mono);font-size:11px;">dc.services.visualstudio.com</span>
         <span style="color:var(--text-subtle);">Telemetry</span>
-        <span style="font-family:monospace;text-align:right;color:var(--text-muted);">2.3 KB</span>
-        <span style="text-align:center;"><span style="font-size:10px;background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 7px;border-radius:20px;">Blocked</span></span>
+        <span style="font-family:var(--font-mono);text-align:right;color:var(--text-muted);">2.3 KB</span>
+        <span style="text-align:center;"><span style="font-size:10px;background:rgba(239,68,68,0.15);color:#B91C1C;padding:2px 7px;border-radius:20px;">Blocked</span></span>
       </div>
       <div style="display:grid;grid-template-columns:80px 120px 1fr 80px 90px 90px;gap:8px;align-items:center;padding:8px 6px;background:var(--surface2);border-radius:6px;">
-        <span style="font-family:monospace;color:var(--text-subtle);">13:44:09</span>
+        <span style="font-family:var(--font-mono);color:var(--text-subtle);">13:44:09</span>
         <span style="color:var(--text);">System</span>
-        <span style="color:var(--text-muted);font-family:monospace;font-size:11px;">mirror.koompi.com</span>
+        <span style="color:var(--text-muted);font-family:var(--font-mono);font-size:11px;">mirror.koompi.com</span>
         <span style="color:var(--text-subtle);">Pkg hash</span>
-        <span style="font-family:monospace;text-align:right;color:var(--text-muted);">0.4 KB</span>
-        <span style="text-align:center;"><span style="font-size:10px;background:var(--emerald-glow);color:var(--emerald);padding:2px 7px;border-radius:20px;">Sent</span></span>
+        <span style="font-family:var(--font-mono);text-align:right;color:var(--text-muted);">0.4 KB</span>
+        <span style="text-align:center;"><span style="font-size:10px;background:var(--emerald-glow);color:#047857;padding:2px 7px;border-radius:20px;">Sent</span></span>
       </div>
-      <div style="display:grid;grid-template-columns:80px 120px 1fr 80px 90px 90px;gap:8px;align-items:center;padding:8px 6px;background:rgba(239,68,68,0.07);border-radius:6px;border-left:2px solid #ef4444;">
-        <span style="font-family:monospace;color:var(--text-subtle);">13:31:55</span>
+      <div style="display:grid;grid-template-columns:80px 120px 1fr 80px 90px 90px;gap:8px;align-items:center;padding:8px 6px;background:rgba(239,68,68,0.07);border-radius:6px;border:1px solid rgba(239,68,68,.35);">
+        <span style="font-family:var(--font-mono);color:var(--text-subtle);">13:31:55</span>
         <span style="color:var(--text);">unknown</span>
-        <span style="color:var(--text-muted);font-family:monospace;font-size:11px;">185.199.108.153 (no SNI)</span>
+        <span style="color:var(--text-muted);font-family:var(--font-mono);font-size:11px;">185.199.108.153 (no SNI)</span>
         <span style="color:var(--text-subtle);">Unknown</span>
-        <span style="font-family:monospace;text-align:right;color:var(--text-muted);">—</span>
-        <span style="text-align:center;"><span style="font-size:10px;background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 7px;border-radius:20px;">Blocked</span></span>
+        <span style="font-family:var(--font-mono);text-align:right;color:var(--text-muted);">—</span>
+        <span style="text-align:center;"><span style="font-size:10px;background:rgba(239,68,68,0.15);color:#B91C1C;padding:2px 7px;border-radius:20px;">Blocked</span></span>
       </div>
-      <div style="display:grid;grid-template-columns:80px 120px 1fr 80px 90px 90px;gap:8px;align-items:center;padding:8px 6px;background:var(--surface2);border-radius:6px;border-left:2px solid var(--cyan);">
-        <span style="font-family:monospace;color:var(--text-subtle);">09:01:12</span>
-        <span style="color:var(--cyan);">Selendra ID</span>
-        <span style="color:var(--text-muted);font-family:monospace;font-size:11px;">rpc.selendra.org</span>
+      <div style="display:grid;grid-template-columns:80px 120px 1fr 80px 90px 90px;gap:8px;align-items:center;padding:8px 6px;background:var(--surface2);border-radius:6px;border:1px solid rgba(34,211,238,.40);">
+        <span style="font-family:var(--font-mono);color:var(--text-subtle);">09:01:12</span>
+        <span style="color:#0E7490;">Selendra ID</span>
+        <span style="color:var(--text-muted);font-family:var(--font-mono);font-size:11px;">rpc.selendra.org</span>
         <span style="color:var(--text-subtle);">ZK proof</span>
-        <span style="font-family:monospace;text-align:right;color:var(--text-muted);">0.1 KB</span>
-        <span style="text-align:center;"><span style="font-size:10px;background:var(--cyan-glow);color:var(--cyan);padding:2px 7px;border-radius:20px;">ZK only</span></span>
+        <span style="font-family:var(--font-mono);text-align:right;color:var(--text-muted);">0.1 KB</span>
+        <span style="text-align:center;"><span style="font-size:10px;background:var(--cyan-glow);color:#0E7490;padding:2px 7px;border-radius:20px;">ZK only</span></span>
       </div>
     </div>
     <div style="text-align:center;margin-top:12px;">
@@ -103,15 +104,15 @@
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
     <div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:16px 20px;">
       <div style="font-size:12px;font-weight:600;color:var(--text-subtle);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Ledger Integrity</div>
-      <div style="font-family:monospace;font-size:11px;color:var(--text-muted);background:var(--surface2);padding:10px 12px;border-radius:6px;margin-bottom:10px;">
-        Chain tip: <span style="color:var(--emerald);">a4f8c3…e912</span><br>
+      <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);background:var(--surface2);padding:10px 12px;border-radius:6px;margin-bottom:10px;">
+        Chain tip: <span style="color:#047857;">a4f8c3…e912</span><br>
         Entries: <span style="color:var(--text);">23</span> today, <span style="color:var(--text);">3,841</span> total<br>
         Hash algo: BLAKE3<br>
         Last verified: 14:23:01
       </div>
       <div style="display:flex;align-items:center;gap:6px;">
         <div style="width:8px;height:8px;background:var(--emerald);border-radius:50%;"></div>
-        <span style="font-size:12px;color:var(--emerald);">Chain intact — no tampering detected</span>
+        <span style="font-size:12px;color:#047857;">Chain intact — no tampering detected</span>
       </div>
     </div>
     <div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:16px 20px;">

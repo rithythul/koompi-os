@@ -8,7 +8,8 @@
   </p>
 
   <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:flex-start;">
-    <!-- Sidebar panel -->
+    <!-- Sidebar panel on a desktop stage -->
+    <div class="panel-stage">
     <div class="sidebar-panel">
       <div class="sidebar-header">
         <span style="font-size:14px;">🔔</span>
@@ -23,12 +24,13 @@
           <div class="notif-group-icon" style="background:#229ED9; color:white;">T</div>
           <span class="notif-group-name">Telegram</span>
           <span class="notif-group-count">5 messages</span>
+          <span style="font-size:10px; color:var(--text-subtle); cursor:pointer; padding:0 2px;">⌄</span>
         </div>
         <div class="notif-ai-summary">✦ Team discussing KOOMPI demo date — Rithy asked Thursday, Vathna confirmed.</div>
         <div class="notif-item">
           <div class="notif-avatar">V</div>
           <div class="notif-body">
-            <div class="notif-title">Vathna</div>
+            <div class="notif-title">Vathna <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent); margin-left:3px; vertical-align:1px;"></span></div>
             <div class="notif-text">Thursday works for me, I'll prepare the slides tonight</div>
             <div class="notif-actions">
               <div class="notif-action-btn primary">Reply</div>
@@ -40,7 +42,7 @@
         <div class="notif-item">
           <div class="notif-avatar">S</div>
           <div class="notif-body">
-            <div class="notif-title">Sopheak</div>
+            <div class="notif-title">Sopheak <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent); margin-left:3px; vertical-align:1px;"></span></div>
             <div class="notif-text">Can we push to Friday? I have the investor call Thursday morning</div>
             <div class="notif-actions">
               <div class="notif-action-btn primary">Reply</div>
@@ -77,6 +79,7 @@
         <span style="font-size:12px; color:var(--text-muted); flex:1;">Do Not Disturb</span>
         <div class="toggle-pill off"></div>
       </div>
+    </div>
     </div>
 
     <!-- Callouts -->

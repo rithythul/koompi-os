@@ -24,21 +24,21 @@
       <div class="card-label" style="margin-bottom:8px;">Proposed patch — memd/src/decay.zig</div>
       <div class="tool-code" style="font-size:11px; line-height:1.8; margin-bottom:14px;">
         <span style="color:var(--text-subtle)">@@ -211,7 +211,8 @@ fn decay_pass(window: []const u8)</span><br>
-        <span style="color:var(--red);">-    const cut = window[0..WINDOW_MAX];</span><br>
-        <span style="color:var(--emerald);">+    // never split inside a grapheme cluster (Khmer, Thai, emoji)</span><br>
-        <span style="color:var(--emerald);">+    const cut = window[0..graphemeSafeBoundary(window, WINDOW_MAX)];</span><br>
+        <span style="color:#B91C1C;">-    const cut = window[0..WINDOW_MAX];</span><br>
+        <span style="color:#047857;">+    // never split inside a grapheme cluster (Khmer, Thai, emoji)</span><br>
+        <span style="color:#047857;">+    const cut = window[0..graphemeSafeBoundary(window, WINDOW_MAX)];</span><br>
         <span style="color:var(--text-subtle)">     try consolidate(cut);</span>
       </div>
 
       <div style="display:flex; align-items:center; gap:12px; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:10px 14px; margin-bottom:14px;">
         <span style="font-size:16px;">📸</span>
         <div style="flex:1; font-size:11px; color:var(--text-muted);">
-          <span style="color:var(--emerald); font-weight:600;">Snapshot guard armed.</span> BTRFS snapshot <span style="font-family:var(--font-mono);">@root-pre-gardener-0142</span> taken. Patch built and staged in a sandbox; 412 replayed consolidation runs pass, zero crashes. Auto-rollback if memd fails twice within 24h of activation.
+          <span style="color:#047857; font-weight:600;">Snapshot guard armed.</span> BTRFS snapshot <span style="font-family:var(--font-mono);">@root-pre-gardener-0142</span> taken. Patch built and staged in a sandbox; 412 replayed consolidation runs pass, zero crashes. Auto-rollback if memd fails twice within 24h of activation.
         </div>
       </div>
 
       <div style="display:flex; gap:10px;">
-        <span style="background:var(--emerald-glow); border:1px solid var(--emerald); color:var(--emerald); border-radius:var(--radius-sm); padding:6px 16px; font-size:12px; font-weight:600;">Approve &amp; activate</span>
+        <span style="background:var(--emerald-glow); border:1px solid var(--emerald); color:#047857; border-radius:var(--radius-sm); padding:6px 16px; font-size:12px; font-weight:600;">Approve &amp; activate</span>
         <span style="background:var(--surface2); border:1px solid var(--border2); color:var(--text-muted); border-radius:var(--radius-sm); padding:6px 16px; font-size:12px;">Decline</span>
         <span style="background:var(--surface2); border:1px solid var(--border2); color:var(--text-muted); border-radius:var(--radius-sm); padding:6px 16px; font-size:12px;">Show full diff &amp; sandbox log</span>
       </div>
@@ -54,9 +54,9 @@
         This patch likely fixes every machine that consolidates long Khmer text. Share it with the KOOMPI fleet?
       </div>
       <div style="display:flex; flex-direction:column; gap:6px; font-size:11px; margin-bottom:12px;">
-        <div style="display:flex; align-items:center; gap:8px;"><span style="color:var(--emerald);">✓</span> <span>Patch + crash signature only — never your logs or memories</span></div>
-        <div style="display:flex; align-items:center; gap:8px;"><span style="color:var(--emerald);">✓</span> <span>ZK-aggregated, like Software Center privacy flags: "1,204 machines hit this" with no machine identified</span></div>
-        <div style="display:flex; align-items:center; gap:8px;"><span style="color:var(--amber);">◷</span> <span>Lands as a normal staged update everywhere else — reviewed, never silent</span></div>
+        <div style="display:flex; align-items:center; gap:8px;"><span style="color:#047857;">✓</span> <span>Patch + crash signature only — never your logs or memories</span></div>
+        <div style="display:flex; align-items:center; gap:8px;"><span style="color:#047857;">✓</span> <span>ZK-aggregated, like Software Center privacy flags: "1,204 machines hit this" with no machine identified</span></div>
+        <div style="display:flex; align-items:center; gap:8px;"><span style="color:#B45309;">◷</span> <span>Lands as a normal staged update everywhere else — reviewed, never silent</span></div>
       </div>
       <div style="display:flex; gap:8px;">
         <span class="state-chip active-state" style="font-size:9px;">contribute</span>
@@ -72,9 +72,9 @@
         <span class="code-key">2046-06-10</span>  memd grapheme split fix            <span class="code-str">pending approval</span><br>
         <span class="code-key">2046-04-22</span>  pruned 11GB stale thumbnail cache  <span class="code-val">approved · kept 90d</span><br>
         <span class="code-key">2046-03-30</span>  Quickshell leak: panel QML timer   <span class="code-val">approved · upstreamed</span><br>
-        <span class="code-key">2046-02-17</span>  fan-curve tweak after sensor drift <span style="color:var(--red);">declined by you</span><br>
+        <span class="code-key">2046-02-17</span>  fan-curve tweak after sensor drift <span style="color:#B91C1C;">declined by you</span><br>
         <span class="code-key">2046-01-08</span>  egress rule conflict auto-detected <span class="code-val">approved · flagged in ledger</span><br>
-        <span class="code-key">2045-12-02</span>  rollback: own patch regressed wifi <span style="color:var(--amber);">auto-rollback · 41s</span>
+        <span class="code-key">2045-12-02</span>  rollback: own patch regressed wifi <span style="color:#B45309;">auto-rollback · 41s</span>
       </div>
       <p style="font-size:11px; color:var(--text-muted); margin-top:10px; line-height:1.5;">
         The December entry matters most: the Gardener once shipped itself a bad patch, the watchdog rolled it back in 41 seconds, and the failure is logged in its own handwriting. A system that hides its mistakes can't be trusted to fix them.

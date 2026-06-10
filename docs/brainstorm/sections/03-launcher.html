@@ -6,6 +6,7 @@
   <p class="desc">
     Semantic launcher triggered by Super+Space or K bar button. Searches files, apps, and AI actions using the Context Engine. Privacy badge shows whether search is local-only.
   </p>
+  <div style="display:inline-flex;align-items:center;gap:7px;margin:-16px 0 24px;font-size:11px;color:var(--accent);background:var(--accent-glow);border:1px solid rgba(99,102,241,.25);padding:4px 12px;border-radius:20px;">⊕ One Ask — this surface opens the shared assistantd session · <a href="#system-map" style="color:var(--accent);font-weight:600;">System Map</a></div>
 
   <div class="launcher-wrap">
     <div class="launcher-modal">
@@ -21,7 +22,7 @@
 
       <!-- AI Action section -->
       <div class="launcher-section">
-        <div class="launcher-section-label">✦ AI Action</div>
+        <div class="launcher-section-label" style="display:flex; align-items:center; gap:6px;">✦ AI Action <span class="launcher-kbd" style="text-transform:none; letter-spacing:0;">Tab</span></div>
         <div class="launcher-item selected">
           <div class="launcher-icon" style="background:var(--accent-glow);color:var(--accent);">✦</div>
           <div class="launcher-item-body">
@@ -41,18 +42,19 @@
             <div class="launcher-item-name">Q4-2025-Report.pdf</div>
             <div class="launcher-item-meta">~/Documents/Finance/</div>
           </div>
+          <span style="font-size:9px; font-weight:600; padding:1px 7px; border-radius:10px; background:var(--accent-glow); color:var(--accent); white-space:nowrap; flex-shrink:0;" title="No filename match — ranked by meaning">≈ semantic</span>
         </div>
         <div class="launcher-item">
           <div class="launcher-icon" style="background:#10B98120;color:#10B981;">XLS</div>
           <div class="launcher-item-body">
-            <div class="launcher-item-name">quarterly-data.xlsx</div>
+            <div class="launcher-item-name"><b style="font-weight:700;">quarterly</b>-data.xlsx</div>
             <div class="launcher-item-meta">~/Documents/Finance/</div>
           </div>
         </div>
         <div class="launcher-item">
           <div class="launcher-icon" style="background:#6366F120;color:#6366F1;">MD</div>
           <div class="launcher-item-body">
-            <div class="launcher-item-name">quarterly-notes.md</div>
+            <div class="launcher-item-name"><b style="font-weight:700;">quarterly</b>-notes.md</div>
             <div class="launcher-item-meta">~/Documents/Notes/</div>
           </div>
         </div>
@@ -96,7 +98,7 @@
           <span><span class="launcher-kbd">↵</span> Open</span>
           <span><span class="launcher-kbd">Tab</span> AI action</span>
         </div>
-        <span>Context Engine · 12,847 files indexed</span>
+        <span style="display:flex; align-items:center; gap:5px;"><span style="display:inline-block; width:5px; height:5px; border-radius:50%; background:var(--emerald); animation:pulse-dot 2s infinite;"></span>Context Engine · 12,847 files indexed · on-device</span>
       </div>
     </div>
   </div>

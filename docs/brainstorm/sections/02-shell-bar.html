@@ -13,9 +13,11 @@
 
   <!-- Style + theme picker -->
   <div class="bar-style-tabs">
-    <button class="bar-style-tab active" onclick="setBarStyle('hug',this)">Hug <span style="font-size:10px;opacity:0.6;">(default)</span></button>
-    <button class="bar-style-tab" onclick="setBarStyle('taskbar',this)">Taskbar <span style="font-size:10px;opacity:0.5;">Win11</span></button>
-    <button class="bar-style-tab" onclick="setBarStyle('dock',this)">Dock <span style="font-size:10px;opacity:0.5;">macOS</span></button>
+    <div class="seg-group">
+      <button class="bar-style-tab active" onclick="setBarStyle('hug',this)">Hug <span style="font-size:10px;opacity:0.6;">(default)</span></button>
+      <button class="bar-style-tab" onclick="setBarStyle('taskbar',this)">Taskbar <span style="font-size:10px;opacity:0.5;">Win11</span></button>
+      <button class="bar-style-tab" onclick="setBarStyle('dock',this)">Dock <span style="font-size:10px;opacity:0.5;">macOS</span></button>
+    </div>
     <button class="theme-toggle" onclick="toggleTheme(this)">☀️ Light</button>
   </div>
 
@@ -32,7 +34,7 @@
       <div class="sim-windows">
         <!-- Terminal (left 40%) -->
         <div class="sim-win sim-win-tiled" id="hug-term"
-             style="left:0; top:40px; width:40%; bottom:0;"
+             style="left:14px; top:54px; width:calc(40% - 21px); bottom:14px;"
              onclick="simFocusWin('hug','hug-term','Terminal — zsh',event)">
           <div class="sim-win-titlebar">
             <span class="sim-win-titlebar-title">zsh — ~/workspace/koompi-os</span>
@@ -59,7 +61,7 @@
 
         <!-- Code editor (right 60%, top 65%) -->
         <div class="sim-win sim-win-tiled" id="hug-code"
-             style="left:40%; top:40px; right:0; height:62%;"
+             style="left:calc(40% + 7px); top:54px; right:14px; bottom:calc(40% + 7px);"
              onclick="simFocusWin('hug','hug-code','VS Code — BarContent.qml',event)">
           <div class="sim-code">
             <div class="sim-code-tree">
@@ -98,7 +100,7 @@
 
         <!-- Firefox / koompi.com (right 60%, bottom 35%) -->
         <div class="sim-win sim-win-tiled" id="hug-fox"
-             style="left:40%; right:0; height:38%; bottom:0;"
+             style="left:calc(40% + 7px); right:14px; top:calc(60% + 7px); bottom:14px;"
              onclick="simFocusWin('hug','hug-fox','Firefox — koompi.com',event)">
           <div class="sim-browser">
             <div class="sim-browser-chrome">
@@ -348,7 +350,7 @@
 
     </div>
   </div>
-  <div class="sim-caption"><span class="sim-cap-pill">Hug</span><span class="sim-cap-hint">Click the <b>K</b>, workspaces, pomodoro, media pill, clock, AI pill, display & volume icons. Click a window to focus it.</span></div>
+  <div class="sim-caption"><span class="sim-cap-pill">Hug</span><span class="sim-cap-hint">Click the <b>K</b>, workspaces, pomodoro, media pill, clock, AI pill, display & volume icons. Click a window to focus it. Titlebar <b>─ ▢ ✕</b> are live — closing a window re-tiles the rest. <b>Esc</b> closes any panel.</span></div>
 
   <!-- ════════════════════════════════════════════════════════
        SIM B — TASKBAR (Win11, light, bottom bar, 1 maximized browser)
@@ -547,7 +549,7 @@
 
     </div>
   </div>
-  <div class="sim-caption"><span class="sim-cap-pill">Taskbar</span><span class="sim-cap-hint">Click the <b>Search</b> bar (launcher), <b>K</b>/Widgets (start), <b>Task View</b> (overview), bell or AI pill (control center), clock (calendar), volume.</span></div>
+  <div class="sim-caption"><span class="sim-cap-pill">Taskbar</span><span class="sim-cap-hint">Click the <b>Search</b> bar (launcher), <b>K</b>/Widgets (start), <b>Task View</b> (overview), bell or AI pill (control center), clock (calendar), volume. Titlebar <b>─ ▢ ✕</b> are live; a taskbar app icon brings windows back. <b>Esc</b> closes any panel.</span></div>
 
   <!-- ════════════════════════════════════════════════════════
        SIM C — DOCK (macOS, light, menu bar top + floating dock,
@@ -765,7 +767,7 @@
 
     </div>
   </div>
-  <div class="sim-caption"><span class="sim-cap-pill">Dock</span><span class="sim-cap-hint">Click the menu-bar <b>K</b> (start), AI pill or ✦ dock icon (control center), 🔍/▦ dock icons (launcher/overview), clock (calendar), brightness & volume. Click a window or dock icon to focus.</span></div>
+  <div class="sim-caption"><span class="sim-cap-pill">Dock</span><span class="sim-cap-hint">Click the menu-bar <b>K</b> (start), AI pill or ✦ dock icon (control center), 🔍/▦ dock icons (launcher/overview), clock (calendar), brightness & volume. Click a window or dock icon to focus. Titlebar <b>─ ▢ ✕</b> are live; dock icons restore. <b>Esc</b> closes any panel.</span></div>
 
   <div style="font-size:11px; color:var(--text-muted); margin:6px 0 20px;" id="style-desc">
     Hug (default) — bar flush to screen edge. Concave fillet "ears" at bottom corners match the display bezel radius. Glass spans full width. Most immersive.
@@ -979,7 +981,7 @@
         </div>
         <div class="topbar-center">
           <div class="bar-group">
-            <div class="pomodoro-widget"><div class="pomo-ring"><svg viewBox="0 0 22 22"><circle cx="11" cy="11" r="9" fill="none" stroke="rgba(239,68,68,0.2)" stroke-width="2"/><circle cx="11" cy="11" r="9" fill="none" stroke="#EF4444" stroke-width="2" stroke-dasharray="42" stroke-dashoffset="14" stroke-linecap="round" transform="rotate(-90 11 11)"/><text x="11" y="14.5" text-anchor="middle" font-size="8" fill="#EF4444">🔥</text></svg></div><span style="font-size:11px;font-weight:600;font-family:monospace;color:#EF4444;">18:33</span></div>
+            <div class="pomodoro-widget"><div class="pomo-ring"><svg viewBox="0 0 22 22"><circle cx="11" cy="11" r="9" fill="none" stroke="rgba(239,68,68,0.2)" stroke-width="2"/><circle cx="11" cy="11" r="9" fill="none" stroke="#EF4444" stroke-width="2" stroke-dasharray="42" stroke-dashoffset="14" stroke-linecap="round" transform="rotate(-90 11 11)"/><text x="11" y="14.5" text-anchor="middle" font-size="8" fill="#EF4444">🔥</text></svg></div><span style="font-size:11px;font-weight:600;font-family:var(--font-mono);color:#EF4444;">18:33</span></div>
           </div>
           <div class="bar-group"><div class="ws-pills">
             <div class="ws-pill active"><div class="ws-dot" style="background:white;"></div></div>
@@ -1007,7 +1009,7 @@
         </div>
         <div class="topbar-center">
           <div class="bar-group">
-            <div class="pomodoro-widget" style="opacity:0.5;"><div class="pomo-ring"><svg viewBox="0 0 22 22"><circle cx="11" cy="11" r="9" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2"/><text x="11" y="14.5" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.25)">🔥</text></svg></div><span style="font-size:11px;font-weight:600;font-family:monospace;color:var(--text-subtle);">25:00</span></div>
+            <div class="pomodoro-widget" style="opacity:0.5;"><div class="pomo-ring"><svg viewBox="0 0 22 22"><circle cx="11" cy="11" r="9" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2"/><text x="11" y="14.5" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.25)">🔥</text></svg></div><span style="font-size:11px;font-weight:600;font-family:var(--font-mono);color:var(--text-subtle);">25:00</span></div>
           </div>
           <div class="bar-group"><div class="ws-pills">
             <div class="ws-pill active"><div class="ws-dot" style="background:white;"></div></div>
@@ -1034,7 +1036,7 @@
         </div>
         <div class="topbar-center">
           <div class="bar-group">
-            <div class="pomodoro-widget"><div class="pomo-ring"><svg viewBox="0 0 22 22"><circle cx="11" cy="11" r="9" fill="none" stroke="rgba(34,211,238,0.2)" stroke-width="2"/><circle cx="11" cy="11" r="9" fill="none" stroke="#22D3EE" stroke-width="2" stroke-dasharray="42" stroke-dashoffset="28" stroke-linecap="round" transform="rotate(-90 11 11)"/><text x="11" y="14.5" text-anchor="middle" font-size="8" fill="#22D3EE">☕</text></svg></div><span style="font-size:11px;font-weight:600;font-family:monospace;color:#22D3EE;">03:12</span></div>
+            <div class="pomodoro-widget"><div class="pomo-ring"><svg viewBox="0 0 22 22"><circle cx="11" cy="11" r="9" fill="none" stroke="rgba(34,211,238,0.2)" stroke-width="2"/><circle cx="11" cy="11" r="9" fill="none" stroke="#22D3EE" stroke-width="2" stroke-dasharray="42" stroke-dashoffset="28" stroke-linecap="round" transform="rotate(-90 11 11)"/><text x="11" y="14.5" text-anchor="middle" font-size="8" fill="#22D3EE">☕</text></svg></div><span style="font-size:11px;font-weight:600;font-family:var(--font-mono);color:#22D3EE;">03:12</span></div>
           </div>
           <div class="bar-group"><div class="ws-pills">
             <div class="ws-pill active"><div class="ws-dot" style="background:white;"></div></div>

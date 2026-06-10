@@ -12,7 +12,7 @@
     <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface2);border-bottom:1px solid var(--border2);">
       <div style="display:flex;align-items:center;gap:8px;">
         <span style="font-size:13px;font-weight:700;color:var(--text);">Workspace 2 · 🧑‍💻 Coding</span>
-        <span style="font-size:10px;font-family:monospace;color:var(--text-subtle);">dwindle · master ratio 0.58</span>
+        <span style="font-size:10px;font-family:var(--font-mono);color:var(--text-subtle);">dwindle · master ratio 0.58</span>
       </div>
       <div style="display:flex;gap:6px;">
         <span style="font-size:10px;padding:3px 8px;border-radius:20px;background:var(--accent-glow);color:var(--accent);">3 tiled</span>
@@ -27,7 +27,7 @@
           <span style="width:8px;height:8px;border-radius:50%;background:var(--accent);"></span>
           <span style="font-size:11px;color:var(--accent);font-weight:600;">nvim — window-manager.zig</span>
         </div>
-        <div style="flex:1;padding:8px;font-family:monospace;font-size:10px;color:var(--text-muted);line-height:1.6;">
+        <div style="flex:1;padding:8px;font-family:var(--font-mono);font-size:10px;color:var(--text-muted);line-height:1.6;">
           <span style="color:var(--text-subtle);">42</span>  pub fn placeWindow(w: *Window) void {<br>
           <span style="color:var(--text-subtle);">43</span>      const ws = router.classify(w);<br>
           <span style="color:var(--accent);">44</span>      ws.attach(w);  <span style="color:var(--emerald);">// deterministic</span>
@@ -36,13 +36,13 @@
       <!-- Live ratio drag handle -->
       <div style="width:6px;align-self:stretch;display:flex;align-items:center;justify-content:center;cursor:col-resize;position:relative;">
         <div style="width:3px;height:100%;background:var(--accent);border-radius:2px;box-shadow:0 0 0 4px var(--accent-glow);"></div>
-        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--text);color:#fff;font-size:10px;font-family:monospace;padding:3px 7px;border-radius:6px;white-space:nowrap;box-shadow:0 4px 12px rgba(26,34,53,.3);">↔ 0.58 → 0.61</div>
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--text);color:#fff;font-size:10px;font-family:var(--font-mono);padding:3px 7px;border-radius:6px;white-space:nowrap;box-shadow:0 4px 12px rgba(26,34,53,.3);">↔ 0.58 → 0.61</div>
       </div>
       <!-- Stack -->
       <div style="width:40%;display:flex;flex-direction:column;gap:6px;margin-left:6px;">
         <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;">
           <div style="height:20px;background:var(--surface4);display:flex;align-items:center;padding:0 8px;"><span style="font-size:10px;color:var(--text-muted);">Zellij — cargo build</span></div>
-          <div style="padding:6px 8px;font-family:monospace;font-size:9px;color:var(--emerald);">✓ Compiling koompi-wm v0.4.1</div>
+          <div style="padding:6px 8px;font-family:var(--font-mono);font-size:9px;color:var(--emerald);">✓ Compiling koompi-wm v0.4.1</div>
         </div>
         <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;">
           <div style="height:20px;background:var(--surface4);display:flex;align-items:center;padding:0 8px;"><span style="font-size:10px;color:var(--text-muted);">Firefox — localhost:3000</span></div>
@@ -53,9 +53,9 @@
       <div style="position:absolute;bottom:24px;right:28px;width:180px;background:var(--surface);border:2px solid var(--amber);border-radius:10px;box-shadow:0 12px 32px rgba(245,158,11,.22);overflow:hidden;">
         <div style="height:22px;background:var(--amber-glow);display:flex;align-items:center;justify-content:space-between;padding:0 8px;">
           <span style="font-size:10px;color:var(--amber);font-weight:600;">🧮 Calculator</span>
-          <span style="font-size:9px;font-family:monospace;color:var(--amber);">float</span>
+          <span style="font-size:9px;font-family:var(--font-mono);color:var(--amber);">float</span>
         </div>
-        <div style="padding:10px 8px;font-family:monospace;font-size:13px;color:var(--text);text-align:right;">1,920 × 0.61 = 1,171</div>
+        <div style="padding:10px 8px;font-family:var(--font-mono);font-size:13px;color:var(--text);text-align:right;">1,920 × 0.61 = 1,171</div>
       </div>
     </div>
     <!-- Inline move/resize hint bar (Khmer keybindings) -->
@@ -80,8 +80,8 @@
         <div style="position:absolute;inset:12px;background:repeating-linear-gradient(45deg,var(--surface4),var(--surface4) 6px,transparent 6px,transparent 12px);opacity:.4;border-radius:8px;"></div>
         <!-- terminal scratchpad sliding down -->
         <div style="position:relative;width:78%;margin:0 auto;background:#10131C;border:1px solid var(--accent);border-radius:10px;box-shadow:0 16px 40px rgba(99,102,241,.3);overflow:hidden;">
-          <div style="height:20px;background:rgba(99,102,241,.2);display:flex;align-items:center;padding:0 8px;gap:6px;"><span style="font-size:10px;color:#A5B4FC;">⌁ scratch-term</span><span style="font-size:9px;font-family:monospace;color:#64748B;margin-left:auto;">↓ summoned</span></div>
-          <div style="padding:8px;font-family:monospace;font-size:10px;color:#10B981;line-height:1.6;">~ ❯ koompi-ctl ws list<br><span style="color:#64748B;">3 active · 1 pinned · 12 history</span></div>
+          <div style="height:20px;background:rgba(99,102,241,.2);display:flex;align-items:center;padding:0 8px;gap:6px;"><span style="font-size:10px;color:#A5B4FC;">⌁ scratch-term</span><span style="font-size:9px;font-family:var(--font-mono);color:#64748B;margin-left:auto;">↓ summoned</span></div>
+          <div style="padding:8px;font-family:var(--font-mono);font-size:10px;color:#10B981;line-height:1.6;">~ ❯ koompi-ctl ws list<br><span style="color:#64748B;">3 active · 1 pinned · 12 history</span></div>
         </div>
       </div>
       <div style="display:flex;gap:10px;padding:10px 14px;background:var(--surface2);border-top:1px solid var(--border2);">
@@ -105,7 +105,7 @@
         <!-- AI decision -->
         <div style="background:var(--accent-glow);border:1px solid rgba(99,102,241,.25);border-radius:8px;padding:10px;margin-bottom:10px;">
           <div style="font-size:11px;color:var(--accent);font-weight:600;margin-bottom:4px;">✦ Routed to 🧑‍💻 Coding (WS 2)</div>
-          <div style="font-size:11px;color:var(--text-muted);line-height:1.5;">Project path matches the workspace you've used for <span style="color:var(--text);">koompi-wm</span> 41 times. Confidence <span style="font-family:monospace;color:var(--accent);">0.94</span>.</div>
+          <div style="font-size:11px;color:var(--text-muted);line-height:1.5;">Project path matches the workspace you've used for <span style="color:var(--text);">koompi-wm</span> 41 times. Confidence <span style="font-family:var(--font-mono);color:var(--accent);">0.94</span>.</div>
         </div>
         <!-- Override chips -->
         <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
@@ -122,12 +122,12 @@
   <div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;overflow:hidden;margin-bottom:16px;">
     <div style="padding:10px 14px;background:var(--surface2);border-bottom:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center;">
       <span style="font-size:13px;font-weight:700;color:var(--text);">Output-bound Workspaces</span>
-      <span style="font-size:10px;font-family:monospace;color:var(--text-subtle);">Hyprland · 2 displays · workspaces follow the output they were created on</span>
+      <span style="font-size:10px;font-family:var(--font-mono);color:var(--text-subtle);">Hyprland · 2 displays · workspaces follow the output they were created on</span>
     </div>
     <div style="display:flex;gap:18px;padding:18px;align-items:flex-start;">
       <!-- Display 1 -->
       <div style="flex:2;">
-        <div style="font-size:10px;color:var(--text-subtle);margin-bottom:6px;font-family:monospace;">DP-1 · 2560×1440 · primary</div>
+        <div style="font-size:10px;color:var(--text-subtle);margin-bottom:6px;font-family:var(--font-mono);">DP-1 · 2560×1440 · primary</div>
         <div style="background:var(--surface3);border:1.5px solid var(--accent);border-radius:8px;padding:8px;display:flex;gap:6px;">
           <div style="flex:1;text-align:center;padding:14px 0;background:var(--surface);border-radius:6px;font-size:11px;color:var(--text-muted);">1 · 💬</div>
           <div style="flex:1;text-align:center;padding:14px 0;background:var(--accent-glow);border:1px solid var(--accent);border-radius:6px;font-size:11px;color:var(--accent);font-weight:600;">2 · 🧑‍💻</div>
@@ -137,7 +137,7 @@
       </div>
       <!-- Display 2 -->
       <div style="flex:1;">
-        <div style="font-size:10px;color:var(--text-subtle);margin-bottom:6px;font-family:monospace;">HDMI-A-1 · 1920×1080 · vertical</div>
+        <div style="font-size:10px;color:var(--text-subtle);margin-bottom:6px;font-family:var(--font-mono);">HDMI-A-1 · 1920×1080 · vertical</div>
         <div style="background:var(--surface3);border:1.5px solid var(--cyan);border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:6px;">
           <div style="text-align:center;padding:10px 0;background:var(--cyan-glow);border:1px solid var(--cyan);border-radius:6px;font-size:11px;color:var(--cyan);font-weight:600;">7 · 📊 Monitoring</div>
           <div style="text-align:center;padding:10px 0;background:var(--surface);border-radius:6px;font-size:11px;color:var(--text-muted);">8 · 📡 Logs</div>
@@ -157,7 +157,7 @@
     <div style="flex:1;min-width:300px;background:var(--surface);border:1px solid var(--border2);border-radius:12px;overflow:hidden;">
       <div style="padding:10px 14px;background:var(--surface2);border-bottom:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center;">
         <span style="font-size:13px;font-weight:700;color:var(--text);">Window Group · tabbed</span>
-        <span style="font-size:10px;font-family:monospace;color:var(--text-subtle);">3 stacked in one tile</span>
+        <span style="font-size:10px;font-family:var(--font-mono);color:var(--text-subtle);">3 stacked in one tile</span>
       </div>
       <div style="padding:12px;background:var(--surface3);">
         <!-- tab strip -->
@@ -229,7 +229,7 @@
     </div>
     <div class="callout">
       <div class="callout-title">Floating is an explicit exception</div>
-      <p>Dialogs, pickers, and calculators float by class rule — and the titlebar says <span style="color:var(--amber);font-family:monospace;">float</span> so you know <em>why</em> it isn't tiled. No window escapes the model without announcing it.</p>
+      <p>Dialogs, pickers, and calculators float by class rule — and the titlebar says <span style="color:var(--amber);font-family:var(--font-mono);">float</span> so you know <em>why</em> it isn't tiled. No window escapes the model without announcing it.</p>
     </div>
     <div class="callout">
       <div class="callout-title">Scratchpads preserve state</div>

@@ -6,6 +6,7 @@
   <p class="desc">
     KOOMPI factory reset is surgical — you choose exactly what gets wiped. Full device reset, selective data removal, or profile snapshot export before wipe. Powered by koompi-restore, a Zig-native restore daemon.
   </p>
+  <div style="display:inline-flex;align-items:center;gap:7px;margin:-16px 0 24px;font-size:11px;color:var(--accent);background:var(--accent-glow);border:1px solid rgba(99,102,241,.25);padding:4px 12px;border-radius:20px;">⊕ Profile snapshot is the <b>snapshot</b> preset of the Lifeboat engine · <a href="#system-map" style="color:var(--accent);font-weight:600;">System Map</a></div>
 
   <!-- Reset tier picker -->
   <div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:24px;margin-bottom:16px;">
@@ -20,9 +21,9 @@
           <div style="font-size:13px;font-weight:600;color:var(--text);">Refresh — Keep Files</div>
           <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Resets app settings and shell config. Your home directory, documents, and AI memory are untouched.</div>
           <div style="display:flex;gap:6px;margin-top:8px;">
-            <span style="font-size:10px;background:var(--emerald-glow);color:var(--emerald);padding:2px 8px;border-radius:20px;">Keeps ~/Documents</span>
-            <span style="font-size:10px;background:var(--emerald-glow);color:var(--emerald);padding:2px 8px;border-radius:20px;">Keeps AI Memory</span>
-            <span style="font-size:10px;background:var(--amber-glow);color:var(--amber);padding:2px 8px;border-radius:20px;">Wipes app configs</span>
+            <span style="font-size:10px;background:var(--emerald-glow);color:#047857;padding:2px 8px;border-radius:20px;">Keeps ~/Documents</span>
+            <span style="font-size:10px;background:var(--emerald-glow);color:#047857;padding:2px 8px;border-radius:20px;">Keeps AI Memory</span>
+            <span style="font-size:10px;background:var(--amber-glow);color:#B45309;padding:2px 8px;border-radius:20px;">Wipes app configs</span>
           </div>
         </div>
       </div>
@@ -36,9 +37,9 @@
           <div style="font-size:13px;font-weight:600;color:var(--accent);">Clean Slate — Wipe User Data</div>
           <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Removes home directory, AI memory, context index, and all user settings. OS and installed packages remain.</div>
           <div style="display:flex;gap:6px;margin-top:8px;">
-            <span style="font-size:10px;background:rgba(239,68,68,0.1);color:#ef4444;padding:2px 8px;border-radius:20px;">Wipes ~/</span>
-            <span style="font-size:10px;background:rgba(239,68,68,0.1);color:#ef4444;padding:2px 8px;border-radius:20px;">Wipes AI Memory</span>
-            <span style="font-size:10px;background:var(--emerald-glow);color:var(--emerald);padding:2px 8px;border-radius:20px;">Keeps OS + packages</span>
+            <span style="font-size:10px;background:rgba(239,68,68,0.1);color:#B91C1C;padding:2px 8px;border-radius:20px;">Wipes ~/</span>
+            <span style="font-size:10px;background:rgba(239,68,68,0.1);color:#B91C1C;padding:2px 8px;border-radius:20px;">Wipes AI Memory</span>
+            <span style="font-size:10px;background:var(--emerald-glow);color:#047857;padding:2px 8px;border-radius:20px;">Keeps OS + packages</span>
           </div>
         </div>
       </div>
@@ -50,8 +51,8 @@
           <div style="font-size:13px;font-weight:600;color:var(--text);">Full Format — Bare Metal</div>
           <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Secure-erases the entire disk and reinstalls KOOMPI OS from the factory image. As if unboxed new.</div>
           <div style="display:flex;gap:6px;margin-top:8px;">
-            <span style="font-size:10px;background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:20px;">Wipes everything</span>
-            <span style="font-size:10px;background:var(--emerald-glow);color:var(--emerald);padding:2px 8px;border-radius:20px;">Reinstalls from image</span>
+            <span style="font-size:10px;background:rgba(239,68,68,0.15);color:#B91C1C;padding:2px 8px;border-radius:20px;">Wipes everything</span>
+            <span style="font-size:10px;background:var(--emerald-glow);color:#047857;padding:2px 8px;border-radius:20px;">Reinstalls from image</span>
           </div>
         </div>
       </div>
@@ -94,7 +95,7 @@
   <!-- Confirm button -->
   <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:20px 24px;margin-bottom:16px;display:flex;align-items:center;gap:16px;">
     <div style="flex:1;">
-      <div style="font-size:14px;font-weight:600;color:#ef4444;margin-bottom:4px;">Reset: Clean Slate</div>
+      <div style="font-size:14px;font-weight:600;color:#B91C1C;margin-bottom:4px;">Reset: Clean Slate</div>
       <div style="font-size:12px;color:var(--text-muted);">This will permanently delete your home directory and all user data. This action cannot be undone.</div>
     </div>
     <button style="font-size:13px;font-weight:600;color:white;background:#ef4444;border:none;border-radius:8px;padding:10px 20px;cursor:pointer;flex-shrink:0;">Hold to Confirm</button>

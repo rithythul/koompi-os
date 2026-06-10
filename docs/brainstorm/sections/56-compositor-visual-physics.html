@@ -11,37 +11,37 @@
   <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:16px;">
     <div style="padding:14px 18px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;background:var(--surface2);">
       <div style="font-size:14px;font-weight:700;color:var(--text);">Render Stack — composited bottom to top</div>
-      <span style="font-family:monospace;font-size:11px;color:var(--text-subtle);">Hyprland · wlr-layer-shell-unstable-v1</span>
+      <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-subtle);">Hyprland · wlr-layer-shell-unstable-v1</span>
     </div>
     <div style="padding:20px;display:flex;flex-direction:column;gap:8px;">
       <!-- overlays -->
       <div style="border:1px solid rgba(99,102,241,0.3);background:var(--accent-glow);border-radius:var(--radius-sm);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-left:48px;">
         <div><span style="font-size:13px;color:var(--accent);font-weight:600;">overlay</span> <span style="font-size:12px;color:var(--text-muted);">— AI sidebar, OSD, screen-lock</span></div>
-        <span style="font-family:monospace;font-size:11px;color:var(--text-subtle);">layer 3 · blur+shadow</span>
+        <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-subtle);">layer 3 · blur+shadow</span>
       </div>
       <!-- top layer-shell -->
       <div style="border:1px solid rgba(34,211,238,0.3);background:var(--cyan-glow);border-radius:var(--radius-sm);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-left:32px;">
-        <div><span style="font-size:13px;color:var(--cyan);font-weight:600;">top</span> <span style="font-size:12px;color:var(--text-muted);">— shell bar, launcher, notifications</span></div>
-        <span style="font-family:monospace;font-size:11px;color:var(--text-subtle);">layer 2 · blur (xray off)</span>
+        <div><span style="font-size:13px;color:#0E7490;font-weight:600;">top</span> <span style="font-size:12px;color:var(--text-muted);">— shell bar, launcher, notifications</span></div>
+        <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-subtle);">layer 2 · blur (xray off)</span>
       </div>
       <!-- windows -->
       <div style="border:1px solid var(--border);background:var(--surface3);border-radius:var(--radius-sm);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-left:16px;">
         <div><span style="font-size:13px;color:var(--text);font-weight:600;">windows</span> <span style="font-size:12px;color:var(--text-muted);">— tiled + floating client surfaces</span></div>
-        <span style="font-family:monospace;font-size:11px;color:var(--text-subtle);">workspace · shadow+round</span>
+        <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-subtle);">workspace · shadow+round</span>
       </div>
       <!-- bottom layer-shell -->
       <div style="border:1px solid var(--border2);background:var(--surface2);border-radius:var(--radius-sm);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
         <div><span style="font-size:13px;color:var(--text-muted);font-weight:600;">bottom</span> <span style="font-size:12px;color:var(--text-subtle);">— desktop widgets, conky-style layers</span></div>
-        <span style="font-family:monospace;font-size:11px;color:var(--text-subtle);">layer 1 · no blur</span>
+        <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-subtle);">layer 1 · no blur</span>
       </div>
       <!-- wallpaper / background -->
       <div style="border:1px solid var(--border2);background:linear-gradient(135deg,#1A2235 0%,#2D3652 60%,#3a2d52 100%);border-radius:var(--radius-sm);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
         <div><span style="font-size:13px;color:#fff;font-weight:600;">wallpaper</span> <span style="font-size:12px;color:rgba(255,255,255,.6);">— background layer, the only blur source</span></div>
-        <span style="font-family:monospace;font-size:11px;color:rgba(255,255,255,.5);">layer 0 · damage = full</span>
+        <span style="font-family:var(--font-mono);font-size:11px;color:rgba(255,255,255,.5);">layer 0 · damage = full</span>
       </div>
     </div>
     <div style="padding:10px 18px;border-top:1px solid var(--border2);background:var(--surface2);font-size:12px;color:var(--text-muted);">
-      <span style="color:var(--amber);font-weight:600;">Cost insight:</span> blur only ever samples what is <em>behind</em> a surface. Stack depth × blurred-surface area is the real bill — not the number of windows. The bar blurs the wallpaper, not the windows beneath it (<code style="font-family:monospace;">blur:xray = true</code> on the top layer), so scrolling a document costs zero recompute of the bar.
+      <span style="color:#B45309;font-weight:600;">Cost insight:</span> blur only ever samples what is <em>behind</em> a surface. Stack depth × blurred-surface area is the real bill — not the number of windows. The bar blurs the wallpaper, not the windows beneath it (<code style="font-family:var(--font-mono);">blur:xray = true</code> on the top layer), so scrolling a document costs zero recompute of the bar.
   </div>
   </div>
 
@@ -51,12 +51,12 @@
     <div style="flex:1;min-width:300px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);overflow:hidden;">
       <div style="padding:14px 18px;border-bottom:1px solid var(--border2);font-size:14px;font-weight:700;color:var(--text);background:var(--surface2);">Decoration Tokens</div>
       <div style="padding:6px 0;">
-        <div style="display:flex;justify-content:space-between;padding:9px 18px;border-bottom:1px solid var(--border2);"><span style="font-size:12px;color:var(--text-muted);">blur:size</span><span style="font-family:monospace;font-size:12px;color:var(--text);">8</span></div>
-        <div style="display:flex;justify-content:space-between;padding:9px 18px;border-bottom:1px solid var(--border2);"><span style="font-size:12px;color:var(--text-muted);">blur:passes</span><span style="font-family:monospace;font-size:12px;color:var(--accent);">2 <span style="color:var(--text-subtle);">(dual-Kawase)</span></span></div>
-        <div style="display:flex;justify-content:space-between;padding:9px 18px;border-bottom:1px solid var(--border2);"><span style="font-size:12px;color:var(--text-muted);">blur:noise / contrast</span><span style="font-family:monospace;font-size:12px;color:var(--text);">0.012 / 1.06</span></div>
-        <div style="display:flex;justify-content:space-between;padding:9px 18px;border-bottom:1px solid var(--border2);"><span style="font-size:12px;color:var(--text-muted);">rounding</span><span style="font-family:monospace;font-size:12px;color:var(--text);">12px <span style="color:var(--text-subtle);">= --radius+2</span></span></div>
-        <div style="display:flex;justify-content:space-between;padding:9px 18px;border-bottom:1px solid var(--border2);"><span style="font-size:12px;color:var(--text-muted);">shadow:range / power</span><span style="font-family:monospace;font-size:12px;color:var(--text);">20 / 3</span></div>
-        <div style="display:flex;justify-content:space-between;padding:9px 18px;"><span style="font-size:12px;color:var(--text-muted);">shadow:color</span><span style="font-family:monospace;font-size:12px;color:var(--text);">1A2235 · 28%</span></div>
+        <div style="display:flex;justify-content:space-between;padding:9px 18px;border-bottom:1px solid var(--border2);"><span style="font-size:12px;color:var(--text-muted);">blur:size</span><span style="font-family:var(--font-mono);font-size:12px;color:var(--text);">8</span></div>
+        <div style="display:flex;justify-content:space-between;padding:9px 18px;border-bottom:1px solid var(--border2);"><span style="font-size:12px;color:var(--text-muted);">blur:passes</span><span style="font-family:var(--font-mono);font-size:12px;color:var(--accent);">2 <span style="color:var(--text-subtle);">(dual-Kawase)</span></span></div>
+        <div style="display:flex;justify-content:space-between;padding:9px 18px;border-bottom:1px solid var(--border2);"><span style="font-size:12px;color:var(--text-muted);">blur:noise / contrast</span><span style="font-family:var(--font-mono);font-size:12px;color:var(--text);">0.012 / 1.06</span></div>
+        <div style="display:flex;justify-content:space-between;padding:9px 18px;border-bottom:1px solid var(--border2);"><span style="font-size:12px;color:var(--text-muted);">rounding</span><span style="font-family:var(--font-mono);font-size:12px;color:var(--text);">12px <span style="color:var(--text-subtle);">= --radius+2</span></span></div>
+        <div style="display:flex;justify-content:space-between;padding:9px 18px;border-bottom:1px solid var(--border2);"><span style="font-size:12px;color:var(--text-muted);">shadow:range / power</span><span style="font-family:var(--font-mono);font-size:12px;color:var(--text);">20 / 3</span></div>
+        <div style="display:flex;justify-content:space-between;padding:9px 18px;"><span style="font-size:12px;color:var(--text-muted);">shadow:color</span><span style="font-family:var(--font-mono);font-size:12px;color:var(--text);">1A2235 · 28%</span></div>
       </div>
     </div>
     <!-- live sample -->
@@ -76,7 +76,7 @@
   <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:16px;">
     <div style="padding:14px 18px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;background:var(--surface2);">
       <div style="font-size:14px;font-weight:700;color:var(--text);">§54 Curve → Compositor Frame Mapping</div>
-      <span style="font-family:monospace;font-size:11px;color:var(--text-subtle);">windowrule · bezier · 60–144Hz</span>
+      <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-subtle);">windowrule · bezier · 60–144Hz</span>
     </div>
     <div style="padding:18px;display:flex;gap:18px;flex-wrap:wrap;align-items:center;">
       <!-- curve viz -->
@@ -89,19 +89,19 @@
           <circle cx="190" cy="15" r="3" fill="var(--accent)"/>
           <text x="95" y="50" font-family="monospace" font-size="9" fill="var(--text-subtle)">koompiSnap</text>
         </svg>
-        <div style="font-family:monospace;font-size:11px;color:var(--text-muted);margin-top:8px;">bezier = koompiSnap, 0.16, 1, 0.30, 1</div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-top:8px;">bezier = koompiSnap, 0.16, 1, 0.30, 1</div>
       </div>
       <!-- frame breakdown -->
       <div style="flex:1.2;min-width:260px;">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
-          <span style="font-size:11px;color:var(--text-subtle);width:54px;font-family:monospace;">window open</span>
+          <span style="font-size:11px;color:var(--text-subtle);width:54px;font-family:var(--font-mono);">window open</span>
           <div style="flex:1;height:18px;border-radius:4px;display:flex;overflow:hidden;border:1px solid var(--border2);">
             <div style="width:18%;background:var(--accent);opacity:.45;"></div>
             <div style="width:28%;background:var(--accent);opacity:.7;"></div>
             <div style="width:34%;background:var(--accent);"></div>
             <div style="width:20%;background:var(--accent);opacity:.6;"></div>
           </div>
-          <span style="font-family:monospace;font-size:11px;color:var(--accent);">180ms</span>
+          <span style="font-family:var(--font-mono);font-size:11px;color:var(--accent);">180ms</span>
         </div>
         <div style="font-size:11px;color:var(--text-muted);margin-bottom:12px;">~11 frames @ 60Hz · ~26 @ 144Hz — same curve, sampled per refresh. The animation is time-based, not frame-counted, so a 60Hz panel and a 144Hz panel finish together; the faster panel just draws smoother.</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -112,7 +112,7 @@
       </div>
     </div>
     <div style="padding:10px 18px;border-top:1px solid var(--border2);background:var(--surface2);font-size:12px;color:var(--text-muted);">
-      <span style="color:var(--cyan);font-weight:600;">Principal detail:</span> Hyprland animates via a monotonic timer driving the bezier, decoupled from frame delivery. We never tie motion to vsync-counted frames — that is the bug that makes GNOME animations feel different on a 90Hz vs 60Hz screen. KOOMPI motion is wall-clock identical everywhere.
+      <span style="color:#0E7490;font-weight:600;">Principal detail:</span> Hyprland animates via a monotonic timer driving the bezier, decoupled from frame delivery. We never tie motion to vsync-counted frames — that is the bug that makes GNOME animations feel different on a 90Hz vs 60Hz screen. KOOMPI motion is wall-clock identical everywhere.
   </div>
   </div>
 
@@ -120,14 +120,14 @@
   <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:16px;">
     <div style="padding:14px 18px;border-bottom:1px solid var(--border2);background:var(--surface2);display:flex;align-items:center;justify-content:space-between;">
       <div style="font-size:14px;font-weight:700;color:var(--text);">Effects Budget — auto-tiered by detected GPU</div>
-      <span style="font-family:monospace;font-size:11px;color:var(--text-subtle);">koompi-compositord · probed at first boot</span>
+      <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-subtle);">koompi-compositord · probed at first boot</span>
     </div>
     <div style="display:flex;flex-wrap:wrap;">
       <!-- HIGH tier -->
       <div style="flex:1;min-width:240px;padding:16px 18px;border-right:1px solid var(--border2);border-bottom:1px solid var(--border2);">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--accent);"></span><span style="font-size:13px;font-weight:700;color:var(--text);">Full Glass</span></div>
         <div style="font-size:11px;color:var(--text-subtle);margin-bottom:10px;">dGPU / Apple-class iGPU · ≥6GB VRAM</div>
-        <div style="font-family:monospace;font-size:11px;color:var(--text-muted);line-height:1.8;">passes 3 · size 10<br>shadow on · noise on<br>blur:xray on</div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);line-height:1.8;">passes 3 · size 10<br>shadow on · noise on<br>blur:xray on</div>
         <div style="margin-top:10px;height:5px;border-radius:3px;background:var(--surface3);overflow:hidden;"><div style="width:34%;height:100%;background:var(--accent);"></div></div>
         <div style="font-size:11px;color:var(--text-muted);margin-top:5px;">~2.1ms/frame · 12% GPU</div>
       </div>
@@ -135,7 +135,7 @@
       <div style="flex:1;min-width:240px;padding:16px 18px;border-right:1px solid var(--border2);border-bottom:1px solid var(--border2);background:var(--accent-glow);">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--cyan);"></span><span style="font-size:13px;font-weight:700;color:var(--text);">Balanced</span> <span class="badge new" style="font-size:10px;">default</span></div>
         <div style="font-size:11px;color:var(--text-subtle);margin-bottom:10px;">Intel UHD 620 · LPDDR4 dual-channel</div>
-        <div style="font-family:monospace;font-size:11px;color:var(--text-muted);line-height:1.8;">passes 2 · size 8<br>shadow on · noise on<br>blur:xray on</div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);line-height:1.8;">passes 2 · size 8<br>shadow on · noise on<br>blur:xray on</div>
         <div style="margin-top:10px;height:5px;border-radius:3px;background:var(--surface3);overflow:hidden;"><div style="width:58%;height:100%;background:var(--cyan);"></div></div>
         <div style="font-size:11px;color:var(--text-muted);margin-top:5px;">~5.8ms/frame · 38% GPU</div>
       </div>
@@ -143,7 +143,7 @@
       <div style="flex:1;min-width:240px;padding:16px 18px;border-bottom:1px solid var(--border2);">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--emerald);"></span><span style="font-size:13px;font-weight:700;color:var(--text);">Efficient</span></div>
         <div style="font-size:11px;color:var(--text-subtle);margin-bottom:10px;">Celeron N4020 · single-channel · netbook</div>
-        <div style="font-family:monospace;font-size:11px;color:var(--text-muted);line-height:1.8;">passes 1 · size 5<br>shadow off · noise off<br>blur on bar only</div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);line-height:1.8;">passes 1 · size 5<br>shadow off · noise off<br>blur on bar only</div>
         <div style="margin-top:10px;height:5px;border-radius:3px;background:var(--surface3);overflow:hidden;"><div style="width:80%;height:100%;background:var(--emerald);"></div></div>
         <div style="font-size:11px;color:var(--text-muted);margin-top:5px;">~7.4ms/frame · 61% GPU</div>
       </div>
@@ -184,24 +184,24 @@
     <div style="padding:18px;display:flex;gap:18px;flex-wrap:wrap;align-items:center;">
       <div style="flex:1;min-width:240px;">
         <div style="display:flex;align-items:center;gap:10px;">
-          <span style="font-size:12px;color:var(--emerald);font-weight:600;width:80px;">Smooth</span>
+          <span style="font-size:12px;color:#047857;font-weight:600;width:80px;">Smooth</span>
           <div style="flex:1;height:6px;border-radius:3px;background:var(--surface3);position:relative;">
             <div style="position:absolute;left:0;width:74%;height:100%;background:linear-gradient(90deg,var(--emerald),var(--amber));border-radius:3px;"></div>
             <div style="position:absolute;left:74%;top:50%;transform:translate(-50%,-50%);width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid var(--amber);box-shadow:0 1px 4px rgba(0,0,0,.2);"></div>
           </div>
-          <span style="font-size:12px;color:var(--amber);font-weight:600;width:80px;text-align:right;">Responsive</span>
+          <span style="font-size:12px;color:#B45309;font-weight:600;width:80px;text-align:right;">Responsive</span>
         </div>
-        <div style="font-family:monospace;font-size:11px;color:var(--text-muted);margin-top:10px;line-height:1.7;">vrr = 2 · adaptive sync<br>tearing = on (fullscreen only)<br>render-ahead = 1 frame</div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-top:10px;line-height:1.7;">vrr = 2 · adaptive sync<br>tearing = on (fullscreen only)<br>render-ahead = 1 frame</div>
       </div>
       <div style="flex:1;min-width:240px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:14px;">
         <div style="font-size:12px;color:var(--text);font-weight:600;margin-bottom:8px;">Per-window policy</div>
-        <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;color:var(--text-muted);"><span>Desktop / shell</span><span style="color:var(--emerald);font-family:monospace;">vsync · tearless</span></div>
-        <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;color:var(--text-muted);border-top:1px solid var(--border2);"><span>dota2.exe <span style="color:var(--text-subtle);">(fullscreen)</span></span><span style="color:var(--amber);font-family:monospace;">tearing on</span></div>
-        <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;color:var(--text-muted);border-top:1px solid var(--border2);"><span>mpv <span style="color:var(--text-subtle);">(video)</span></span><span style="color:var(--cyan);font-family:monospace;">vrr cap 60</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;color:var(--text-muted);"><span>Desktop / shell</span><span style="color:#047857;font-family:var(--font-mono);">vsync · tearless</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;color:var(--text-muted);border-top:1px solid var(--border2);"><span>dota2.exe <span style="color:var(--text-subtle);">(fullscreen)</span></span><span style="color:#B45309;font-family:var(--font-mono);">tearing on</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;color:var(--text-muted);border-top:1px solid var(--border2);"><span>mpv <span style="color:var(--text-subtle);">(video)</span></span><span style="color:#0E7490;font-family:var(--font-mono);">vrr cap 60</span></div>
       </div>
     </div>
     <div style="padding:10px 18px;border-top:1px solid var(--border2);background:var(--surface2);font-size:12px;color:var(--text-muted);">
-      Tearing is a per-window <em>opt-in</em>, never global. The shell stays buttery; only the focused fullscreen game tears — and only if it asks via the <code style="font-family:monospace;">wp-tearing-control</code> protocol. Switch focus away and the tear hint is dropped instantly.
+      Tearing is a per-window <em>opt-in</em>, never global. The shell stays buttery; only the focused fullscreen game tears — and only if it asks via the <code style="font-family:var(--font-mono);">wp-tearing-control</code> protocol. Switch focus away and the tear hint is dropped instantly.
   </div>
   </div>
 
@@ -229,8 +229,8 @@
       <div style="padding:16px;">
         <div style="position:relative;height:120px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);overflow:hidden;">
           <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 9px,rgba(203,213,225,.25) 9px,rgba(203,213,225,.25) 10px);"></div>
-          <div style="position:absolute;top:14px;left:14px;width:90px;height:40px;border:2px solid var(--cyan);background:var(--cyan-glow);border-radius:6px;display:flex;align-items:center;justify-content:center;"><span style="font-size:10px;font-family:monospace;color:var(--cyan);">dirty: caret</span></div>
-          <div style="position:absolute;bottom:14px;right:14px;width:84px;height:34px;border:2px solid var(--cyan);background:var(--cyan-glow);border-radius:6px;display:flex;align-items:center;justify-content:center;"><span style="font-size:10px;font-family:monospace;color:var(--cyan);">dirty: clock</span></div>
+          <div style="position:absolute;top:14px;left:14px;width:90px;height:40px;border:2px solid var(--cyan);background:var(--cyan-glow);border-radius:6px;display:flex;align-items:center;justify-content:center;"><span style="font-size:10px;font-family:var(--font-mono);color:#0E7490;">dirty: caret</span></div>
+          <div style="position:absolute;bottom:14px;right:14px;width:84px;height:34px;border:2px solid var(--cyan);background:var(--cyan-glow);border-radius:6px;display:flex;align-items:center;justify-content:center;"><span style="font-size:10px;font-family:var(--font-mono);color:#0E7490;">dirty: clock</span></div>
           <span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:11px;color:var(--text-subtle);">clean — not recomposited</span>
         </div>
         <div style="font-size:12px;color:var(--text-muted);margin-top:11px;">Only the blinking caret and the bar clock are damaged each frame — two small rects, not the whole screen. The expensive blur pass re-runs <em>only</em> over damaged regions intersecting glass. A typing user idles the GPU ~94% of the time.</div>

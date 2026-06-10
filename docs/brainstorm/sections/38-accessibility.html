@@ -14,7 +14,7 @@
         <div style="width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px var(--accent-glow);"></div>
         <span style="font-size:13px;font-weight:600;color:var(--text);">koompi-a11yd · Screen Reader (Orca-class, AT-SPI2)</span>
       </div>
-      <span style="font-size:10px;font-family:monospace;color:var(--emerald);background:var(--emerald-glow);padding:2px 8px;border-radius:20px;">SPEAKING · 1.0×</span>
+      <span style="font-size:10px;font-family:var(--font-mono);color:#047857;background:var(--emerald-glow);padding:2px 8px;border-radius:20px;">SPEAKING · 1.0×</span>
     </div>
     <div style="padding:18px;">
       <!-- Simulated shell bar with focus ring on one item -->
@@ -26,7 +26,7 @@
           <span style="font-size:12px;color:#fff;background:rgba(99,102,241,.25);border:2px solid var(--accent);border-radius:6px;padding:4px 10px;box-shadow:0 0 0 3px var(--accent-glow);">✦ AI</span>
           <div style="position:absolute;top:36px;left:0;white-space:nowrap;background:#0E1320;border:1px solid var(--accent);border-radius:8px;padding:8px 12px;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:2;">
             <div style="font-size:11px;color:#fff;font-weight:600;">"AI assistant, button"</div>
-            <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:2px;font-family:monospace;">role=push_button · 3 of 7 · Super+A to activate</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:2px;font-family:var(--font-mono);">role=push_button · 3 of 7 · Super+A to activate</div>
           </div>
         </div>
         <span style="font-size:12px;color:rgba(255,255,255,.45);margin-left:auto;">14:08</span>
@@ -36,30 +36,30 @@
       <div style="display:flex;gap:18px;flex-wrap:wrap;">
         <div style="flex:1;min-width:280px;">
           <div style="font-size:11px;font-weight:600;color:var(--text-subtle);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">AT-SPI2 Accessibility Tree (live)</div>
-          <div style="font-family:monospace;font-size:11px;line-height:1.9;color:var(--text-muted);background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:12px;">
+          <div style="font-family:var(--font-mono);font-size:11px;line-height:1.9;color:var(--text-muted);background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:12px;">
             <div>▾ <span style="color:var(--accent);">application</span> "koompi-shell"</div>
             <div style="padding-left:14px;">▾ <span style="color:var(--accent);">panel</span> "Shell Bar" <span style="color:var(--text-subtle);">[orientation: horizontal]</span></div>
             <div style="padding-left:28px;">• push_button "Workspaces"</div>
-            <div style="padding-left:28px;background:var(--accent-glow);border-radius:4px;">▸ push_button "AI assistant" <span style="color:var(--emerald);">←focus</span></div>
+            <div style="padding-left:28px;background:var(--accent-glow);border-radius:4px;">▸ push_button "AI assistant" <span style="color:#047857;">←focus</span></div>
             <div style="padding-left:28px;">• label "14:08" <span style="color:var(--text-subtle);">[live: polite]</span></div>
             <div style="padding-left:28px;">• push_button "Battery 84 percent"</div>
           </div>
-          <div style="font-size:10px;color:var(--text-subtle);margin-top:6px;">Every QML <code style="font-family:monospace;">Accessible</code> attached property maps to one node. Custom-painted widgets that forget it appear as "unnamed filler" — caught by CI a11y-lint before merge.</div>
+          <div style="font-size:10px;color:var(--text-subtle);margin-top:6px;">Every QML <code style="font-family:var(--font-mono);">Accessible</code> attached property maps to one node. Custom-painted widgets that forget it appear as "unnamed filler" — caught by CI a11y-lint before merge.</div>
         </div>
         <div style="flex:1;min-width:240px;">
           <div style="font-size:11px;font-weight:600;color:var(--text-subtle);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Speech Engine</div>
           <div style="display:flex;flex-direction:column;gap:8px;">
             <div style="display:flex;justify-content:space-between;align-items:center;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;">
               <span style="font-size:12px;color:var(--text);">Voice</span>
-              <span style="font-size:12px;color:var(--accent);font-family:monospace;">Piper · km_KH-sokha (on-device)</span>
+              <span style="font-size:12px;color:var(--accent);font-family:var(--font-mono);">Piper · km_KH-sokha (on-device)</span>
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;">
               <span style="font-size:12px;color:var(--text);">Rate</span>
-              <span style="font-size:12px;color:var(--text-muted);font-family:monospace;">320 wpm</span>
+              <span style="font-size:12px;color:var(--text-muted);font-family:var(--font-mono);">320 wpm</span>
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;background:var(--emerald-glow);border:1px solid var(--emerald);border-radius:8px;padding:8px 12px;">
               <span style="font-size:12px;color:var(--text);">Network</span>
-              <span style="font-size:12px;color:var(--emerald);font-weight:600;">Offline · 0 bytes egress</span>
+              <span style="font-size:12px;color:#047857;font-weight:600;">Offline · 0 bytes egress</span>
             </div>
           </div>
         </div>
@@ -116,7 +116,7 @@
             <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;position:relative;overflow:hidden;">
               <div style="font-size:11px;color:var(--text-muted);">slide-up 220ms · scale 0.94→1 · blur 12px</div>
               <div style="margin-top:6px;height:24px;background:linear-gradient(90deg,var(--accent-glow),transparent);border-radius:5px;"></div>
-              <div style="font-size:9px;color:var(--amber);margin-top:6px;">⚠ vestibular trigger</div>
+              <div style="font-size:9px;color:#B45309;margin-top:6px;">⚠ vestibular trigger</div>
             </div>
           </div>
           <div style="flex:1;">
@@ -124,7 +124,7 @@
             <div style="background:var(--surface2);border:1px solid var(--emerald);border-radius:8px;padding:10px;">
               <div style="font-size:11px;color:var(--text-muted);">cross-fade 90ms · no scale · no parallax</div>
               <div style="margin-top:6px;height:24px;background:var(--emerald-glow);border-radius:5px;"></div>
-              <div style="font-size:9px;color:var(--emerald);margin-top:6px;">✓ opacity-only, motion-safe</div>
+              <div style="font-size:9px;color:#047857;margin-top:6px;">✓ opacity-only, motion-safe</div>
             </div>
           </div>
         </div>
@@ -144,7 +144,7 @@
           <div style="position:absolute;left:75%;width:16px;height:16px;background:var(--accent);border-radius:50%;top:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 4px var(--accent-glow);"></div>
         </div>
         <span style="font-size:20px;color:var(--text-subtle);">A</span>
-        <span style="font-family:monospace;font-size:13px;color:var(--accent);width:48px;text-align:right;">200%</span>
+        <span style="font-family:var(--font-mono);font-size:13px;color:var(--accent);width:48px;text-align:right;">200%</span>
       </div>
       <div style="display:flex;gap:12px;flex-wrap:wrap;">
         <div style="flex:1;min-width:220px;">
@@ -164,7 +164,7 @@
           </div>
         </div>
       </div>
-      <div style="font-size:11px;color:var(--text-muted);margin-top:12px;">Scaling is fractional (PipeWire-friendly, no blurry bitmap upscale) and applied via Wayland <code style="font-family:monospace;">wp_fractional_scale</code>. The bar height tracks font metrics — at 200% it grows to 56px and the clock truncates seconds before it ever truncates the hour. Icons are SVG, so they stay crisp at any factor for the next 50 years of higher-DPI panels.</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:12px;">Scaling is fractional (PipeWire-friendly, no blurry bitmap upscale) and applied via Wayland <code style="font-family:var(--font-mono);">wp_fractional_scale</code>. The bar height tracks font metrics — at 200% it grows to 56px and the clock truncates seconds before it ever truncates the hour. Icons are SVG, so they stay crisp at any factor for the next 50 years of higher-DPI panels.</div>
     </div>
   </div>
 
@@ -184,7 +184,7 @@
               <div style="font-size:11px;color:var(--cyan);margin-top:2px;">button · focused</div>
             </div>
           </div>
-          <div style="position:absolute;bottom:10px;left:16px;font-size:10px;color:var(--cyan);font-family:monospace;">lens 4.0× · tracks AT-SPI focus, not just cursor</div>
+          <div style="position:absolute;bottom:10px;left:16px;font-size:10px;color:var(--cyan);font-family:var(--font-mono);">lens 4.0× · tracks AT-SPI focus, not just cursor</div>
         </div>
         <div style="font-size:11px;color:var(--text-muted);margin-top:10px;">The lens follows the screen-reader focus object, so keyboard-only users keep the magnified region locked to wherever Tab lands — not chasing a mouse they may not use. Edge-pan is smoothed even in reduced-motion (an instant snap there would itself be nauseating).</div>
       </div>
@@ -195,25 +195,25 @@
       <div style="padding:12px 16px;background:var(--surface2);border-bottom:1px solid var(--border2);font-size:13px;font-weight:600;color:var(--text);">Full Keyboard Navigation</div>
       <div style="padding:16px;">
         <div style="display:flex;flex-direction:column;gap:7px;font-size:12px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;"><span style="color:var(--text-muted);">Cycle bar regions</span><span style="font-family:monospace;color:var(--text);background:var(--surface3);border:1px solid var(--border);border-radius:5px;padding:2px 8px;">Super + F6</span></div>
-          <div style="display:flex;justify-content:space-between;align-items:center;"><span style="color:var(--text-muted);">Move within region</span><span style="font-family:monospace;color:var(--text);background:var(--surface3);border:1px solid var(--border);border-radius:5px;padding:2px 8px;">Tab / ← →</span></div>
-          <div style="display:flex;justify-content:space-between;align-items:center;"><span style="color:var(--text-muted);">Window menu</span><span style="font-family:monospace;color:var(--text);background:var(--surface3);border:1px solid var(--border);border-radius:5px;padding:2px 8px;">Super + Space</span></div>
-          <div style="display:flex;justify-content:space-between;align-items:center;"><span style="color:var(--text-muted);">Reveal hotkeys (no mouse)</span><span style="font-family:monospace;color:var(--accent);background:var(--accent-glow);border:1px solid var(--accent);border-radius:5px;padding:2px 8px;">Super + ?</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;"><span style="color:var(--text-muted);">Cycle bar regions</span><span style="font-family:var(--font-mono);color:var(--text);background:var(--surface3);border:1px solid var(--border);border-radius:5px;padding:2px 8px;">Super + F6</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;"><span style="color:var(--text-muted);">Move within region</span><span style="font-family:var(--font-mono);color:var(--text);background:var(--surface3);border:1px solid var(--border);border-radius:5px;padding:2px 8px;">Tab / ← →</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;"><span style="color:var(--text-muted);">Window menu</span><span style="font-family:var(--font-mono);color:var(--text);background:var(--surface3);border:1px solid var(--border);border-radius:5px;padding:2px 8px;">Super + Space</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;"><span style="color:var(--text-muted);">Reveal hotkeys (no mouse)</span><span style="font-family:var(--font-mono);color:var(--accent);background:var(--accent-glow);border:1px solid var(--accent);border-radius:5px;padding:2px 8px;">Super + ?</span></div>
         </div>
         <div style="height:1px;background:var(--border2);margin:14px 0;"></div>
         <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-subtle);margin-bottom:8px;">Motor assists</div>
         <div style="display:flex;flex-direction:column;gap:8px;">
           <div style="display:flex;justify-content:space-between;align-items:center;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;">
             <span style="font-size:12px;color:var(--text);">Sticky Keys</span>
-            <span style="font-size:11px;color:var(--emerald);">On · latch modifiers</span>
+            <span style="font-size:11px;color:#047857;">On · latch modifiers</span>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;">
             <span style="font-size:12px;color:var(--text);">Dwell Click</span>
-            <span style="font-size:11px;color:var(--text-muted);font-family:monospace;">hover 800ms → click</span>
+            <span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">hover 800ms → click</span>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;">
             <span style="font-size:12px;color:var(--text);">Slow / Bounce Keys</span>
-            <span style="font-size:11px;color:var(--text-muted);font-family:monospace;">debounce 200ms</span>
+            <span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">debounce 200ms</span>
           </div>
         </div>
       </div>
@@ -226,7 +226,7 @@
     <div style="flex:1;min-width:300px;background:var(--surface);border:1px solid var(--border2);border-radius:12px;overflow:hidden;">
       <div style="padding:12px 16px;background:var(--surface2);border-bottom:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center;">
         <span style="font-size:13px;font-weight:600;color:var(--text);">Voice-Only Launcher</span>
-        <span style="font-size:10px;color:var(--emerald);background:var(--emerald-glow);padding:2px 8px;border-radius:20px;">local STT · whisper.cpp</span>
+        <span style="font-size:10px;color:#047857;background:var(--emerald-glow);padding:2px 8px;border-radius:20px;">local STT · whisper.cpp</span>
       </div>
       <div style="padding:16px;">
         <div style="background:#1A2235;border-radius:10px;padding:14px;">
@@ -272,7 +272,7 @@
           </div>
           <div style="display:flex;justify-content:space-between;background:var(--emerald-glow);border:1px solid var(--emerald);border-radius:8px;padding:8px 12px;">
             <span style="color:var(--text);">Khmer TTS voice</span>
-            <span style="color:var(--emerald);font-weight:600;">on-device · no cloud</span>
+            <span style="color:#047857;font-weight:600;">on-device · no cloud</span>
           </div>
         </div>
         <div style="font-size:11px;color:var(--text-muted);margin-top:10px;">Khmer has no spaces between words, so a naive reader spells gibberish. KOOMPI segments with the same on-device model the IME uses, then speaks whole syllable clusters. This is the first Khmer-native screen reader to ship — Orca cannot do it today.</div>
@@ -294,7 +294,7 @@
   <div class="callout-group">
     <div class="callout">
       <div class="callout-title">A11y is a build gate, not a panel <span class="badge new">KOOMPI</span></div>
-      <p>Every custom-painted QML widget must declare its <code style="font-family:monospace;">Accessible</code> role, name, and action, or CI fails the merge. GNOME and KDE discover a11y gaps in the field, years late; KOOMPI catches an unlabeled button before it ever ships. Beautiful by default is enforced for everyone, by the pipeline.</p>
+      <p>Every custom-painted QML widget must declare its <code style="font-family:var(--font-mono);">Accessible</code> role, name, and action, or CI fails the merge. GNOME and KDE discover a11y gaps in the field, years late; KOOMPI catches an unlabeled button before it ever ships. Beautiful by default is enforced for everyone, by the pipeline.</p>
     </div>
     <div class="callout">
       <div class="callout-title">Assistive tech stays local</div>
@@ -306,7 +306,7 @@
     </div>
     <div class="callout">
       <div class="callout-title">Whole-system motion + scale</div>
-      <p>Reduced motion swaps Hyprland's animation curves at the compositor and fractional scaling flows through <code style="font-family:monospace;">wp_fractional_scale</code> — so one toggle changes every app at once, instead of each app re-implementing (and forgetting) the setting. The proof a Lifetime OS can keep adapting for fifty years on the same install.</p>
+      <p>Reduced motion swaps Hyprland's animation curves at the compositor and fractional scaling flows through <code style="font-family:var(--font-mono);">wp_fractional_scale</code> — so one toggle changes every app at once, instead of each app re-implementing (and forgetting) the setting. The proof a Lifetime OS can keep adapting for fifty years on the same install.</p>
     </div>
   </div>
 </section>

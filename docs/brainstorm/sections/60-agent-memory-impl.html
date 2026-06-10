@@ -4,7 +4,7 @@
     <span class="tag ai">AI</span>
   </div>
   <p class="desc">
-    The implementation design for <code style="color:var(--accent)">koompi-agent-memd</code> — the neuromorphic memory daemon. A Zig system process owns the durable substrate and IPC; a <code style="color:var(--cyan)">NeuroAgentMemory</code> controller encodes the four-layer cognitive logic. Two invariants govern everything: <strong style="color:var(--emerald)">the durability split</strong> (forget the index, never the record) and <strong style="color:var(--amber)">embedding-model obsolescence</strong> (raw episodic text is immortal so the index can be re-embedded under future models). Forgetting is a ranking property; remembering is reconstruction with citations.
+    The implementation design for <code style="color:var(--accent)">koompi-agent-memd</code> — the neuromorphic memory daemon. A Zig system process owns the durable substrate and IPC; a <code style="color:#0E7490">NeuroAgentMemory</code> controller encodes the four-layer cognitive logic. Two invariants govern everything: <strong style="color:#047857">the durability split</strong> (forget the index, never the record) and <strong style="color:#B45309">embedding-model obsolescence</strong> (raw episodic text is immortal so the index can be re-embedded under future models). Forgetting is a ranking property; remembering is reconstruction with citations.
   </p>
 
   <!-- ───────────────────────── 1. SYSTEM ARCHITECTURE DIAGRAM ───────────────────────── -->
@@ -45,7 +45,7 @@
   </div>
 
   <p class="desc" style="margin-bottom:16px;">
-    The Zig daemon is the only process that touches disk, sockets, and the encryption key. The Python controller is the <em>executable specification</em> of the cognitive logic — in the shipping binary this is Rust-native, but the architecture is language-neutral and shown here for readability. Every vector carries an <code style="color:var(--cyan)">embed_model_id</code> so a 2050 model never silently re-interprets who you were at 25.
+    The Zig daemon is the only process that touches disk, sockets, and the encryption key. The Python controller is the <em>executable specification</em> of the cognitive logic — in the shipping binary this is Rust-native, but the architecture is language-neutral and shown here for readability. Every vector carries an <code style="color:#0E7490">embed_model_id</code> so a 2050 model never silently re-interprets who you were at 25.
   </p>
 
   <!-- ───────────────────────── 2. NeuroAgentMemory CLASS ───────────────────────── -->
@@ -266,13 +266,13 @@ base(n)     = emotional_intensity(n) · novelty(n)
     <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.25);border-radius:10px;padding:18px 20px;">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
         <div style="width:8px;height:8px;background:var(--emerald);border-radius:50%;"></div>
-        <span style="font-size:13px;color:var(--emerald);font-weight:600;">Privacy Guarantees</span>
+        <span style="font-size:13px;color:#047857;font-weight:600;">Privacy Guarantees</span>
       </div>
       <div style="font-size:11.5px;line-height:1.9;color:rgba(255,255,255,0.65);">
-        <div style="margin-bottom:8px;"><span style="color:var(--emerald);">✓ All processing local.</span> Embedding + LLM + graph run on-device. Episodic data <strong>never</strong> egresses for consolidation — T2/T3 defer until a capable local session exists.</div>
-        <div style="margin-bottom:8px;"><span style="color:var(--emerald);">✓ Encryption at rest.</span> <code>@data</code> sealed with XChaCha20 (age). Key in TPM / Selendra-derived keystore, never on disk in cleartext.</div>
-        <div style="margin-bottom:8px;"><span style="color:var(--emerald);">✓ User audit trail.</span> <code>AuditTrail()</code> exposes every read/write/inference the daemon made — who asked, what surfaced, which sources cited.</div>
-        <div><span style="color:var(--emerald);">✓ Sovereignty.</span> Sync is opt-in E2EE; <code>--full</code> wipes the index but leaves <code>@data</code>; user can export or destroy episodic at will.</div>
+        <div style="margin-bottom:8px;"><span style="color:#047857;">✓ All processing local.</span> Embedding + LLM + graph run on-device. Episodic data <strong>never</strong> egresses for consolidation — T2/T3 defer until a capable local session exists.</div>
+        <div style="margin-bottom:8px;"><span style="color:#047857;">✓ Encryption at rest.</span> <code>@data</code> sealed with XChaCha20 (age). Key in TPM / Selendra-derived keystore, never on disk in cleartext.</div>
+        <div style="margin-bottom:8px;"><span style="color:#047857;">✓ User audit trail.</span> <code>AuditTrail()</code> exposes every read/write/inference the daemon made — who asked, what surfaced, which sources cited.</div>
+        <div><span style="color:#047857;">✓ Sovereignty.</span> Sync is opt-in E2EE; <code>--full</code> wipes the index but leaves <code>@data</code>; user can export or destroy episodic at will.</div>
       </div>
     </div>
 
@@ -283,11 +283,11 @@ base(n)     = emotional_intensity(n) · novelty(n)
         <span style="font-size:13px;color:var(--accent);font-weight:600;font-family:system-ui,sans-serif;">Performance Budget</span>
       </div>
       <div style="font-size:11.5px;line-height:1.95;color:rgba(255,255,255,0.7);">
-        <div style="display:flex;justify-content:space-between;"><span>working mem read/evict</span><span style="color:var(--emerald);">&lt; 1 ms</span></div>
-        <div style="display:flex;justify-content:space-between;"><span>episodic append (WAL)</span><span style="color:var(--emerald);">&lt; 5 ms</span></div>
-        <div style="display:flex;justify-content:space-between;"><span>semantic query (vec⊕FTS)</span><span style="color:var(--emerald);">&lt; 50 ms</span></div>
-        <div style="display:flex;justify-content:space-between;"><span>graph_expand depth-2</span><span style="color:var(--cyan);">&lt; 20 ms</span></div>
-        <div style="display:flex;justify-content:space-between;"><span>full reconstruct (+LLM)</span><span style="color:var(--amber);">≈ goal_lat</span></div>
+        <div style="display:flex;justify-content:space-between;"><span>working mem read/evict</span><span style="color:#047857;">&lt; 1 ms</span></div>
+        <div style="display:flex;justify-content:space-between;"><span>episodic append (WAL)</span><span style="color:#047857;">&lt; 5 ms</span></div>
+        <div style="display:flex;justify-content:space-between;"><span>semantic query (vec⊕FTS)</span><span style="color:#047857;">&lt; 50 ms</span></div>
+        <div style="display:flex;justify-content:space-between;"><span>graph_expand depth-2</span><span style="color:#0E7490;">&lt; 20 ms</span></div>
+        <div style="display:flex;justify-content:space-between;"><span>full reconstruct (+LLM)</span><span style="color:#B45309;">≈ goal_lat</span></div>
         <div style="display:flex;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.08);margin-top:6px;padding-top:6px;"><span>sleep cycle T2/T3</span><span style="color:var(--accent);">async · non-blocking</span></div>
         <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:8px;font-family:system-ui,sans-serif;">Floor: 4 GB / CPU-only. Hot path never blocks on consolidation; sleep tiers run off the UI thread on AC + idle.</div>
       </div>
@@ -306,7 +306,7 @@ base(n)     = emotional_intensity(n) · novelty(n)
     </div>
     <div class="callout">
       <div class="callout-title">Recorded vs inferred, always</div>
-      <p>Every reconstructed span is tagged <code style="color:var(--emerald)">recorded</code> (an episodic row, clickable + timestamped) or <code style="color:var(--amber)">inferred</code> (LLM reconstruction, flagged). An OS entrusted with a human life that confabulates is a betrayal; this one is auditable down to the timestamped row.</p>
+      <p>Every reconstructed span is tagged <code style="color:#047857">recorded</code> (an episodic row, clickable + timestamped) or <code style="color:#B45309">inferred</code> (LLM reconstruction, flagged). An OS entrusted with a human life that confabulates is a betrayal; this one is auditable down to the timestamped row.</p>
     </div>
   </div>
 </section>

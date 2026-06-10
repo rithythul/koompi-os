@@ -281,6 +281,8 @@ window.initObserver = initObserver;
 
 // ── Async section loader ─────────────────────────────────────
 var sectionFiles = [
+  'sections/00-what-is.html',
+  'sections/84-system-map.html',
   'sections/01-design-system.html',
   'sections/02-shell-bar.html',
   'sections/03-launcher.html',
@@ -294,6 +296,8 @@ var sectionFiles = [
   'sections/34-window-management.html',
   'sections/45-file-manager.html',
   'sections/46-clipboard-manager.html',
+  'sections/82-browser.html',
+  'sections/83-app-suite.html',
   'sections/10-ai-sidebar.html',
   'sections/11-tool-approval.html',
   'sections/12-rag-sources.html',
@@ -330,7 +334,6 @@ var sectionFiles = [
   'sections/57-gaming-mode.html',
   'sections/16-ambient-intelligence.html',
   'sections/17-memory-palace.html',
-  'sections/18-fluid-continuity.html',
   'sections/19-proactive-os.html',
   'sections/20-appless-computing.html',
   'sections/21-khmer-ai.html',

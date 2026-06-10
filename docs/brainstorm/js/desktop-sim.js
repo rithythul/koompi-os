@@ -91,6 +91,132 @@
     if (tl && title) tl.textContent = title;
   };
 
+  // ── Window controls: close / minimize / maximize ──────────
+  // Delegated — the ✕ ─ ▢ buttons in every titlebar are live.
+  var HUG_FULL = 'left:14px;top:54px;right:14px;bottom:14px;';
+  var hugLayouts = {
+    'term,code,fox': {
+      term: 'left:14px;top:54px;width:calc(40% - 21px);bottom:14px;',
+      code: 'left:calc(40% + 7px);top:54px;right:14px;bottom:calc(40% + 7px);',
+      fox:  'left:calc(40% + 7px);right:14px;top:calc(60% + 7px);bottom:14px;'
+    },
+    'term,code': {
+      term: 'left:14px;top:54px;width:calc(40% - 21px);bottom:14px;',
+      code: 'left:calc(40% + 7px);top:54px;right:14px;bottom:14px;'
+    },
+    'term,fox': {
+      term: 'left:14px;top:54px;width:calc(40% - 21px);bottom:14px;',
+      fox:  'left:calc(40% + 7px);top:54px;right:14px;bottom:14px;'
+    },
+    'code,fox': {
+      code: 'left:14px;top:54px;right:14px;bottom:calc(40% + 7px);',
+      fox:  'left:14px;top:calc(60% + 7px);right:14px;bottom:14px;'
+    },
+    'term': { term: HUG_FULL }, 'code': { code: HUG_FULL }, 'fox': { fox: HUG_FULL }
+  };
+
+  function hugRetile() {
+    var visible = ['term', 'code', 'fox'].filter(function (k) {
+      var w = q('hug', '#hug-' + k);
+      return w && !w.classList.contains('win-hidden');
+    });
+    var layout = hugLayouts[visible.join(',')];
+    if (!layout) return;
+    visible.forEach(function (k) {
+      var w = q('hug', '#hug-' + k);
+      delete w.dataset.prev; // a retile cancels any maximize
+      w.style.cssText = layout[k];
+    });
+  }
+
+  function updateReopen(sim) {
+    var r = root(sim);
+    if (!r) return;
+    var hidden = r.querySelectorAll('.sim-win.win-hidden').length;
+    var chip = r.querySelector('.sim-reopen');
+    if (!chip) {
+      chip = document.createElement('div');
+      chip.className = 'sim-reopen sim-reopen-' + sim;
+      chip.textContent = '↺ Reopen windows';
+      chip.onclick = function (ev) { ev.stopPropagation(); restoreAll(sim); };
+      r.appendChild(chip);
+    }
+    chip.classList.toggle('show', hidden > 0);
+  }
+
+  function hideWin(sim, win, kind) {
+    win.classList.remove('win-focused');
+    win.classList.add(kind === 'min' ? 'win-minimizing' : 'win-closing');
+    setTimeout(function () {
+      win.classList.add('win-hidden');
+      win.classList.remove('win-minimizing', 'win-closing');
+      if (sim === 'hug') hugRetile();
+      updateReopen(sim);
+    }, 200);
+  }
+
+  function restoreAll(sim) {
+    var r = root(sim);
+    if (!r) return;
+    r.querySelectorAll('.sim-win.win-hidden').forEach(function (w) {
+      w.classList.remove('win-hidden');
+      w.classList.add('win-closing'); // enter from the same curve it left on
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { w.classList.remove('win-closing'); });
+      });
+    });
+    if (sim === 'hug') hugRetile();
+    updateReopen(sim);
+  }
+  window.simRestoreAll = restoreAll;
+
+  var MAX_INSET = {
+    hug:     { left: '14px', top: '54px', right: '14px', bottom: '14px' },
+    taskbar: { left: '0',    top: '0',    right: '0',    bottom: '48px' },
+    dock:    { left: '14px', top: '34px', right: '14px', bottom: '64px' }
+  };
+  function toggleMax(sim, win) {
+    if (win.dataset.prev) {
+      win.style.cssText = win.dataset.prev;
+      delete win.dataset.prev;
+      return;
+    }
+    win.dataset.prev = win.style.cssText;
+    var m = MAX_INSET[sim] || MAX_INSET.hug;
+    win.style.left = m.left; win.style.top = m.top;
+    win.style.right = m.right; win.style.bottom = m.bottom;
+    win.style.width = 'auto'; win.style.height = 'auto';
+  }
+
+  // Capture phase: window onclick handlers call stopPropagation(),
+  // so bubble-phase delegation would never see these clicks.
+  document.addEventListener('click', function (e) {
+    var ctrl = e.target.closest ? e.target.closest('.sim-win-ctrl') : null;
+    if (ctrl) {
+      var win = ctrl.closest('.sim-win');
+      var simRoot = ctrl.closest('.desktop-sim');
+      if (!win || !simRoot) return;
+      e.stopPropagation(); // don't focus a window that's being closed
+      var sim = simRoot.id.replace('demo-', '');
+      if (ctrl.classList.contains('close')) hideWin(sim, win, 'close');
+      else if (ctrl.classList.contains('min')) hideWin(sim, win, 'min');
+      else if (ctrl.classList.contains('max')) toggleMax(sim, win);
+      return;
+    }
+    // Taskbar / dock app icons bring minimized windows back
+    var app = e.target.closest ? e.target.closest('.win-app, .dock-app') : null;
+    if (app) {
+      var sr = app.closest('.desktop-sim');
+      if (sr) restoreAll(sr.id.replace('demo-', ''));
+    }
+  }, true);
+
+  // ── Escape closes every open layer in every sim ────────────
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    ['hug', 'taskbar', 'dock'].forEach(function (sim) { closeAll(sim, null); });
+  });
+
   // ── Dismiss all panels when clicking the desktop background ──
   // Sidebars, popups, and the bar all call event.stopPropagation(),
   // so this only fires when the bare wallpaper / app-window area is hit.

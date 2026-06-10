@@ -6,9 +6,11 @@
   <p class="desc">
     When AI wants to execute a tool (read file, run command, call API), user sees this modal before anything happens. Explicit consent model — nothing runs without a human decision.
   </p>
+  <div style="display:inline-flex;align-items:center;gap:7px;margin:-16px 0 24px;font-size:11px;color:var(--accent);background:var(--accent-glow);border:1px solid rgba(99,102,241,.25);padding:4px 12px;border-radius:20px;">⊕ "Remember for this session" writes a session policy to the one Policy Engine · <a href="#system-map" style="color:var(--accent);font-weight:600;">System Map</a></div>
 
   <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:flex-start;">
-    <!-- Tool modal -->
+    <!-- Tool modal on a desktop stage -->
+    <div class="panel-stage" style="flex-shrink:1; min-width:320px;">
     <div class="tool-modal">
       <div class="tool-modal-header">
         <div class="tool-modal-icon">🔧</div>
@@ -38,6 +40,7 @@
         <div class="tool-btn">Allow once</div>
         <div class="tool-btn deny">✗ Deny</div>
       </div>
+    </div>
     </div>
 
     <!-- Callouts -->

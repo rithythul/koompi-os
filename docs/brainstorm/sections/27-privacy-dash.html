@@ -6,22 +6,23 @@
   <p class="desc">
     A live map of what KOOMPI OS knows about you, where that data lives, and what has been shared. Default posture: everything stays on-device. The user controls every outbound flow explicitly.
   </p>
+  <div style="display:inline-flex;align-items:center;gap:7px;margin:-16px 0 24px;font-size:11px;color:var(--accent);background:var(--accent-glow);border:1px solid rgba(99,102,241,.25);padding:4px 12px;border-radius:20px;">⊕ Becomes the <b>Overview</b> tab of Privacy Center · <a href="#system-map" style="color:var(--accent);font-weight:600;">System Map</a></div>
 
   <!-- Trust score hero -->
   <div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:24px;margin-bottom:16px;display:flex;gap:24px;align-items:center;">
     <div style="flex-shrink:0;width:80px;height:80px;border-radius:50%;background:conic-gradient(var(--emerald) 0% 94%,var(--surface3) 94%);display:flex;align-items:center;justify-content:center;position:relative;">
       <div style="width:62px;height:62px;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;flex-direction:column;">
-        <div style="font-size:20px;font-weight:700;color:var(--emerald);line-height:1;">94</div>
+        <div style="font-size:20px;font-weight:700;color:#047857;line-height:1;">94</div>
         <div style="font-size:9px;color:var(--text-subtle);">/ 100</div>
       </div>
     </div>
     <div>
       <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px;">Privacy Score: Excellent</div>
-      <div style="font-size:13px;color:var(--text-muted);margin-bottom:10px;">6 points: Telegram telemetry opt-out available. Firefox sync enabled.</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:10px;">−6: Telegram telemetry opt-out available · Firefox Sync sends bookmarks off-device.</div>
       <div style="display:flex;gap:8px;">
-        <span style="font-size:11px;background:var(--emerald-glow);color:var(--emerald);padding:3px 10px;border-radius:20px;">On-device AI ✓</span>
-        <span style="font-size:11px;background:var(--emerald-glow);color:var(--emerald);padding:3px 10px;border-radius:20px;">No cloud sync ✓</span>
-        <span style="font-size:11px;background:var(--amber-glow);color:var(--amber);padding:3px 10px;border-radius:20px;">2 open flows !</span>
+        <span style="font-size:11px;background:var(--emerald-glow);color:#047857;padding:3px 10px;border-radius:20px;">On-device AI ✓</span>
+        <span style="font-size:11px;background:var(--emerald-glow);color:#047857;padding:3px 10px;border-radius:20px;">No cloud sync ✓</span>
+        <span style="font-size:11px;background:var(--amber-glow);color:#B45309;padding:3px 10px;border-radius:20px;">2 open flows !</span>
       </div>
     </div>
   </div>
@@ -34,38 +35,38 @@
       <div style="display:grid;grid-template-columns:140px 1fr 90px 80px;align-items:center;gap:8px;font-size:13px;padding:10px 12px;background:var(--surface2);border-radius:8px;">
         <div style="color:var(--text);font-weight:500;">Firefox</div>
         <div style="color:var(--text-subtle);">Mozilla Sync → sync.services.mozilla.com</div>
-        <div style="font-family:monospace;font-size:11px;color:var(--text-subtle);">38.2 KB ↑</div>
-        <span style="font-size:11px;background:var(--amber-glow);color:var(--amber);padding:2px 8px;border-radius:20px;text-align:center;">Consented</span>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-subtle);">38.2 KB ↑</div>
+        <span style="font-size:11px;background:var(--amber-glow);color:#B45309;padding:2px 8px;border-radius:20px;text-align:center;">Consented</span>
       </div>
       <div style="display:grid;grid-template-columns:140px 1fr 90px 80px;align-items:center;gap:8px;font-size:13px;padding:10px 12px;background:var(--surface2);border-radius:8px;">
         <div style="color:var(--text);font-weight:500;">Telegram</div>
         <div style="color:var(--text-subtle);">Messages → telegram.org</div>
-        <div style="font-family:monospace;font-size:11px;color:var(--text-subtle);">1.4 MB ↑↓</div>
-        <span style="font-size:11px;background:var(--amber-glow);color:var(--amber);padding:2px 8px;border-radius:20px;text-align:center;">Consented</span>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-subtle);">1.4 MB ↑↓</div>
+        <span style="font-size:11px;background:var(--amber-glow);color:#B45309;padding:2px 8px;border-radius:20px;text-align:center;">Consented</span>
       </div>
       <div style="display:grid;grid-template-columns:140px 1fr 90px 80px;align-items:center;gap:8px;font-size:13px;padding:10px 12px;background:var(--surface2);border-radius:8px;">
         <div style="color:var(--text);font-weight:500;">koompi-ai</div>
         <div style="color:var(--text-subtle);">Local inference only — no network</div>
-        <div style="font-family:monospace;font-size:11px;color:var(--text-subtle);">0 B ↑</div>
-        <span style="font-size:11px;background:var(--emerald-glow);color:var(--emerald);padding:2px 8px;border-radius:20px;text-align:center;">Local</span>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-subtle);">0 B ↑</div>
+        <span style="font-size:11px;background:var(--emerald-glow);color:#047857;padding:2px 8px;border-radius:20px;text-align:center;">Local</span>
       </div>
       <div style="display:grid;grid-template-columns:140px 1fr 90px 80px;align-items:center;gap:8px;font-size:13px;padding:10px 12px;background:var(--surface2);border-radius:8px;">
         <div style="color:var(--text);font-weight:500;">koompi-contextd</div>
         <div style="color:var(--text-subtle);">Filesystem indexing — local only</div>
-        <div style="font-family:monospace;font-size:11px;color:var(--text-subtle);">0 B ↑</div>
-        <span style="font-size:11px;background:var(--emerald-glow);color:var(--emerald);padding:2px 8px;border-radius:20px;text-align:center;">Local</span>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-subtle);">0 B ↑</div>
+        <span style="font-size:11px;background:var(--emerald-glow);color:#047857;padding:2px 8px;border-radius:20px;text-align:center;">Local</span>
       </div>
       <div style="display:grid;grid-template-columns:140px 1fr 90px 80px;align-items:center;gap:8px;font-size:13px;padding:10px 12px;background:var(--surface2);border-radius:8px;">
         <div style="color:var(--text);font-weight:500;">System Update</div>
         <div style="color:var(--text-subtle);">pacman mirrors — package hashes only</div>
-        <div style="font-family:monospace;font-size:11px;color:var(--text-subtle);">4.1 KB ↑</div>
-        <span style="font-size:11px;background:var(--emerald-glow);color:var(--emerald);padding:2px 8px;border-radius:20px;text-align:center;">Minimal</span>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-subtle);">4.1 KB ↑</div>
+        <span style="font-size:11px;background:var(--emerald-glow);color:#047857;padding:2px 8px;border-radius:20px;text-align:center;">Minimal</span>
       </div>
-      <div style="display:grid;grid-template-columns:140px 1fr 90px 80px;align-items:center;gap:8px;font-size:13px;padding:10px 12px;background:var(--surface2);border-radius:8px;border-left:3px solid var(--cyan);">
-        <div style="color:var(--cyan);font-weight:500;">Selendra ID</div>
+      <div style="display:grid;grid-template-columns:140px 1fr 90px 80px;align-items:center;gap:8px;font-size:13px;padding:10px 12px;background:var(--surface2);border-radius:8px;border:1px solid rgba(34,211,238,.45);">
+        <div style="color:#0E7490;font-weight:500;">Selendra ID</div>
         <div style="color:var(--text-subtle);">Identity anchor — blockchain proof only</div>
-        <div style="font-family:monospace;font-size:11px;color:var(--text-subtle);">0.1 KB ↑</div>
-        <span style="font-size:11px;background:var(--cyan-glow);color:var(--cyan);padding:2px 8px;border-radius:20px;text-align:center;">Proof only</span>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-subtle);">0.1 KB ↑</div>
+        <span style="font-size:11px;background:var(--cyan-glow);color:#0E7490;padding:2px 8px;border-radius:20px;text-align:center;">Proof only</span>
       </div>
     </div>
   </div>

@@ -6,29 +6,30 @@
   <p class="desc">
     koompi-contextd continuously watches the filesystem and maintains a local semantic index for AI RAG queries. This panel shows indexing health, coverage, and per-source stats — all processed on-device.
   </p>
+  <div style="display:inline-flex;align-items:center;gap:7px;margin:-16px 0 24px;font-size:11px;color:var(--accent);background:var(--accent-glow);border:1px solid rgba(99,102,241,.25);padding:4px 12px;border-radius:20px;">⊕ Becomes the <b>Index</b> tab of Privacy Center · <a href="#system-map" style="color:var(--accent);font-weight:600;">System Map</a></div>
 
   <!-- Status overview bar -->
   <div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:20px 24px;margin-bottom:16px;">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-      <div style="width:10px;height:10px;background:var(--emerald);border-radius:50%;box-shadow:0 0 8px var(--emerald);flex-shrink:0;"></div>
+      <div style="width:10px;height:10px;background:var(--emerald);border-radius:50%;box-shadow:0 0 8px var(--emerald);flex-shrink:0;animation:pulse-dot 2s infinite;"></div>
       <span style="font-weight:600;color:var(--text);">Context Engine · Active</span>
-      <span style="margin-left:auto;font-size:12px;color:var(--text-subtle);font-family:monospace;">koompi-contextd 0.4.1</span>
+      <span style="margin-left:auto;font-size:12px;color:var(--text-subtle);font-family:var(--font-mono);">koompi-contextd 0.4.1</span>
     </div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
       <div style="background:var(--surface2);border-radius:8px;padding:12px;">
-        <div style="font-size:22px;font-weight:700;color:var(--cyan);font-family:monospace;">47,382</div>
+        <div style="font-size:22px;font-weight:700;color:#0E7490;font-family:var(--font-mono);">47,382</div>
         <div style="font-size:11px;color:var(--text-subtle);margin-top:2px;">Files Indexed</div>
       </div>
       <div style="background:var(--surface2);border-radius:8px;padding:12px;">
-        <div style="font-size:22px;font-weight:700;color:var(--accent);font-family:monospace;">2.1 GB</div>
+        <div style="font-size:22px;font-weight:700;color:var(--accent);font-family:var(--font-mono);">2.1 GB</div>
         <div style="font-size:11px;color:var(--text-subtle);margin-top:2px;">Vector Store Size</div>
       </div>
       <div style="background:var(--surface2);border-radius:8px;padding:12px;">
-        <div style="font-size:22px;font-weight:700;color:var(--emerald);font-family:monospace;">99.4%</div>
+        <div style="font-size:22px;font-weight:700;color:#047857;font-family:var(--font-mono);">99.4%</div>
         <div style="font-size:11px;color:var(--text-subtle);margin-top:2px;">Coverage</div>
       </div>
       <div style="background:var(--surface2);border-radius:8px;padding:12px;">
-        <div style="font-size:22px;font-weight:700;color:var(--amber);font-family:monospace;">138</div>
+        <div style="font-size:22px;font-weight:700;color:#B45309;font-family:var(--font-mono);">138</div>
         <div style="font-size:11px;color:var(--text-subtle);margin-top:2px;">Pending Queue</div>
       </div>
     </div>
@@ -39,7 +40,7 @@
     <div style="font-size:12px;font-weight:600;color:var(--text-subtle);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">Currently Indexing</div>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="4" width="10" height="8" rx="1" stroke="var(--cyan)" stroke-width="1.5"/><path d="M4 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" stroke="var(--cyan)" stroke-width="1.5"/></svg>
-      <span style="font-family:monospace;font-size:13px;color:var(--text);">~/Documents/Projects/koompi-os/</span>
+      <span style="font-family:var(--font-mono);font-size:13px;color:var(--text);">~/Documents/Projects/koompi-os/</span>
     </div>
     <div style="background:var(--surface3);border-radius:6px;height:6px;overflow:hidden;margin-bottom:8px;">
       <div style="width:73%;height:100%;background:linear-gradient(90deg,var(--cyan),var(--accent));border-radius:6px;"></div>
@@ -103,13 +104,13 @@
       <button style="font-size:11px;color:var(--accent);background:var(--accent-glow);border:none;border-radius:4px;padding:3px 10px;cursor:pointer;">+ Add Rule</button>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:6px;">
-      <span style="font-family:monospace;font-size:12px;background:var(--surface3);padding:4px 10px;border-radius:20px;color:var(--text-muted);">~/.ssh/</span>
-      <span style="font-family:monospace;font-size:12px;background:var(--surface3);padding:4px 10px;border-radius:20px;color:var(--text-muted);">~/.gnupg/</span>
-      <span style="font-family:monospace;font-size:12px;background:var(--surface3);padding:4px 10px;border-radius:20px;color:var(--text-muted);">*.env</span>
-      <span style="font-family:monospace;font-size:12px;background:var(--surface3);padding:4px 10px;border-radius:20px;color:var(--text-muted);">/proc/, /sys/</span>
-      <span style="font-family:monospace;font-size:12px;background:var(--surface3);padding:4px 10px;border-radius:20px;color:var(--text-muted);">node_modules/</span>
-      <span style="font-family:monospace;font-size:12px;background:var(--surface3);padding:4px 10px;border-radius:20px;color:var(--text-muted);">*.key, *.pem</span>
-      <span style="font-family:monospace;font-size:12px;background:var(--amber-glow);padding:4px 10px;border-radius:20px;color:var(--amber);">Downloads/Finance/ (manual)</span>
+      <span style="font-family:var(--font-mono);font-size:12px;background:var(--surface3);padding:4px 10px;border-radius:20px;color:var(--text-muted);">~/.ssh/</span>
+      <span style="font-family:var(--font-mono);font-size:12px;background:var(--surface3);padding:4px 10px;border-radius:20px;color:var(--text-muted);">~/.gnupg/</span>
+      <span style="font-family:var(--font-mono);font-size:12px;background:var(--surface3);padding:4px 10px;border-radius:20px;color:var(--text-muted);">*.env</span>
+      <span style="font-family:var(--font-mono);font-size:12px;background:var(--surface3);padding:4px 10px;border-radius:20px;color:var(--text-muted);">/proc/, /sys/</span>
+      <span style="font-family:var(--font-mono);font-size:12px;background:var(--surface3);padding:4px 10px;border-radius:20px;color:var(--text-muted);">node_modules/</span>
+      <span style="font-family:var(--font-mono);font-size:12px;background:var(--surface3);padding:4px 10px;border-radius:20px;color:var(--text-muted);">*.key, *.pem</span>
+      <span style="font-family:var(--font-mono);font-size:12px;background:var(--amber-glow);padding:4px 10px;border-radius:20px;color:#B45309;">Downloads/Finance/ (manual)</span>
     </div>
   </div>
 
