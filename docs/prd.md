@@ -5,7 +5,7 @@
 **Date:** 2026-06-07
 **Repo:** `~/workspace/koompi-os` (canonical, public) — github.com/rithythul/koompi-os
 **Status:** Pre-v1 (Naga). Desktop base production-grade; the "thinks" stack (~0% built today) is the work this PRD scopes. The current AI surface is a commodity chatbot sidebar — see §4.
-**Companion docs:** [`docs/roadmap.md`](roadmap.md) (current ship-gates, restore stack), [`docs/os-build.md`](os-build.md) (build/package architecture), [`docs/data-ownership-sync-plane.md`](data-ownership-sync-plane.md) (the ownership/sync plane design), [`docs/naming.md`](naming.md) (release eras), [`UPSTREAM.md`](../UPSTREAM.md) (fork attribution).
+**Companion docs:** [`docs/roadmap.md`](roadmap.md) (current ship-gates, restore stack), [`docs/os-build.md`](os-build.md) (build/package architecture), [`docs/data-ownership.md`](data-ownership.md) (the ownership/sync plane design), [`docs/naming.md`](naming.md) (release eras), [`UPSTREAM.md`](../UPSTREAM.md) (fork attribution).
 
 > **This PRD rewrites the product thesis.** The previous PRD positioned KOOMPI as a Cambodia-locked education OS whose moat was regional/recovery and which deferred AI as "not the moat." That framing is **dead and inverted** (founder decision, 2026-06-07). KOOMPI OS is now a **general-purpose, AI-first OS for the world**; the moat is **data-ownership AI in the AI era** (local-first/private by default; opt-in sovereign sync); Khmer is a **first-class feature**, not the positioning. Where the rest of the repo still carries the old frame, it is stale and must be reconciled — tracked as a hard doc-coherence gate in §11.
 
@@ -98,7 +98,7 @@ Every restore step is implemented and called in `installer/src/post_install.sh m
 - **G3 — `[koompi]` repo unpublished.** The signed repo has a TODO GPG key + publish URL; nothing can install `koompi-*` packages, which blocks shipping every new daemon the thinks stack needs.
 
 ### Subvolume layout (the L0/L1 coupling)
-`archinstall.zig:125-129` defines **five** subvolumes: `@ @home @var_log @var_cache @snapshots`. There is no dedicated index/data subvolume — and per the storage decision in §5.0 there must not be one. Live ISO locale is `C.UTF-8`; installer locale hardcodes `en_US.UTF-8`.
+`archinstall.zig:125-129` defines **five** subvolumes: `@ @home @var_log @var_cache @snapshots`. There is no 6th **system** subvolume (and must not be); the per-user index lives in a **nested subvol under `@home`** created at account setup — a different category (§5.0). Live ISO locale is `C.UTF-8`; installer locale hardcodes `en_US.UTF-8`.
 
 ### Tests / CI — none
 Zero test files in the repo; no `zig build`/`zig test` in any workflow; no AI eval/golden/red-team harness; CI sign+publish is commented out. For an OS that indexes untrusted content and can run shell commands, the **absence of a prompt-injection regression corpus** is a first-order gap (§5.6).
@@ -107,13 +107,13 @@ Zero test files in the repo; no `zig build`/`zig test` in any workflow; no AI ev
 
 ## 5. Product Pillars & Functional Requirements
 
-Seven pillars, mapped to the layer model (L0–L4) plus the cross-cutting model, privacy/ownership, and i18n planes. Requirements are functional (WHAT/WHY); the HOW lives in the layer designs and `docs/data-ownership-sync-plane.md`. FORK B means **all of L0–L4 and the planes are scoped here**; §7 then carves the demo slice. Where a layer design was over-optimistic, the FR reflects the **critique-corrected** state.
+Seven pillars, mapped to the layer model (L0–L4) plus the cross-cutting model, privacy/ownership, and i18n planes. Requirements are functional (WHAT/WHY); the HOW lives in the layer designs and `docs/data-ownership.md`. FORK B means **all of L0–L4 and the planes are scoped here**; §7 then carves the demo slice. Where a layer design was over-optimistic, the FR reflects the **critique-corrected** state.
 
 ### 5.0 The one storage decision (resolve once; every pillar references it)
 
 The L1 index DB holds **extracted plaintext chunks and invertible embeddings** of the user's documents/mail/chat. That single fact collapses three competing proposals (a system subvolume that survives restore; `@home`; a separate `@data` subvol that `--full` skips):
 
-- **FR-S1.** The index/knowledge-graph/memory store lives **per-user under `@home`** (e.g. `~/.local/state/koompi/...`), set `nodatacow` via `chattr +C` on the empty dir before the DB is created (SQLite on btrfs CoW fragments badly). It is **NOT** a system `/var/lib` store and **NOT** a separate subvolume that outlives the user.
+- **FR-S1.** The index/knowledge-graph/memory store lives **per-user under `@home`** as a **per-user nested btrfs subvolume** (`~/.local/state/koompi/...`), `nodatacow` via `chattr +C` on the empty subvol before the DB is created (SQLite on btrfs CoW fragments badly), and **excluded from `@home` snapshots** (a rebuildable GB-scale cache must not bloat rollback points). It is **NOT** a system `/var/lib` store and **NOT** a 6th *system* subvolume — a per-user nested subvol is a different category, created at account setup, and `--full` wipes it.
 - **FR-S2.** Consequence — **`--full` factory reset wipes the index** along with `@home` (required: a separate store would leak the prior user's plaintext to the next person; this is the confidentiality guarantee). **System Restore keeps `@home`**, so files and their index stay consistent. **Corruption is recovered by rebuild from source**, not rollback (the index is a derived cache).
 - **FR-S3.** Because System Restore reverts `@` (the daemon binary, the extension, the embedding model, the schema) while `@home` stays forward, the daemon **must** detect daemon-vs-schema skew on start and **forward-migrate or rebuild**, never silently corrupt. This also covers the rolling-distro case where `pacman -Syu` updates the daemon/extension/model independently of the on-disk schema. This migration story is owned **here**, not deferred (§5.6).
 
@@ -185,13 +185,13 @@ Ship Khmer as an **atomic unit** or not at all — a half-built language is wors
 - **FR-L4-3.** A **separate unattended execution mode** with default-deny write/danger capabilities: the interactive human-approval gate is meaningless at 6am, so headless runs are READ-only unless the user explicitly granted a capability to that specific automation; tool calls from non-interactive triggers are never auto-executed.
 - **FR-L4-4.** The flagship daily briefing (calendar + mail + notes/todos + RSS → local summarization → notification + sidebar card + markdown digest), fully local by default, degrading and labeling missing sources.
 - **FR-L4-5.** A Settings → Automations surface (discover/enable/run-now/edit-grants/view-history); opt-in only, nothing auto-enabled; run-history is the audit ledger for "what did my automations do, did anything leave."
-- **Honesty:** `qs ipc` requires the shell alive and is Quickshell-only — KDE and shell-down cases need a headless flow-runner; whether the KDE edition gets the briefing in v1 is a named scope decision (§7).
+- **Honesty:** `qs ipc` requires the shell alive and is Quickshell-only — so the briefing engine is the **headless flow-runner** (Ollama + sqlite-vec + D-Bus, no shell), which makes it **edition-agnostic**. Settled (§7; ADR-0007): the KDE edition gets the briefing in v1.
 
 ---
 
 ## 6. Non-Goals
 
-- **Not surveillance-funded AI.** No analytics or chat telemetry by default; `telemetry=none` means there is architecturally **no phone-home path**, not a flag set off.
+- **Not surveillance-funded AI.** No analytics or chat telemetry by default. `telemetry=none` is **policy-enforced in v1**; it becomes *architecturally* **no phone-home path** only once the root-owned netns/nftables enforcement (P-2) lands (**1.x**) — v1 does not overclaim it as structural (see the bounded claim below, FR-P7).
 - **Local-first is not a UI toggle.** Egress enforcement is code/kernel-level (FR-P2); a session-bus policy daemon alone does not isolate.
 - **The "nothing leaves your machine" claim is bounded.** It means the **sync path is the only audited data-egress path** (FR-P7), not that a general-purpose desktop with a browser emits zero packets. We will not overclaim.
 - **The index is not a sync product and not survive-restore state.** It is a per-user derived cache under `@home`, wiped by `--full`, rebuilt on corruption (FR-S1/S2). No separate subvolume outlives the user.
@@ -227,7 +227,7 @@ A "make-it-safe-and-true" base the critiques converge on, before any L1–L4 fea
 
 **Demo-minimal v1 (if time-boxed to CODE-C):** P0 + P1 (RAG over a few folders, local model) + a slice of P3 (the morning briefing) — that alone demonstrates the three talk beats (*never find files again*, *AI as foundation*, *morning automated*) **fully local**, without the complete L3 bus or the sync plane. The complete L0–L4 + planes remain the documented architecture (FORK B); the demo is a slice of it, not a shrink of it.
 
-**Out of scope for v1:** a software store, fleet management, a multi-device sync UI beyond single-device backup, Selendra anchoring on the critical path, and any heavier (LanceDB) vector tier. **Named scope decision:** whether the KDE edition gets the morning briefing in v1 or waits for the headless flow-runner.
+**Out of scope for v1:** a software store, fleet management, a multi-device sync UI beyond single-device backup, Selendra anchoring on the critical path, and any heavier (LanceDB) vector tier. **Settled scope decision:** the morning briefing is **edition-agnostic** (daemon-side headless `Ask()`, not shell-specific), so the **KDE edition gets it in v1** alongside Hyprland/Quickshell — see ADR-0007.
 
 ---
 
@@ -280,7 +280,7 @@ No metric below has been measured (the installer has never executed; the thinks 
 - **Planes are cross-cutting:** the privacy/ownership plane (§5.5) and the model plane (§5.7) underpin every layer; the policy enforcement point (FR-P2) and a fail-closed stub must exist before L1–L4 call it.
 - **Dependency licenses (verified 2026-06-07):** `sqlite-vec` (MIT/Apache, default vector index), SQLite/FTS5 (public domain), Ollama/llama.cpp (MIT), Automerge (MIT), libsodium (ISC), BGE-M3 (MIT). **Flagged:** LanceDB OSS is Apache-2.0 but **open-core** → optional heavier tier only, never the default. **Model weights** are first-class dependencies and must be license-verified per FR-M2. Run a transitive license scan (`cargo deny`) in CI.
 
-Execution detail and the current restore stack live in [`docs/roadmap.md`](roadmap.md); build/package architecture in [`docs/os-build.md`](os-build.md); the ownership/sync plane in [`docs/data-ownership-sync-plane.md`](data-ownership-sync-plane.md).
+Execution detail and the current restore stack live in [`docs/roadmap.md`](roadmap.md); build/package architecture in [`docs/os-build.md`](os-build.md); the ownership/sync plane in [`docs/data-ownership.md`](data-ownership.md).
 
 ---
 
@@ -309,7 +309,7 @@ Genuine unknowns the repo does not answer; resolve with the KOOMPI team and ecos
 - libvaxis 0.16 compatibility (a pinned commit that compiles clean) and whether Zig 0.16 + libvaxis is a stable installer baseline.
 
 **Product / scope**
-- Is the KDE edition co-first-class for the thinks stack and the morning briefing in v1, or does the briefing wait for the headless flow-runner?
+- ~~Is the KDE edition co-first-class for the thinks stack and the morning briefing in v1?~~ **Settled (§7; ADR-0007):** yes — the thinks stack is daemon-based and the briefing runs on the headless flow-runner, both edition-agnostic, so KDE is co-first-class in v1.
 - Translator + Khmer-QA resourcing and the coverage threshold to enable `km_KH`.
 - Accessibility baseline for GA (Wayland/Orca/at-spi reality on Hyprland and KDE).
 - Release-era naming (currently Khmer-mythology codenames, `docs/naming.md`) — keep as neutral internal codenames or move to a region-neutral scheme now that the product is positioned globally.

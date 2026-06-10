@@ -78,22 +78,26 @@ single placement satisfies, simultaneously:
 - **Confidentiality on hand-off** — `--full` (which wipes `@home`) destroys the
   plaintext chunks + embeddings. A system `@var_index` that `--full` skips would leak
   the prior user's data — rejected.
-- **Multi-user isolation** (the PRD's *primary* deployment) — per-`$XDG_STATE_HOME`
+- **Multi-user isolation** (a first-class case, not the primary deployment — prd §2) — per-`$XDG_STATE_HOME`
   means one student's index/keys are never co-located with another's, and one user's
   `koompi-restore --full` cannot wipe another user's index. A system `/var/lib/koompi`
   store breaks this — rejected.
 - **System-Restore consistency** — System Restore reverts `@` and keeps `@home`, so the
   index stays consistent with the source files it indexes (both survive together).
 - **Corruption recovery** — the index is a **rebuildable derived cache**; on corruption
-  the daemon drops it and re-extracts from source. No independent snapshot/subvolume is
-  needed. `chattr +C` on the empty `context/` dir at first-run gives `nodatacow` without
-  a new subvolume — **zero installer disk-layout change.**
+  the daemon drops it and re-extracts from source (no independent rollback needed). It
+  lives in a **per-user nested subvol** under `@home` (`~/.local/state/koompi`): `chattr
+  +C` gives `nodatacow`, and being a nested subvol **excludes it from `@home` snapshots**
+  so a GB-scale rebuildable cache never bloats rollback points. Created at account setup;
+  the installer's **5 SYSTEM subvolumes are unchanged** (a per-user nested subvol is not a
+  system subvol).
 
-**`@var_index` is superseded** — do not add a 6th subvolume to the archinstall
+**`@var_index` is superseded** — do not add a 6th **system** subvolume to the archinstall
 `disk_config` (`archinstall.zig:124-129` keeps `@ @home @var_log @var_cache
-@snapshots`). The vector index is **never synced** — each device re-embeds locally from
+@snapshots`). The per-user index nested subvol is created at **account setup**, not in
+`disk_config`. The vector index is **never synced** — each device re-embeds locally from
 synced source (syncing a binary vector DB is conflict-hell). See `architecture.md` §7
-for the schema; `docs/data-ownership-sync-plane.md` for the sync exclusion.
+for the schema; `docs/data-ownership.md` for the sync exclusion.
 
 ### 2.2 Single egress chokepoint — settled: root-owned enforcement, one decision brain
 
@@ -140,6 +144,7 @@ Track L1 — Context Engine: the data fabric ("never find files")        [v1]
 Track L2 — Assistant over your data: RAG, memory, safe tool-calling    [v1]
 Track L3 — App-context bus ("apps talk to each other")                 [1.x]
 Track L4 — Automation ("morning automated")                           [1.x]
+Track S  — Subsystem: per-context isolation (Light/App Window/Detonation) + Broker  [wrapper v1; modes 1.x]
 Track O  — Ownership/sync plane (KOOMPI.Cloud + Selendra)             [P0 at-rest in v1; sync/anchor 1.x]
 Track I  — Two-language (English default + Khmer first-class)          [UI base v1 if resourced; search w/ L1]
 Track X  — Cross-cutting: CI/test, migration, governance, a11y,       [interleaved; some v1-blocking]
@@ -147,6 +152,35 @@ Track X  — Cross-cutting: CI/test, migration, governance, a11y,       [interle
 ```
 
 Dependency spine and the v1 critical path are in §10.
+
+### 3.1 Phase-scheme crosswalk (the Track map is the model of record)
+
+Three numbering schemes exist across the docs and they **do not align** — `prd.md` §7's
+`P0–P4` and `architecture.md` §14's `P1–P6` were written before this Track map and number
+*different things*. **The Track labels here are canonical;** the P-schemes are reading aids
+that map onto Tracks as follows. (`data-ownership.md` already uses `O-1..O-4`, which match
+Track O.)
+
+| Concern | **Track (canonical)** | prd §7 | arch §14 | v1/1.x |
+|---|---|---|---|---|
+| Doc gate (rewrite to settled decisions) | precondition | — | step 0 | v1 |
+| Safe-base prefix (privacy default, gate `set_shell_config`, localhost fix, storage, policy stub) | G + R + P (P-0a/b/c, P-1 stub) | P0 (prefix 1–6) | steps 1–6 | v1 |
+| L0 substrate (`koompi-restore` PKGBUILD + polkit, per-user index slot, pre-stage embed/Ollama/OCR, seed model) | G + R + L1-prep | P0 | **P1** | v1 |
+| Local agency (native tool-calling, model pin) | L2 (L2-2) + P | P0 | P3 (tool-calling slice) | v1 |
+| L1 Context Engine ("never find files") | **L1** | P1 | P2 | v1 |
+| L2 RAG + memory + safe tool-calling | **L2** | P2 | P3 | v1 |
+| L3 app-bus ("apps talk") | **L3** | P3 (with L4) | P4 | 1.x |
+| L4 automation / morning briefing (**edition-agnostic** — KDE incl., ADR-0007) | **L4** | P3 (with L3) | P5 | 1.x |
+| Ownership at-rest | **O-1** | P4 | P6 | v1 |
+| Sync / cloud / Selendra anchor | **O-2..O-4** | P4 | P6 | 1.x (ADR-0008, ADR-0009) |
+| Subsystem: per-context isolation + Broker (Light/App Window/Detonation) | **S** | — (not in prd P-scheme; ADR-origin) | — | wrapper v1; modes 1.x (ADR-0010, ADR-0011) |
+| Khmer i18n (atomic with L1) | **I** | cross | i18n | v1 if resourced |
+| Cross-cutting (CI, migration, a11y, licensing) | **X** | cross | cross | interleaved |
+
+**The drift to remember:** prd `P0` is the widest — it spans the arch prefix (steps 1–6),
+arch `P1` (L0 substrate), **and** the tool-calling slice of arch `P3`. After that they track
+1:1 but offset: prd `P1` = arch `P2`; prd `P2` = arch `P3`; prd `P3` = arch `P4`+`P5`; prd
+`P4` = arch `P6` = Track O. When the schemes disagree, the Track wins.
 
 ---
 
@@ -527,11 +561,55 @@ meaningless at 6am). Design depth: `architecture.md` §8.2.
   (Ollama + sqlite-vec + D-Bus) so the briefing exists on KDE too. **Done when:** the
   briefing runs on a KDE session with the shell down.
 
+### Track S — Subsystem: per-context isolation + Broker — **wrapper v1; modes 1.x**
+
+Per-context isolated app contexts. Design of record: [ADR-0010](adr/0010-subsystem-two-axis-trust-driven-isolation.md)
+(two-axis, trust-driven; modes Light / App Window / Detonation Chamber) and
+[ADR-0011](adr/0011-subsystem-credential-broker.md) (credential boundary = engine, not store;
+deputy-first auth). Sequenced **boundary-value-first on cheap hardware, VM tiers later**; the
+Broker is the spine everything authenticated hangs off, and the VM tiers are gated by **The
+Floor** (16 GB+, [ADR-0001](adr/0001-degrade-local-never-silent-cloud.md)). Reuses Track P-2's
+root-owned egress chokepoint per-context — no parallel egress plane.
+
+- **S-0. Env-scoping wrapper** (`koompi-run --profile=…`: scoped env + key + config dir).
+  Ships earliest, standalone; **explicitly NOT a security boundary** (ADR-0002) — labelled as
+  ergonomics so it is never mistaken for isolation. Floor-friendly; may land in v1. **Done when:**
+  the same CLI runs against two providers with separate config dirs, and the UI calls it
+  convenience, not containment.
+- **S-1. Broker + Light mode + Deputy** (the first real boundary). `koompi-brokerd` (per-context
+  source store — *not* the shared `application=koompi` blob — + short-TTL scoped-token minting +
+  host-attested context identity (SO_PEERCRED for bwrap, vsock CID for VM) + brokered interactive auth, [ADR-0012](adr/0012-subsystem-brokered-interactive-auth.md));
+  Light = bwrap + per-context netns/nftables + hygiene store;
+  Deputy = TLS-terminating auth-injecting egress proxy with destination-pinning. Delivers
+  per-context egress isolation + deputy-first auth at **floor hardware** (no VM). **Done when:** a
+  trusted CLI in one context cannot reach a host outside its allowlist, holds no long-lived
+  secret, and every egress is in the host-side ledger.
+- **S-2. App Window — trusted-Linux seamless** (bwrap + Wayland-socket passthrough; compositor
+  withholds `wlr-screencopy`/`ext-data-control`/global-input). Seamless window for a *trusted*
+  Linux GUI app at native speed. **Done when:** a trusted Linux app appears as its own KOOMPI
+  window with no guest shell, screen-capture/clipboard not silently exposed.
+- **S-3. Detonation Chamber** (headless VM — Firecracker/Cloud-Hypervisor; hermetic, no
+  display/GPU/shared-FS; **complete** egress ledger; **no** secret injection). Want #1: run a
+  risky experiment without touching the host. Sequenced before the seamless-VM tier — headless is
+  simpler and is the higher-priority want. **16 GB+.** **Done when:** untrusted code runs fully
+  disposable, every byte of egress is ledgered, and disposal leaves no host residue.
+- **S-4. App Window — semi-trusted/foreign Linux microVM** (crosvm/Cloud-Hypervisor +
+  virtio-gpu/Venus + waypipe/Sommelier; vsock early-boot secret provisioning). Want #2: a foreign
+  Linux app as a seamless near-native window at VM-grade isolation. **16 GB+.** **Done when:** a
+  semi-trusted Linux app renders seamlessly with credential isolation enforced by the guest
+  kernel.
+- **S-5. App Window — Windows** (QEMU + FreeRDP-RemoteApp/RAIL — the ADR-0003 promotion to a
+  first-class App Window engine). Windows apps as seamless KOOMPI windows. **16 GB+, Windows
+  license.** **Done when:** a Windows app appears as its own KOOMPI window with no Windows shell.
+
+> Forward-looking constraint (ADR-0011 D3): if/when microVM snapshotting is built, secret-bearing
+> guests are non-snapshottable (warm-start = secret-free snapshot + fresh vsock re-injection).
+
 ### Track O — Ownership/sync plane (KOOMPI.Cloud + Selendra) — **P0 at-rest in v1; sync/anchor 1.x**
 
 Local-first/private on-device by default; opt-in E2EE sync to self-hosted KOOMPI.Cloud;
 Selendra anchors identity/keys/ownership only (never bulk data). Design depth:
-`docs/data-ownership-sync-plane.md`.
+`docs/data-ownership.md`.
 
 - **O-1 (v1). On-device encryption-at-rest** — `koompi-vault` (master key from
   gnome-keyring + PAM; optional TPM2 seal), per-object DEKs, XChaCha20-Poly1305. Migrate
@@ -628,12 +706,12 @@ not footnotes.
   low-connectivity install has a working local assistant without a ~4GB first-boot pull.
   **Done when:** the bundled default weights are confirmed no-strings and a fully-offline
   install has a working local model.
-- **X-5 (v1). Multi-user isolation as a first-class input** (the PRD's PRIMARY
-  deployment). Per-user index namespace + per-user keyring scoping + per-user policy with
-  an admin/parent **LOCK FLOOR** stored where factory-reset cannot revert it (a minor
-  must not reset away the parental floor — note `/etc` lives in `@`, so the floor needs a
-  persist-across-`--full` home + a restrictive `@baseline`), and per-user `--full`
-  hand-off semantics. **Drop all system-wide `/var/lib/koompi` user-data stores.** **Done
+- **X-5. Multi-user isolation as a first-class input** (a must-handle normal-OS concern,
+  not the primary deployment — prd §2). **v1:** per-user index namespace + per-user
+  keyring scoping + per-user policy + per-user `--full` hand-off semantics. **1.x (school
+  admin tier):** the admin/parent **LOCK FLOOR** (a minor must not reset away the parental
+  floor) — needs a persist-across-`--full` home (note `/etc` lives in `@`) + a restrictive
+  `@baseline`; deferred to the 1.x admin interface. **Drop all system-wide `/var/lib/koompi` user-data stores.** **Done
   when:** two users on one device are isolated and a student account cannot loosen the
   admin floor via factory reset.
 - **X-6 (v1). Aggregate hardware footprint + honest capability ladder.** Sum **all**
@@ -649,7 +727,8 @@ not footnotes.
 - **X-7 (v1). Privacy-governance artifact.** A written privacy posture / data-collection
   matrix (what stays local, what leaves only on opt-in, retention/TTL), a minors/parental/
   school-admin consent framework, and the user-visible egress audit ledger (Track P-6).
-  `telemetry=none` must be **structural** (no outbound path exists) not a flag. **Done
+  `telemetry=none` is policy-enforced in v1 and **structural** (no outbound path exists)
+  only once P-2 netns/nftables lands (1.x) — never merely a flag. **Done
   when:** the posture doc exists and a school can audit what a minor's machine indexed and
   what (if anything) left it.
 - **X-8 (1.x). Accessibility track.** Zero a11y references exist anywhere in the stack.
@@ -663,6 +742,22 @@ not footnotes.
   all depend on `org.koompi.Policy`. **Done when:** a clean install brings up
   policy → context → assistant → bus in the correct order with activation, and a
   `cargo deny` license+transitive scan gates CI.
+
+### 10.1 Ratified owner assignments (settled in grilling — DO re-confirm names, not the decisions)
+
+The *decisions* below are ratified; what each line needs is a **named human owner** before its
+work starts. One line is still **UNASSIGNED** and that is the real gap.
+
+| Decision | Ratified outcome | Owner | Where recorded |
+|---|---|---|---|
+| TPM2 across the device lineup | survey required/optional/absent; sizes the master-key sealing story | **KOOMPI hardware** | `data-ownership.md` (ON-DEVICE) |
+| KOOMPI.Cloud operation | offer BOTH operated + self-host (zero-knowledge) | **KOOMPI business/ops** | ADR-0008 |
+| Selendra anchoring | OFF by default; opt-in identity/ownership anchor, 1.x | **KOOMPI + Selendra** | ADR-0009 |
+| Recovery / key-escrow | optional wrapped key-escrow blob, default-OFF; explicit UX | **KOOMPI product** | `data-ownership.md` (KOOMPI.Cloud), ADR-0008 |
+| Khmer translation execution | `km_KH.json` gated on coverage threshold; `he_HE`→`he_IL` when touching locales | **KOOMPI community/team** | Track I (I-3), prd FR-I1 |
+| Accessibility track (X-8) | a11y is a real 1.x track, not a footnote | **UNASSIGNED ⚠** | Track X-8 |
+| Phase-numbering reconciliation | Track map is the model of record | **DONE** (§3.1 crosswalk) | §3.1 |
+| Package-signing custodian | CI-secret-with-guardrails for v1 | **open (KOOMPI-internal)** | ADR-0005 |
 
 ---
 

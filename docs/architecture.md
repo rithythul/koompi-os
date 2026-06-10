@@ -23,16 +23,8 @@ by side, and never lets the vision masquerade as shipped.
 **Date:** 2026-06-07
 **Repo:** `~/workspace/koompi-os` — github.com/rithythul/koompi-os
 **Companion docs:** [`os-build.md`](os-build.md) (build/package graph),
-[`data-ownership-sync-plane.md`](data-ownership-sync-plane.md),
+[`data-ownership.md`](data-ownership.md),
 [`roadmap.md`](roadmap.md).
-
-> **Doc-coherence warning.** `docs/prd.md` still encodes the **dead, inverted**
-> thesis ("built for Cambodian students," "regional/education moat," "AI is NOT the
-> moat," AI deferred to last). The settled 2026-06-07 product decisions **invert
-> all of it**: general-purpose OS for the world, AI-first, AI **is** the moat,
-> Khmer is a feature not the positioning. This architecture follows the settled
-> decisions. The PRD must be rewritten before any contributor builds from it — see
-> §13.
 
 ---
 
@@ -162,7 +154,8 @@ Process model: **one `systemd --user` instance per logged-in user** for
 `koompi-contextd`, `koompi-assistantd`, `koompi-busd` (per-user isolation on shared
 lab machines — see §10). The shell (`Ai.qml`) is a **client**, never the engine.
 `org.koompi.Policy` runs system + per-user. The native daemons are **Rust**
-(memory-safe, no GC, small RSS, clean async D-Bus via `zbus`); the shell stays
+(chosen for **ecosystem** — `zbus`, `rustls`/`reqwest`, `rusqlite`/`sqlite-vec`,
+Automerge — not language properties, see ADR-0004); the shell stays
 QML/Quickshell; the installer/restore stay Zig.
 
 ---
@@ -181,7 +174,7 @@ without later breaking the restore model.
 | `koompi-installer` | G1: real libvaxis event loop (replace `nextAction()==.advance` stub `main.zig:122`; real disk enumeration; Review keypress gate before destructive exec `main.zig:264`); emit `user_configuration.json`/`user_credentials.json` from a **pinned** archinstall schema; exec `archinstall --silent`; run `post_install.sh` in chroot | Zig 0.16, libvaxis (pinned 0.16 rev, currently dropped), archinstall 4.x **exact** pin | archinstall, btrfs-progs, snapper, grub, grub-btrfs |
 | `koompi-restore` (+ PKGBUILD) | G2b: package the code-complete CLI; install `/usr/bin/koompi-restore`, `reset_home.sh`, `koompi-factory-reset-home.service`, **and a polkit action** for GUI escalation; pulled into `koompi-base` so reset ships on every install | Zig 0.16, systemd unit (`Before=home.mount`), polkit, btrfs/snapper | snapper, btrfs-progs, polkit |
 | btrfs layout + `@baseline` | 5 subvolumes today (`@ @home @var_log @var_cache @snapshots`, `archinstall.zig:125-129`); pin a read-only un-prunable `@baseline` after install (factory point); snap-pac pre/post per pacman txn; grub-btrfs bootable snapshot menu | btrfs, snapper, snap-pac, grub-btrfs | — |
-| `@data` subvol (ownership store) | **NEW, optional/P-late:** `/var/lib/koompi/data` for the *canonical encrypted* object store + CRDT log, own snapper config. The *derived index* does **not** live here (§7) | btrfs subvolume + snapper | btrfs-progs |
+| `@data` subvol (ownership store) | **1.x ownership plane (NOT a v1 layout change):** `/var/lib/koompi/data` for the *canonical encrypted* object store + CRDT log, own snapper config. The *derived index* does **not** live here — it is a per-user nested subvol under `@home` (§7) | btrfs subvolume + snapper | btrfs-progs |
 | Signed `[koompi]` repo + CI | G3: RSA-4096 no-expiry key as CI secret; sign packages + DB; publish (GitHub Releases v1, then `repo.koompi.org`); ship pubkey + `pacman-key` import on the ISO; add `build-installer.yml` (`zig build`) — **no CI compiles the Zig today** | GitHub Actions, makechrootpkg, repo-add --sign, GnuPG, pacman-key | base-devel, devtools, gnupg |
 | `koompi-input` (Khmer) | FORK C: package the orphaned fcitx5 config + the XKB `km` layout switcher + `noto-fonts-khmer`; pull into `koompi-base` | fcitx5 + fcitx5-keyboard, xkeyboard-config `km`, noto-fonts-khmer | (reverse) koompi-base |
 | Credential hardening | Installer password is a plain borrowed slice never zeroed (`config.zig:47`, `archinstall.zig:165`) → hold in a locked/zeroed buffer, wipe right after `/dev/shm` creds write | Zig locked buffer, tmpfs | — |
@@ -214,10 +207,13 @@ Until both are VM-verified, `--full` ships **disabled** (or warn-and-abort).
 L0 does **not** add a system-wide `@var_index`. The L1 *derived index* (which holds
 plaintext text chunks + invertible embeddings of private data) lives **per-user
 under `@home`** so `--full` wipes it (confidentiality on hand-off) and shared-lab
-users are isolated. L0's contribution is: (a) the `@data` subvol for the *canonical
-encrypted* store only, (b) a `systemd` slice with resource caps for the L1 daemon,
-(c) `chattr +C` on the empty index dir at first-run (nodatacow without a new
-subvol). The full reasoning is §7.
+users are isolated. L0's contribution is: (a) a `systemd` slice with resource caps
+for the L1 daemon, (b) a **per-user nested btrfs subvolume** for the index
+(`~/.local/state/koompi`, `chattr +C`), created at account setup — it excludes the
+GB-scale rebuildable cache from `@home` snapshots yet stays under `@home` (survives
+System Restore, wiped by `--full`); this is **per-user, not a 6th system subvol**.
+The `@data` canonical-encrypted store is a **1.x** ownership-plane concern, not v1.
+The full reasoning is §7.
 
 ---
 
@@ -341,14 +337,20 @@ the user's mail/docs, and embeddings are **partially invertible**. Therefore:
 
 | Artifact | Home | Survives System Restore? | Wiped by `--full`? | Per-user? |
 |---|---|---|---|---|
-| **Derived index** (vectors + FTS + KG cache) | `$XDG_STATE_HOME/koompi/context/index.db` in **`@home`**, `chattr +C` | yes (consistent with the `$HOME` files it indexes) | **yes** (required) | **yes** |
+| **Derived index** (vectors + FTS + KG cache) | `$XDG_STATE_HOME/koompi/` as a **per-user nested subvol** in `@home`, `chattr +C`, **excluded from `@home` snapshots** | yes (under `@home`; kept when `@` rolls back) | **yes** (required) | **yes** |
 | **Canonical encrypted store** (CRDT docs, manifest) | **`@data`** (`/var/lib/koompi/data`), own snapper config, **per-uid subtree** | independently rollback-able | local key destroyed → effectively yes | yes (per-uid) |
 | **Master key / DEKs** | gnome-keyring in `@home` | yes | **yes** (correct for hand-off) | yes |
 
-The only real benefit of a separate subvolume — `nodatacow` (SQLite on btrfs CoW
-fragments badly) — is obtained on `@home` via `chattr +C` on the **empty** dir at
-first-run **before** the DB exists. This requires **zero** change to the installer's
-existing 5-subvolume layout.
+**Refinement (settled in grilling):** the index lives in a **per-user nested btrfs
+subvolume** under `@home` (`~/.local/state/koompi`), created at account setup. This buys
+two things a plain dir cannot: (1) `nodatacow` via `chattr +C` on the empty subvol
+before the DB exists (SQLite on btrfs CoW fragments badly), and (2) **exclusion from
+`@home` snapshots** — a nested subvol is not captured in the parent's snapshot, so a
+rebuildable GB-scale cache never bloats `@home` rollback points. It is **per-user**, so
+the installer's **5 SYSTEM subvolumes are unchanged** and the "no 6th *system*
+subvolume" rule holds (a per-user nested subvol is a different category). This refines
+the earlier "no separate subvolume" call, which weighed only independent rollback —
+moot for a derived cache — and missed the snapshot-bloat cost.
 
 ### The one SQLite database
 
@@ -546,7 +548,8 @@ org.koompi.Policy  (system + per-user D-Bus daemon, FAIL-CLOSED)
   RequestConsent(action) -> grant|deny         # drives a polkit-style prompt
   GetEffectivePolicy(uid) -> {scopes, egress, locked_by}
   # per-user policy with an admin/parent LOCK FLOOR a student cannot loosen
-  # telemetry=none is STRUCTURAL: no component has an outbound path except the two above
+  # telemetry=none: v1 = policy-enforced (soft); STRUCTURAL no-egress (no outbound path
+  #   but these two) only once P-2 root-owned netns/nftables lands (1.x) — see §9 CORRECTED
 ```
 
 ### CORRECTED — a session-bus daemon is NOT enforcement
@@ -563,7 +566,13 @@ stated** — a packet capture will show the user's browser traffic.
   mechanism — per-app network namespace + nftables allowlist (only `localhost:11434`
   and the named sync host) — so a user-process `curl` or `run_shell_command`
   physically cannot reach arbitrary hosts when `policy=local-only`. Then the D-Bus
-  daemon manages the allowlist; it is not the sole gate.
+  daemon manages the allowlist; it is not the sole gate. **The allowlist is
+  policy-driven, not static:** `local-only` ⇒ `{localhost:11434, sync-host}`;
+  `cloud-permitted` (`ai=1` + a selected cloud model + BYO key) ⇒ **+ that cloud host**
+  — so `assistantd`'s cloud call (§6) is an *allowed* egress, not a contradiction. The
+  Subsystem (1.x) generalizes this to a per-context allowlist (`CanEgress(context_id,…)`) —
+  the Subsystem is a three-mode, trust-driven model (Light / App Window / Detonation Chamber),
+  see [ADR-0010](adr/0010-subsystem-two-axis-trust-driven-isolation.md).
 
 ### Adversaries, mitigations, residual risks
 
@@ -589,9 +598,10 @@ sudo-group user — **verify** the pinned archinstall honors the `sudo` field, e
 
 ---
 
-## 10. Multi-user (shared lab machines) — a v1 PRIMARY case, not an edge
+## 10. Multi-user (shared lab machines) — a first-class case, not the primary deployment
 
-Shared/inherited devices are a primary deployment. Several designs proposed
+Shared/inherited devices are a first-class supported case (the individual on a personal
+machine is the primary deployment — prd §2). Several designs proposed
 **system-wide** `/var/lib` user-data stores (`@var_index`, `/var/lib/koompi/data`,
 `/var/lib/koompi/index`) — **rejected**: they co-locate one student's index/keys with
 another's, and one student's `koompi-restore --full` would wipe **every** user's
@@ -823,8 +833,8 @@ boxes / silently-failing search:
 2. **Sole egress chokepoint** → one authority (`org.koompi.Policy`); real
    enforcement needs root-owned netns+nftables, not a voluntary session-bus call
    (§9).
-3. **Multi-user** → primary case; per-user everything; no system-wide `/var/lib`
-   user-data stores (§10).
+3. **Multi-user** → first-class case (not primary); per-user everything; no system-wide
+   `/var/lib` user-data stores (§10).
 
 ### Reconciled critical path (the unavoidable prefix, then L1→L4)
 

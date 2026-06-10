@@ -23,9 +23,16 @@ KOOMPI.Cloud (zero-knowledge ciphertext sync, self-hosted), Selendra (identity/o
 
 ## Subvol co-design with L0 restore (extends the audit's L0/L1 demand)
 
-Add `@data` to the existing archinstall layout (@ @home @var_log @var_cache @snapshots):
-  @data -> /var/lib/koompi/data   (encrypted store, CRDT log, manifest)  — own snapper config
-  index lives in @home/.cache (rebuildable, never synced, never snapshotted)
+v1 keeps the installer's **five SYSTEM subvolumes** (@ @home @var_log @var_cache @snapshots) —
+no 6th *system* subvolume. The two stores layer on without changing that:
+  index (v1)  -> a per-user NESTED subvol under @home: ~/.local/state/koompi  (chattr +C).
+                Rebuildable, never synced, WIPED by `--full`, survives System Restore, and
+                EXCLUDED from @home snapshots (a nested subvol is not captured in the parent
+                snapshot — keeps a GB-scale rebuildable cache out of rollback points). Per-user,
+                created at account setup — NOT a system subvol.
+  @data (1.x) -> /var/lib/koompi/data  (canonical ENCRYPTED store, CRDT log, manifest), own
+                snapper config. Ownership-plane (O-1+), NOT a v1 layout change, and distinct
+                from the derived index above.
   master key in keyring (lives in @home) — `--full` wipes it (correct for hand-off)
 
 Reconciliation: `--full` is LOCAL-ONLY (destroys local keys+data+index). Cloud ciphertext is
