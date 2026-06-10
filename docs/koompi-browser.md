@@ -8,6 +8,18 @@ still coherent in year 30.
 
 ---
 
+> **Design revision v0.2 — The Partner Window.** The browser and the AI Sidebar are
+> fused into one surface: a conversation with the **composer at the bottom** (no
+> address bar — a URL is one kind of utterance), the **stream** as trusted chrome
+> where answers, page cards, consent cards, and signing ceremonies render, and
+> **sheets** as full-bleed contained webviews the stream expands into. Canvases
+> become **threads** (own cookie jar, own page stack, mapped to workspaces); the
+> same component mounts as overlay rail (Super+A), full window, or embedded pane.
+> The trust seam survives as a *layer* rule: a page renders into a sheet, never
+> into the stream. §2's chrome described below (ask-bar, canvas rail) is
+> superseded by this conversation-first anatomy; the engine, containment,
+> automation, memory, and Web3 architecture are unchanged.
+
 ## 1 · OS-Native Intelligence: One Brain, Not Two
 
 ### 1.1 Runtime integration, not embedding

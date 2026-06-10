@@ -68,7 +68,13 @@ Structure the response into these 5 sections:
   LEAKED-ONCE), incognito as a true no-write mode, and the right to Suppress / Seal /
   Destroy any browsing memory via Ceremonial Forgetting.
 
-### 2. Radical Interface: Workspace over Tabs
+### 2. Radical Interface: The Partner Window (conversation-first)
+The browser and the OS assistant are ONE surface — a conversation that absorbed
+the browser. Input is a chat composer at the BOTTOM (no address bar; URLs are
+utterances); the web materializes as cards in the stream and expands into
+full-bleed contained sheets; actions return as inline consent cards (talk when
+needed, act once agreed). Hard layer rule: pages render into sheets, never into
+the trusted stream.
 - **The Zero-Tab paradigm:** Replace tabs with task-scoped **Builder Canvases** that
   bundle web resources, local files, terminals, and agent threads — mapped onto
   Hyprland workspaces so the AI's workspace labels ("🧑‍💻 Coding", "📚 Research") and

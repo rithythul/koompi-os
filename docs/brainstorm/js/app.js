@@ -298,7 +298,6 @@ var sectionFiles = [
   'sections/46-clipboard-manager.html',
   'sections/82-browser.html',
   'sections/83-app-suite.html',
-  'sections/10-ai-sidebar.html',
   'sections/11-tool-approval.html',
   'sections/12-rag-sources.html',
   'sections/13-memory.html',
