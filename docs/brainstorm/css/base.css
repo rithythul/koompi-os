@@ -34,9 +34,9 @@
 
   /* shared dark-desktop staging backdrop for floating shell components */
   --stage-aurora:
-    radial-gradient(ellipse 70% 60% at 20% 80%, rgba(86, 64, 245, 0.34) 0%, transparent 65%),
-    radial-gradient(ellipse 55% 45% at 80% 15%, rgba(18, 95, 152, 0.38) 0%, transparent 68%),
-    linear-gradient(160deg, #0e1326 0%, #0a0f1c 60%, #080b15 100%);
+    radial-gradient(ellipse 70% 60% at 20% 80%, rgba(204, 120, 92, 0.18) 0%, transparent 65%),
+    radial-gradient(ellipse 55% 45% at 80% 15%, rgba(99, 102, 241, 0.12) 0%, transparent 68%),
+    linear-gradient(160deg, #242019 0%, #1C1915 60%, #171411 100%);
 }
 
 /* ── Reset ─────────────────────────────────────────────────── */

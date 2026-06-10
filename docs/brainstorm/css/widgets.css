@@ -11,7 +11,7 @@
   align-items: flex-start;
   justify-content: center;
   margin-bottom: 20px;
-  box-shadow: inset 0 0 80px rgba(2, 4, 10, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 0 80px rgba(24, 18, 12, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 .launcher-modal {
   width: 560px;
@@ -131,7 +131,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  box-shadow: inset 0 0 80px rgba(2, 4, 10, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 0 80px rgba(24, 18, 12, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
   flex-shrink: 0;
 }
 .panel-stage .sidebar-panel,
@@ -248,7 +248,7 @@
   gap: 10px;
   margin-bottom: 16px;
   position: relative;
-  box-shadow: inset 0 0 80px rgba(2, 4, 10, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 0 80px rgba(24, 18, 12, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 .osd-demo-label {
   position: absolute;
@@ -309,7 +309,7 @@
   border-radius: var(--radius-lg);
   padding: 20px;
   margin-bottom: 16px;
-  box-shadow: inset 0 0 80px rgba(2, 4, 10, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 0 80px rgba(24, 18, 12, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 .ws-overview-grid {
   display: grid;
@@ -381,7 +381,7 @@
   position: relative;
   margin-bottom: 16px;
   overflow: hidden;
-  box-shadow: inset 0 0 80px rgba(2, 4, 10, 0.40), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 0 80px rgba(24, 18, 12, 0.40), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 .widget-card {
   background: var(--surface);
@@ -700,9 +700,9 @@
 }
 .briefing-hero {
   background:
-    radial-gradient(ellipse 70% 80% at 18% 90%, rgba(86, 64, 245, 0.45) 0%, transparent 65%),
-    radial-gradient(ellipse 50% 60% at 85% 20%, rgba(18, 95, 152, 0.50) 0%, transparent 68%),
-    linear-gradient(160deg, #0e1328 0%, #0a0f1d 60%, #080b16 100%);
+    radial-gradient(ellipse 70% 80% at 18% 90%, rgba(204, 120, 92, 0.22) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 60% at 85% 20%, rgba(99, 102, 241, 0.14) 0%, transparent 68%),
+    linear-gradient(160deg, #242019 0%, #1C1915 60%, #171411 100%);
   padding: 22px 22px 18px;
   position: relative;
   overflow: hidden;
@@ -710,7 +710,7 @@
 .briefing-hero::after {
   content: '';
   position: absolute; inset: 0;
-  background: radial-gradient(circle at 80% 50%, rgba(99,102,241,0.20) 0%, transparent 60%);
+  background: radial-gradient(circle at 80% 50%, rgba(204,120,92,0.14) 0%, transparent 60%);
 }
 .briefing-greeting { font-size: 20px; font-weight: 200; color: rgba(255,255,255,0.9); letter-spacing: -0.5px; margin-bottom: 3px; position: relative; z-index: 1; }
 .briefing-date-str { font-size: 11px; color: rgba(255,255,255,0.4); position: relative; z-index: 1; }
@@ -735,7 +735,7 @@
   align-items: center;
   gap: 20px;
   margin-bottom: 16px;
-  box-shadow: inset 0 0 100px rgba(2, 4, 10, 0.60), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 0 100px rgba(24, 18, 12, 0.60), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 .session-title { font-size: 20px; font-weight: 200; color: rgba(255,255,255,0.75); letter-spacing: 3px; text-transform: uppercase; }
 .session-grid { display: grid; grid-template-columns: repeat(4, 76px); gap: 10px; }
