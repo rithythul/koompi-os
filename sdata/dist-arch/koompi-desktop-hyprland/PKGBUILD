@@ -22,6 +22,8 @@ depends=(
   # Hyprland dotfiles into /etc/skel (conflicts koompi-kde-config — one edition
   # per machine).
   koompi-hyprland-config
+  # AI memory daemon: vector+keyword long-term memory for the sidebar AI chat.
+  koompi-agent-memd
 )
 
 package() {

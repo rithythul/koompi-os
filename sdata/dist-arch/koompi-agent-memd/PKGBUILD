@@ -1,0 +1,72 @@
+# koompi-agent-memd — long-term memory daemon for the KOOMPI AI assistant.
+#
+# Talks to Quickshell's MemoryService.qml over newline-delimited JSON on
+# stdin/stdout. Provides hybrid retrieval (vector KNN + FTS5 keyword, merged
+# with reciprocal rank fusion) backed by sqlite-vec. Embedding can be local
+# (fastembed / ONNX, offline) or API-based (Gemini / OpenAI).
+#
+# Source: https://github.com/rithythul/koompi-agent-memd
+# Update _commit + sha256sum for each release.
+_commit='REPLACE_WITH_COMMIT_HASH'
+
+groups=(koompi)
+_prefix='koompi'
+_pkgname='agent-memd'
+pkgname="$_prefix-$_pkgname"
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='Long-term vector+keyword memory daemon for the KOOMPI AI assistant'
+arch=(x86_64 aarch64)
+url='https://github.com/rithythul/koompi-agent-memd'
+license=('MIT')
+depends=(
+  # ONNX Runtime for local (offline) embedding via fastembed.
+  # Users who configure provider = "gemini" or "openai" still need the .so
+  # present since the binary is compiled with the "local" feature.
+  'onnxruntime-cpu'
+  # TLS root certs for Gemini / OpenAI embedding API calls.
+  'ca-certificates'
+)
+makedepends=(
+  'rust'
+  'cargo'
+  'onnxruntime-cpu'
+)
+
+_pkgsrc='koompi-agent-memd'
+source=("$_pkgsrc::git+$url.git#commit=$_commit")
+sha256sums=('SKIP')
+
+build() {
+  cd "$_pkgsrc"
+  # ORT_USE_SYSTEM_LIB tells ort-sys to link against the system onnxruntime-cpu
+  # package instead of downloading a pre-built binary at build time.
+  ORT_USE_SYSTEM_LIB=1 \
+    cargo build --release --locked --features local
+}
+
+package() {
+  cd "$_pkgsrc"
+  install -Dm755 "target/release/koompi-agent-memd" \
+    "$pkgdir/usr/bin/koompi-agent-memd"
+  install -Dm644 "README.md" \
+    "$pkgdir/usr/share/doc/$pkgname/README.md"
+  # Example config: users copy to ~/.config/userx-ai/memd.toml and customise.
+  install -Dm644 /dev/stdin \
+    "$pkgdir/usr/share/doc/$pkgname/memd.toml.example" << 'EOF'
+# koompi-agent-memd configuration
+# Copy to ~/.config/userx-ai/memd.toml to override defaults.
+# All values are optional; environment variables (set by MemoryService.qml) win.
+
+# Embedding provider: local (offline ONNX), gemini, or openai
+provider = "local"
+
+[local]
+# fastembed model name (offline, downloads once to ~/.cache/huggingface)
+model = "bge-small-en-v1.5"   # or bge-base-en-v1.5, all-minilm-l6-v2
+
+[api]
+gemini_model = "text-embedding-004"
+openai_model = "text-embedding-3-small"
+EOF
+}
