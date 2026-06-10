@@ -32,7 +32,7 @@ by side, and never lets the vision masquerade as shipped.
 
 KOOMPI OS = **"The OS That Thinks"** — AI-first, data-aware, intuitive; a
 general-purpose OS for the world, two desktop flavors (Hyprland + KDE Plasma). The
-CODE-C 2026 thesis verbatim: *"you don't compute, you work with data"*; the problem
+founding thesis verbatim: *"you don't compute, you work with data"*; the problem
 is *"data treated as dead files"*; the OS *"understands your data," "never find
 files again," "apps talk to each other," "AI as foundation / not a feature,"
 "morning automated: collected, organized, ready," "intuitive as your thoughts,"
@@ -868,7 +868,7 @@ P6  Ownership/sync (opt-in): on-device encryption-at-rest; KOOMPI.Cloud zero-kno
 i18n  Khmer atomic unit lands with P1/P2 (font+IME+strings+segmentation together)
 ```
 
-**CODE-C 2026 demo-minimal slice (cross-layer, not deliverable by one team):**
+**Minimal coherent slice (cross-layer, not deliverable by one team):**
 the prefix (1–6) + a narrow L1 (RAG over a few folders) + L2 daemon + the L4 morning
 briefing. That demonstrates the three talk beats — *never find files again* (RAG),
 *AI as foundation* (daemon as system service), *morning automated* (headless

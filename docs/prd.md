@@ -15,7 +15,7 @@
 
 ### The thesis
 
-Today you don't work with your data — you manage files. A document is a dead blob in a folder you have to remember; your mail, notes, calendar, and chat live in silos that cannot see each other; and the "AI" bolted onto your desktop is a chat window that knows nothing about any of it. KOOMPI OS inverts this. The OS understands your data: it watches, extracts, and indexes what is yours into a private on-device knowledge layer, so you **never find files again** — you ask, and the answer comes with its source. **Apps talk to each other** through a capability bus so the assistant can act across them. AI is the **foundation, not a feature** — the substrate the whole desktop is built on. And the morning is **automated: collected, organized, ready** before you sit down. The interface should be as intuitive as your thoughts. (Vision verbatim from the CODE-C 2026 talk, smallworld.xyz, by OS lead Brilliant Phal: "you don't compute, you work with data"; "10 outthink 10,000".)
+Today you don't work with your data — you manage files. A document is a dead blob in a folder you have to remember; your mail, notes, calendar, and chat live in silos that cannot see each other; and the "AI" bolted onto your desktop is a chat window that knows nothing about any of it. KOOMPI OS inverts this. The OS understands your data: it watches, extracts, and indexes what is yours into a private on-device knowledge layer, so you **never find files again** — you ask, and the answer comes with its source. **Apps talk to each other** through a capability bus so the assistant can act across them. AI is the **foundation, not a feature** — the substrate the whole desktop is built on. And the morning is **automated: collected, organized, ready** before you sit down. The interface should be as intuitive as your thoughts. (Vision verbatim from the founding talk, smallworld.xyz, by OS lead Brilliant Phal: "you don't compute, you work with data"; "10 outthink 10,000".)
 
 ### The positioning — data ownership in the AI era
 
@@ -33,7 +33,7 @@ KOOMPI ships **two first-class editions** — a Hyprland (Quickshell) edition an
 
 ### Honest framing (load-bearing)
 
-The vision above is **mostly unbuilt.** What ships today is a polished end-4/dots-hyprland reskin on Arch, a **commodity chatbot sidebar** (cloud LLMs + local Ollama, a `/`-command chat, a user-approval gate on shell commands), and a **code-complete-but-never-executed** btrfs/snapper restore stack. The data fabric, semantic search, knowledge graph, app bus, automation engine, and the ownership/sync plane are **~0% built.** §4 states the gap precisely. This PRD scopes the whole architecture (FORK B: no shortcuts) and then carves a v1 demo slice (§7).
+The vision above is **mostly unbuilt.** What ships today is a polished end-4/dots-hyprland reskin on Arch, a **commodity chatbot sidebar** (cloud LLMs + local Ollama, a `/`-command chat, a user-approval gate on shell commands), and a **code-complete-but-never-executed** btrfs/snapper restore stack. The data fabric, semantic search, knowledge graph, app bus, automation engine, and the ownership/sync plane are **~0% built.** §4 states the gap precisely. This PRD scopes the whole architecture (FORK B: no shortcuts) and then carves a v1 slice (§7).
 
 ### Upstream honesty
 
@@ -107,7 +107,7 @@ Zero test files in the repo; no `zig build`/`zig test` in any workflow; no AI ev
 
 ## 5. Product Pillars & Functional Requirements
 
-Seven pillars, mapped to the layer model (L0–L4) plus the cross-cutting model, privacy/ownership, and i18n planes. Requirements are functional (WHAT/WHY); the HOW lives in the layer designs and `docs/data-ownership.md`. FORK B means **all of L0–L4 and the planes are scoped here**; §7 then carves the demo slice. Where a layer design was over-optimistic, the FR reflects the **critique-corrected** state.
+Seven pillars, mapped to the layer model (L0–L4) plus the cross-cutting model, privacy/ownership, and i18n planes. Requirements are functional (WHAT/WHY); the HOW lives in the layer designs and `docs/data-ownership.md`. FORK B means **all of L0–L4 and the planes are scoped here**; §7 then carves the v1 slice. Where a layer design was over-optimistic, the FR reflects the **critique-corrected** state.
 
 ### 5.0 The one storage decision (resolve once; every pillar references it)
 
@@ -207,7 +207,7 @@ Ship Khmer as an **atomic unit** or not at all — a half-built language is wors
 
 ## 7. Scope & v1 (Naga) Definition + phasing recommendation
 
-**v1 name:** KOOMPI OS — Naga (technical 1.0; in-era updates 1.1, 1.2 keep the Naga name until Apsara). KOOMPI is **rolling Arch**, so "v1" is a quality bar and a CODE-C 2026 demo milestone, not a frozen point-release — which is exactly why the migration runner (FR-Q2) is load-bearing.
+**v1 name:** KOOMPI OS — Naga (technical 1.0; in-era updates 1.1, 1.2 keep the Naga name until Apsara). KOOMPI is **rolling Arch**, so "v1" is a quality bar — capability-gated, not event-gated — not a frozen point-release — which is exactly why the migration runner (FR-Q2) is load-bearing.
 
 ### The prefix every feature depends on (must land first)
 A "make-it-safe-and-true" base the critiques converge on, before any L1–L4 feature:
@@ -220,12 +220,12 @@ A "make-it-safe-and-true" base the critiques converge on, before any L1–L4 fea
 
 ### Phasing recommendation (FORK B architecture, demo-carved)
 - **P0 — Safe base + local agency:** the prefix above; native-Ollama local tool-calling (FR-L2-6); pin + license-verify the default model tier (FR-M2); a fail-closed policy stub.
-- **P1 — L1 demo core ("never find files again"):** the Context Engine over a few folders (text/PDF/OCR), hybrid query with source attribution, fully local — the headline CODE-C beat.
+- **P1 — L1 core ("never find files again"):** the Context Engine over a few folders (text/PDF/OCR), hybrid query with source attribution, fully local — the headline thesis beat.
 - **P2 — L2 RAG + memory + safety:** RAG into the agent loop, two-tier memory, the bounded loop + result validator, the sandbox for `run_shell_command`, the multilingual layer; **prompt-injection mitigation ships with tool-calling, not after** (FR-Q1).
 - **P3 — L3 bus + L4 briefing (the demo's "apps talk / morning automated"):** the broker + one pilot provider (calendar/files), the `Ai.qml` IpcHandler, a fully-local morning briefing.
 - **P4 — Ownership/sync plane:** on-device encryption-at-rest first (the privacy default, zero cloud); then opt-in KOOMPI.Cloud backup + DID; then multi-device CRDT sync + QR pairing; then Selendra anchoring + the egress-audit UI. No sync code ships without a written protocol + encryption-in-transit spec.
 
-**Demo-minimal v1 (if time-boxed to CODE-C):** P0 + P1 (RAG over a few folders, local model) + a slice of P3 (the morning briefing) — that alone demonstrates the three talk beats (*never find files again*, *AI as foundation*, *morning automated*) **fully local**, without the complete L3 bus or the sync plane. The complete L0–L4 + planes remain the documented architecture (FORK B); the demo is a slice of it, not a shrink of it.
+**Minimal coherent v1 (if scope must shrink):** P0 + P1 (RAG over a few folders, local model) + a slice of P3 (the morning briefing) — that alone delivers the three thesis beats (*never find files again*, *AI as foundation*, *morning automated*) **fully local**, without the complete L3 bus or the sync plane. The complete L0–L4 + planes remain the documented architecture (FORK B); the minimal cut is a slice of it, not a shrink of it.
 
 **Out of scope for v1:** a software store, fleet management, a multi-device sync UI beyond single-device backup, Selendra anchoring on the critical path, and any heavier (LanceDB) vector tier. **Settled scope decision:** the morning briefing is **edition-agnostic** (daemon-side headless `Ask()`, not shell-specific), so the **KDE edition gets it in v1** alongside Hyprland/Quickshell — see ADR-0007.
 

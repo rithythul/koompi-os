@@ -41,7 +41,7 @@ Cloud delete is a SEPARATE explicit "Delete cloud account" action. Migration to 
 happen BEFORE `--full` or data is unrecoverable — the UX enforces this ordering.
 
 ## Phasing (= roadmap Track O — O-1..O-4; NOT prd.md §7's product phases P0–P3, which mean something different)
-O-1 (v1): on-device encryption-at-rest (no cloud, no Selendra) — the privacy default, CODE-C demo floor.
+O-1 (v1): on-device encryption-at-rest (no cloud, no Selendra) — the privacy default, the v1 floor.
 O-2 (1.x): single-device encrypted backup/restore to KOOMPI.Cloud (blob push/pull, LWW); DID at onboarding.
 O-3 (1.x): multi-device Automerge CRDT sync + QR device pairing.
 O-4 (1.x): Selendra anchoring (Merkle roots, rotation/revocation) + egress-audit UI + selective-sync UI.

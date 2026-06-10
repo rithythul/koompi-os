@@ -47,7 +47,7 @@ not yet boot.** Nothing here is a dead end — the engine is solid, the restore 
 ~one stub from running, and the assistant is the right place to grow L2 — but this
 roadmap is honest that L1–L4 + the ownership/sync plane + Khmer search are *greenfield*.
 
-**Recommended v1 (demos at CODE-C 2026):** L0-solid (gates closed, restore VM-tested) +
+**Recommended v1 (ships when it is real — capability-gated, not event-gated):** L0-solid (gates closed, restore VM-tested) +
 **L1 context engine** ("never find files again") + **L2 assistant-over-your-data**
 (RAG, local-first default). L3 app-bus, L4 automation, Selendra anchoring, and full
 multi-device sync are **1.x**. Khmer UI base (render/type/translate) is v1 *if
@@ -763,7 +763,7 @@ work starts. One line is still **UNASSIGNED** and that is the real gap.
 
 ## 11. v1 vs 1.x (the concrete line) + sequencing
 
-### v1 (must demo at CODE-C 2026): L0-solid + L1 + L2
+### v1 (the real thing, shipped when ready): L0-solid + L1 + L2
 
 - **Track G** (G1–G3 closed) — installs itself, signed repo, installer on ISO.
 - **Track R** (restore VM-tested; `--full` gated behind R-1/R-3) — restore is real.
