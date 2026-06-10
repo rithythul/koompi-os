@@ -1,0 +1,114 @@
+<section class="section" id="memory-etiquette">
+  <div class="section-header">
+    <h2>Memory Etiquette</h2>
+    <span class="tag">Futures</span>
+    <span class="tag priv">Privacy</span>
+  </div>
+  <p class="desc">
+    Your OS remembers other people — and a conversation belongs to both parties. No platform has ever asked what your machine owes the humans it observes. KOOMPI does: machines exchange remembering-preferences over the local mesh, honor them mechanically, and log the honoring in both Egress Ledgers. For everyone without a KOOMPI, there is a printed notice by the door. The first OS with manners.
+  </p>
+
+  <!-- Etiquette handshake -->
+  <div style="max-width:760px; background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-xl); overflow:hidden;">
+    <div style="padding:12px 16px; border-bottom:1px solid var(--border2); display:flex; align-items:center; gap:8px;">
+      <span style="font-size:14px;">🤝</span>
+      <span style="font-size:13px; font-weight:700; flex:1;">Etiquette handshake · local mesh · no internet involved</span>
+      <span class="state-chip priv-state" style="font-size:9px;">peer-to-peer</span>
+    </div>
+    <div style="padding:16px;">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+        <div style="flex:1; background:var(--surface2); border:1px solid var(--border2); border-radius:var(--radius); padding:10px 12px; text-align:center;">
+          <div style="font-size:16px;">💻</div>
+          <div style="font-size:11px; font-weight:600;">rithy-thinkpad</div>
+          <div style="font-size:9px; color:var(--text-subtle); font-family:var(--font-mono);">host</div>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:2px; color:var(--text-subtle);">
+          <span style="font-size:10px; font-family:var(--font-mono); color:var(--cyan);">→ prefs</span>
+          <span style="font-size:13px;">⇄</span>
+          <span style="font-size:10px; font-family:var(--font-mono); color:var(--emerald);">← honored</span>
+        </div>
+        <div style="flex:1; background:var(--surface2); border:1px solid var(--border2); border-radius:var(--radius); padding:10px 12px; text-align:center;">
+          <div style="font-size:16px;">💻</div>
+          <div style="font-size:11px; font-weight:600;">vathna-koompi</div>
+          <div style="font-size:9px; color:var(--text-subtle); font-family:var(--font-mono);">guest · arrived 19:32</div>
+        </div>
+      </div>
+      <div class="tool-code" style="font-size:11px; line-height:1.8;">
+        <span style="color:var(--text-subtle);">19:32:04</span>  <span class="code-key">recv</span>  remembering-preferences <span class="code-str">vathna-koompi</span><br>
+        <span style="color:var(--text-subtle);">├─</span> <span class="code-key">health</span>      <span class="code-val">no inference — store nothing derived</span><br>
+        <span style="color:var(--text-subtle);">├─</span> <span class="code-key">verbatim</span>    <span class="code-val">keep 90 days, then summary only</span><br>
+        <span style="color:var(--text-subtle);">├─</span> <span class="code-key">embeddings</span>  <span class="code-val">allowed · tagged third-party:vathna</span><br>
+        <span style="color:var(--text-subtle);">└─</span> <span class="code-key">sharing</span>     <span class="code-str">never beyond this machine</span><br>
+        <span style="color:var(--text-subtle);">19:32:05</span>  <span class="code-key">ack</span>   policy applied · receipt signed · logged to <span class="code-str">both Egress Ledgers</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:flex-start; margin-top:24px;">
+
+    <!-- Remembering-preference card -->
+    <div style="width:360px; flex-shrink:0; background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-lg); overflow:hidden;">
+      <div style="padding:12px 16px; background:linear-gradient(135deg, var(--cyan-glow), transparent); border-bottom:1px solid var(--border2);">
+        <div style="font-size:13px; font-weight:700;">How this machine remembers Vathna</div>
+        <div style="font-size:11px; color:var(--text-muted);">Her preferences · honored since 14 Feb 2030</div>
+      </div>
+      <div style="padding:14px 16px; display:flex; flex-direction:column; gap:10px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="state-chip" style="font-size:9px; color:var(--red); border-color:rgba(239,68,68,0.3); background:var(--red-glow); flex-shrink:0;">no inference</span>
+          <div style="font-size:11px; color:var(--text-muted); line-height:1.5;">Her health is off-limits — even when she mentions the clinic, koompi-agent-memd writes no derived facts.</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="state-chip warn-state" style="font-size:9px; flex-shrink:0;">90-day verbatim</span>
+          <div style="font-size:11px; color:var(--text-muted); line-height:1.5;">Word-for-word transcripts of her decay to summaries on a timer. 3 conversations decay next week.</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="state-chip active-state" style="font-size:9px; flex-shrink:0;">auditable</span>
+          <div style="font-size:11px; color:var(--text-muted); line-height:1.5;">She can ask her OS to verify mine kept its word — signed receipts in both ledgers, checked without revealing content.</div>
+        </div>
+        <div style="margin-top:2px; padding:8px 10px; background:var(--surface2); border:1px dashed var(--border); border-radius:var(--radius-sm); font-size:10px; color:var(--text-subtle); font-family:var(--font-mono);">
+          memd: 312 episodes touch vathna · 0 policy violations · last audit 02 Jun 2032
+        </div>
+      </div>
+    </div>
+
+    <!-- Guest notice QR -->
+    <div style="flex:1; min-width:280px; background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-lg); padding:16px;">
+      <div class="card-label" style="margin-bottom:12px;">The social API for the analog world — print it, tape it by the door</div>
+      <div style="display:flex; gap:14px; background:var(--surface2); border:1px solid var(--border2); border-radius:var(--radius); padding:14px;">
+        <div style="width:84px; height:84px; flex-shrink:0; background:var(--surface4); border:1px solid var(--border2); border-radius:var(--radius-sm); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;">
+          <span style="font-size:26px;">▦</span>
+          <span style="font-size:8px; color:var(--text-subtle); font-family:var(--font-mono);">koompi.local/guests</span>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:13px; font-weight:700; margin-bottom:4px;">🏠 This home runs a remembering machine</div>
+          <div style="font-size:11px; color:var(--text-muted); line-height:1.6;">
+            What it retains about guests: <strong style="color:var(--text);">summaries of conversations, no audio, no video, no faces.</strong> Nothing leaves this house. Scan to set your own preferences — or tell Rithy <em>"off the record"</em> and the machine stops writing.
+          </div>
+          <div style="display:flex; gap:6px; margin-top:8px;">
+            <span class="state-chip active-state" style="font-size:9px;">no raw audio</span>
+            <span class="state-chip active-state" style="font-size:9px;">never leaves device</span>
+            <span class="state-chip warn-state" style="font-size:9px;">"off the record" honored</span>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:11px; color:var(--text-muted); margin-top:12px; line-height:1.5;">
+        Etiquette cannot require the other person to own a KOOMPI. The QR works from any phone; the spoken phrase works from any mouth. Manners degrade gracefully.
+      </p>
+    </div>
+  </div>
+
+  <div class="callout-group">
+    <div class="callout">
+      <div class="callout-title">Conversations have two owners <span class="badge new">KOOMPI</span></div>
+      <p>Every memory platform treats whatever the user hears as the user's data. KOOMPI is the first to model the other party's stake: remembering-preferences are exchanged machine-to-machine and enforced by koompi-agent-memd at write time, not filtered after the fact.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Honored, and provably so</div>
+      <p>An etiquette promise without an audit trail is a vibe. Receipts land in both Egress Ledgers, so Vathna's OS can verify Rithy's kept its word — the same single-gate accountability that governs network egress, turned toward social obligations.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Etiquette is culture, shipped as protocol</div>
+      <p>What a machine owes a guest is a deeply Cambodian question — hospitality has rules. Encoding them as a mesh protocol and a notice by the door makes KOOMPI's politeness exportable: the first OS whose defaults include respect for people who never touch it.</p>
+    </div>
+  </div>
+</section>

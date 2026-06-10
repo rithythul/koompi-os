@@ -1,0 +1,95 @@
+<section class="section" id="appless-computing">
+  <div class="section-header">
+    <h2>App-less Computing</h2>
+    <span class="tag">Futures</span>
+  </div>
+  <p class="desc">
+    In ten years, apps may be dead as discrete things. You won't launch a tool — you'll state an intent, and the OS assembles the right capabilities to fulfill it. "Edit my photo" opens the right tool inline. "Send this to Vathna" picks the channel, drafts the message, and shows it for approval. The app store gives way to a <strong>capability graph</strong>.
+  </p>
+
+  <!-- Universal intent bar -->
+  <div style="max-width:760px;">
+    <div style="background:linear-gradient(135deg, var(--accent-glow), transparent); border:1px solid var(--accent); border-radius:var(--radius-lg); padding:16px;">
+      <div style="display:flex; align-items:center; gap:10px; background:var(--surface); border-radius:var(--radius); padding:12px 16px;">
+        <span style="color:var(--accent); font-size:16px;">⤳</span>
+        <span style="flex:1; font-size:14px;">Draft a summary of the Q4 report and send it to the board group</span>
+        <span class="launcher-kbd" style="font-size:10px;">do ↵</span>
+      </div>
+      <div style="font-size:10px; color:var(--text-subtle); margin-top:8px; padding-left:4px;">This is not a launcher and not a search — it's a <em>do</em> bar. You name the outcome; the OS routes the verbs.</div>
+    </div>
+
+    <!-- Capability resolution flow -->
+    <div style="background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-lg); margin-top:14px; padding:16px;">
+      <div class="card-label" style="margin-bottom:12px;">Intent resolved into a chain of capabilities</div>
+      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <span class="state-chip" style="background:var(--cyan-glow); color:var(--cyan); border-color:rgba(34,211,238,0.3);">📄 read · Q4 report</span>
+        <span style="color:var(--text-subtle);">→</span>
+        <span class="state-chip active-state">✦ summarize · local LLM</span>
+        <span style="color:var(--text-subtle);">→</span>
+        <span class="state-chip" style="background:var(--emerald-glow); color:var(--emerald); border-color:rgba(16,185,129,0.3);">✉ compose · board group</span>
+        <span style="color:var(--text-subtle);">→</span>
+        <span class="state-chip warn-state">⏸ await approval</span>
+      </div>
+      <div style="margin-top:14px; background:var(--surface2); border:1px solid var(--border2); border-radius:var(--radius); padding:12px 14px;">
+        <div style="font-size:10px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; color:var(--text-subtle); margin-bottom:6px;">Ready to send · Telegram → "KOOMPI Board"</div>
+        <div style="font-size:12px; line-height:1.6; color:var(--text-muted);">Q4 in three lines: ARR up 38% to $2.1M, runway 19 months, two senior hires closed. Full deck attached. — sent on your behalf once you approve.</div>
+        <div class="tool-actions" style="margin-top:10px;">
+          <div class="tool-btn allow">✓ Send</div><div class="tool-btn">Edit</div><div class="tool-btn deny">Cancel</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Capability tiles -->
+  <div style="max-width:760px; margin-top:24px;">
+    <div class="card-label" style="margin-bottom:10px;">Capability tiles — what you can <em>do</em>, not what you have installed</div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(120px,1fr)); gap:10px;">
+      <div style="background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius); padding:14px; text-align:center;">
+        <div style="font-size:22px; margin-bottom:6px;">✍️</div><div style="font-size:12px; font-weight:600;">Write</div>
+      </div>
+      <div style="background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius); padding:14px; text-align:center;">
+        <div style="font-size:22px; margin-bottom:6px;">🖼</div><div style="font-size:12px; font-weight:600;">Edit images</div>
+      </div>
+      <div style="background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius); padding:14px; text-align:center;">
+        <div style="font-size:22px; margin-bottom:6px;">📊</div><div style="font-size:12px; font-weight:600;">Analyze data</div>
+      </div>
+      <div style="background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius); padding:14px; text-align:center;">
+        <div style="font-size:22px; margin-bottom:6px;">✉️</div><div style="font-size:12px; font-weight:600;">Communicate</div>
+      </div>
+      <div style="background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius); padding:14px; text-align:center;">
+        <div style="font-size:22px; margin-bottom:6px;">💸</div><div style="font-size:12px; font-weight:600;">Pay / send value</div>
+      </div>
+      <div style="background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius); padding:14px; text-align:center;">
+        <div style="font-size:22px; margin-bottom:6px;">🧩</div><div style="font-size:12px; font-weight:600;">Build / code</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- App graveyard transition -->
+  <div style="max-width:760px; margin-top:16px; display:flex; align-items:center; gap:14px; background:var(--surface2); border:1px solid var(--border2); border-radius:var(--radius); padding:14px 16px;">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <span style="font-size:24px; opacity:0.35; filter:grayscale(1);">🖌️</span>
+      <span style="color:var(--text-subtle); font-size:18px;">→</span>
+      <span class="state-chip active-state" style="font-size:11px;">🖼 edit images</span>
+    </div>
+    <div style="flex:1;">
+      <div style="font-size:12px; font-weight:600;">App graveyard</div>
+      <div style="font-size:11px; color:var(--text-muted);">The old icon fades; its capability survives. Apps become invisible engines the OS calls — you never see them again.</div>
+    </div>
+  </div>
+
+  <div class="callout-group">
+    <div class="callout">
+      <div class="callout-title">Intent over application <span class="badge new">KOOMPI</span></div>
+      <p>You describe the outcome; the OS chooses the engines. Tools become interchangeable backends behind a capability — swap the photo editor and nothing in your workflow changes.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">The store dissolves into a graph</div>
+      <p>Instead of browsing apps, capabilities are discovered and verified locally. New abilities slot into the same intent bar — no launcher, no home screen of icons to manage.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Approval survives the abstraction</div>
+      <p>Even when apps vanish, the consent tap does not. Any capability that sends, pays, or leaves the device still stops for your yes — convenience never erases the boundary.</p>
+    </div>
+  </div>
+</section>

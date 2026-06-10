@@ -1,0 +1,92 @@
+<section class="section" id="continuity-charter">
+  <div class="section-header">
+    <h2>The Continuity Charter</h2>
+    <span class="tag">Futures</span>
+    <span class="tag sys">System</span>
+  </div>
+  <p class="desc">
+    You're being asked to trust this OS for fifty years. Companies rarely live thirty. So the hardest promise is written down, in public, with machinery behind it: if KOOMPI the company dies, KOOMPI the OS does not. Everything is reproducible from public repos, the signing keys are escrowed behind a dead-man's switch, and the protocol is specified so thoroughly that strangers in 2060 could re-implement it from the documents alone.
+  </p>
+
+  <!-- Charter document card -->
+  <div style="max-width:760px; background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-xl); overflow:hidden;">
+    <div style="padding:14px 16px; background:linear-gradient(135deg, var(--accent-glow), transparent); border-bottom:1px solid var(--border2); display:flex; align-items:center; gap:10px;">
+      <span style="font-size:18px;">📜</span>
+      <div style="flex:1;">
+        <div style="font-size:15px; font-weight:700;">The KOOMPI Continuity Charter</div>
+        <div style="font-size:11px; color:var(--text-muted);">v1.3 · ratified Phnom Penh, 2026 · signed by founders &amp; community council</div>
+      </div>
+      <span class="state-chip active-state" style="font-size:9px;">in force</span>
+    </div>
+    <div style="padding:16px; display:flex; flex-direction:column; gap:10px;">
+      <div style="display:flex; align-items:flex-start; gap:12px; background:var(--surface2); border:1px solid var(--border2); border-radius:var(--radius); padding:10px 12px;">
+        <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent); width:24px;">§1</span>
+        <div style="flex:1; font-size:12px; line-height:1.5;"><strong>Reproducible from public source.</strong> <span style="color:var(--text-muted);">Every package in the OS builds from public repos. No private build step may ever be load-bearing.</span></div>
+        <span style="font-size:10px; font-family:var(--font-mono); color:var(--emerald);">repos public ✓ 312/312</span>
+      </div>
+      <div style="display:flex; align-items:flex-start; gap:12px; background:var(--surface2); border:1px solid var(--border2); border-radius:var(--radius); padding:10px 12px;">
+        <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent); width:24px;">§2</span>
+        <div style="flex:1; font-size:12px; line-height:1.5;"><strong>Protocol over implementation.</strong> <span style="color:var(--text-muted);">Memory schema, egress format, and the capability bus are specified independently of the code. Anyone may re-implement; the spec is the contract.</span></div>
+        <span style="font-size:10px; font-family:var(--font-mono); color:var(--emerald);">spec versioned ✓ v2.1</span>
+      </div>
+      <div style="display:flex; align-items:flex-start; gap:12px; background:var(--surface2); border:1px solid var(--border2); border-radius:var(--radius); padding:10px 12px;">
+        <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent); width:24px;">§3</span>
+        <div style="flex:1; font-size:12px; line-height:1.5;"><strong>Key escrow with a dead-man's switch.</strong> <span style="color:var(--text-muted);">Signing keys are split 3-of-5 to a community council. If KOOMPI stops checking in for 90 days, release begins automatically.</span></div>
+        <span style="font-size:10px; font-family:var(--font-mono); color:var(--emerald);">escrow armed ✓ last ping 2d ago</span>
+      </div>
+      <div style="display:flex; align-items:flex-start; gap:12px; background:var(--surface2); border:1px solid var(--border2); border-radius:var(--radius); padding:10px 12px;">
+        <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent); width:24px;">§4</span>
+        <div style="flex:1; font-size:12px; line-height:1.5;"><strong>A seated, independent council.</strong> <span style="color:var(--text-muted);">Five keyholders: two community maintainers, one digital-rights advocate, one archivist, one user representative. No two in the same country.</span></div>
+        <span style="font-size:10px; font-family:var(--font-mono); color:var(--emerald);">council seated ✓ 5/5</span>
+      </div>
+      <div style="display:flex; align-items:flex-start; gap:12px; background:var(--surface2); border:1px solid var(--border2); border-radius:var(--radius); padding:10px 12px;">
+        <span style="font-family:var(--font-mono); font-size:11px; color:var(--accent); width:24px;">§5</span>
+        <div style="flex:1; font-size:12px; line-height:1.5;"><strong>Your machine never depends on us being alive.</strong> <span style="color:var(--text-muted);">No phone-home, no license check, no kill switch. A KOOMPI machine that never hears from KOOMPI again works forever (ADR-0001: degrade local, never silent cloud).</span></div>
+        <span style="font-size:10px; font-family:var(--font-mono); color:var(--emerald);">verified ✓ ISO audit</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- If KOOMPI dies — timeline -->
+  <div style="max-width:760px; margin-top:24px; background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-lg); padding:16px;">
+    <div class="card-label" style="margin-bottom:14px;">"What if KOOMPI dies?" — the written answer, as a timeline</div>
+    <div style="position:relative; padding-left:18px;">
+      <div style="position:absolute; left:5px; top:6px; bottom:6px; width:2px; background:var(--border);"></div>
+      <div style="position:relative; margin-bottom:14px;">
+        <span style="position:absolute; left:-18px; top:3px; width:9px; height:9px; border-radius:50%; background:var(--red); border:2px solid var(--surface);"></span>
+        <div style="font-size:12px; font-weight:600;">Day 0 — KOOMPI ceases operations</div>
+        <div style="font-size:11px; color:var(--text-muted);">Every machine keeps working in full. Updates pause; nothing else changes. The escrow heartbeat stops.</div>
+      </div>
+      <div style="position:relative; margin-bottom:14px;">
+        <span style="position:absolute; left:-18px; top:3px; width:9px; height:9px; border-radius:50%; background:var(--amber); border:2px solid var(--surface);"></span>
+        <div style="font-size:12px; font-weight:600;">Day 30 — council confirms silence</div>
+        <div style="font-size:11px; color:var(--text-muted);">Keyholders independently verify the company is gone, not merely offline. Public notice posted; 60-day clock continues.</div>
+      </div>
+      <div style="position:relative; margin-bottom:14px;">
+        <span style="position:absolute; left:-18px; top:3px; width:9px; height:9px; border-radius:50%; background:var(--accent); border:2px solid var(--surface);"></span>
+        <div style="font-size:12px; font-weight:600;">Day 90 — keys released, 3-of-5</div>
+        <div style="font-size:11px; color:var(--text-muted);">The dead-man's switch completes. The council can now sign updates against the public repos. Machines accept them because the keys are the same keys.</div>
+      </div>
+      <div style="position:relative;">
+        <span style="position:absolute; left:-18px; top:3px; width:9px; height:9px; border-radius:50%; background:var(--emerald); border:2px solid var(--surface);"></span>
+        <div style="font-size:12px; font-weight:600;">Day 90+ — community succession</div>
+        <div style="font-size:11px; color:var(--text-muted);">Maintainership passes to the community under the charter's governance. To a user in Battambang or Berlin, nothing visible happened — which is the entire point.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout-group">
+    <div class="callout">
+      <div class="callout-title">The promise no Big Tech OS can make <span class="badge new">KOOMPI</span></div>
+      <p>Ask any platform "what happens to my OS if you die?" and you get silence — their business depends on you not asking. KOOMPI publishes the answer, with status checks you can verify today. The charter is a trust weapon precisely because it's falsifiable.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">The spec outlives the code</div>
+      <p>The memory schema, egress format, and capability bus are documents first, implementations second. A team in 2060 with no KOOMPI source could rebuild a compatible OS from the spec — the same way TCP/IP outlived every original stack.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Continuity is enforced, not pledged</div>
+      <p>Goodwill doesn't survive bankruptcy courts; key shards and public repos do. The dead-man's switch turns "we promise" into a mechanism that executes even if nobody at KOOMPI is left to keep the promise.</p>
+    </div>
+  </div>
+</section>

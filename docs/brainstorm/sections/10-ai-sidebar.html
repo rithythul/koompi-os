@@ -1,0 +1,106 @@
+<section class="section" id="ai-sidebar">
+  <div class="section-header">
+    <h2>AI Sidebar</h2>
+    <span class="tag ai">AI</span>
+  </div>
+  <p class="desc">
+    Left sidebar. Full AI chat interface with RAG context awareness, memory display, and local/cloud mode toggle. Detachable to a floating window.
+  </p>
+
+  <div class="ai-sidebar-wrap">
+    <!-- Chat panel -->
+    <div class="ai-sidebar-panel">
+      <div class="ai-sidebar-header">
+        <span style="font-size:13px; color:var(--accent);">✦</span>
+        <span class="ai-sidebar-title">KOOMPI AI</span>
+        <span class="ai-mode-chip local">LOCAL</span>
+        <div class="sidebar-close-btn">×</div>
+      </div>
+
+      <div class="ai-context-bar">
+        <span style="font-weight:600;">Context:</span>
+        <span class="ai-context-file">koompi-os/CONTEXT.md</span>
+        <span class="ai-context-file">docs/prd.md</span>
+      </div>
+
+      <div class="ai-chat">
+        <div class="ai-msg user">What's the current architecture for the bar?</div>
+        <div class="ai-msg assistant">The bar uses Quickshell + QML. Three styles: Hug (default), Taskbar (Win11), Dock (macOS). Bar content is in BarContent.qml with left/center/right zones. The center has Workspaces + Pomodoro. Right zone handles media, tray, brightness/volume scroll.</div>
+        <div class="ai-thinking">
+          <div class="ai-thinking-dots"><span></span><span></span><span></span></div>
+          Searching your files…
+        </div>
+      </div>
+
+      <div class="ai-input-area">
+        <div class="ai-input-box">
+          <span class="ai-input-text">Ask about your system...</span>
+          <div class="ai-input-send">↵</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info panel -->
+    <div class="ai-info-panel">
+      <div class="ai-info-section">
+        <div class="ai-info-section-title">RAG Sources</div>
+        <div class="rag-source-item">
+          <span class="rag-source-type">FILE</span>
+          <div>
+            <div class="rag-source-name">BarContent.qml</div>
+            <div class="rag-source-excerpt">...LeftSidebarButton, Workspaces, MprisController...</div>
+          </div>
+        </div>
+        <div class="rag-source-item">
+          <span class="rag-source-type">FILE</span>
+          <div>
+            <div class="rag-source-name">CONTEXT.md</div>
+            <div class="rag-source-excerpt">KOOMPI OS repositioned as AI-first desktop...</div>
+          </div>
+        </div>
+        <div class="rag-source-item">
+          <span class="rag-source-type">DOC</span>
+          <div>
+            <div class="rag-source-name">prd.md</div>
+            <div class="rag-source-excerpt">The OS That Thinks — data ownership in the AI era...</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-info-section">
+        <div class="ai-info-section-title">Recent Memory</div>
+        <div class="memory-item">
+          <span class="memory-type project-t">PROJECT</span>
+          <span class="memory-text">KOOMPI OS repositioned to AI-first OS</span>
+        </div>
+        <div class="memory-item">
+          <span class="memory-type user-t">USER</span>
+          <span class="memory-text">Rithy is KOOMPI founder, blockchain background</span>
+        </div>
+        <div class="memory-item">
+          <span class="memory-type feedback-t">FEEDBACK</span>
+          <span class="memory-text">Always show privacy pill in mockups</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout-group">
+    <div class="callout">
+      <div class="callout-title">Local model first <span class="badge new">KOOMPI</span></div>
+      <p>Default mode runs a local LLM. Chip shows LOCAL in emerald. Switching to cloud shows amber CLOUD chip and triggers a consent prompt the first time.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">RAG context panel <span class="badge new">KOOMPI</span></div>
+      <p>Shows exactly which files, docs, and memory entries the AI loaded. Full transparency — you always know why the AI said what it said.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Memory awareness <span class="badge new">KOOMPI</span></div>
+      <p>Persistent memories (user profile, project state, feedback) are visible and editable. AI uses them for personalization without hidden context.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Detach to window</div>
+      <p>AI sidebar can be popped out as a floating window (Super+A twice). Stays connected to the same session and context.</p>
+    </div>
+  </div>
+</section>

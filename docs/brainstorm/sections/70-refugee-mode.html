@@ -1,0 +1,113 @@
+<section class="section" id="refugee-mode">
+  <div class="section-header">
+    <h2>Refugee Mode</h2>
+    <span class="tag">Futures</span>
+    <span class="tag priv">Privacy</span>
+  </div>
+  <p class="desc">
+    In Cambodia, the question "what if you had to leave tonight, with nothing?" is not a thought experiment — it is living memory. So the OS answers it plainly: your entire life — memory palace, keys, identity — exports to one encrypted microSD and one passphrase you carry in your head. The card can cross a border sewn into a hem. The passphrase can cross any border ever built.
+  </p>
+
+  <!-- Export flow -->
+  <div style="max-width:760px; background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-xl); overflow:hidden;">
+    <div style="padding:14px 16px; background:linear-gradient(135deg, var(--accent-glow), transparent); border-bottom:1px solid var(--border2);">
+      <div style="font-size:15px; font-weight:700;">Export a life</div>
+      <div style="font-size:11px; color:var(--text-muted);">koompi-restore export --refugee · everything that is you, made portable</div>
+    </div>
+    <div style="padding:16px; display:flex; align-items:center; gap:14px;">
+      <div style="flex:1.2; background:var(--surface2); border:1px solid var(--border2); border-radius:var(--radius); padding:12px;">
+        <div style="font-size:11px; font-weight:600; margin-bottom:8px;">Your life · 2026–2034</div>
+        <div style="display:flex; flex-direction:column; gap:4px; font-size:10px; font-family:var(--font-mono); color:var(--text-muted);">
+          <div>memory palace <span style="color:var(--cyan);">31.2 GB</span></div>
+          <div>documents &amp; photos <span style="color:var(--cyan);">6.4 GB</span></div>
+          <div>identity keys <span style="color:var(--cyan);">4 KB</span></div>
+          <div>egress ledger &amp; postures <span style="color:var(--cyan);">112 MB</span></div>
+        </div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:10px; font-family:var(--font-mono); color:var(--text-subtle);">encrypt →</div>
+        <div style="font-size:16px; margin:4px 0;">🔐</div>
+        <div style="font-size:9px; font-family:var(--font-mono); color:var(--text-subtle);">age + argon2id</div>
+      </div>
+      <div style="flex:1; background:var(--surface2); border:1px solid rgba(16,185,129,0.35); border-radius:var(--radius); padding:12px; text-align:center;">
+        <div style="font-size:22px;">💾</div>
+        <div style="font-size:12px; font-weight:700; margin-top:4px;">38 GB · one microSD</div>
+        <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">indistinguishable from random data</div>
+        <span class="state-chip active-state" style="font-size:9px; margin-top:8px;">sealed</span>
+      </div>
+    </div>
+    <div style="padding:12px 16px; border-top:1px solid var(--border2); display:flex; align-items:center; gap:10px;">
+      <span style="font-size:16px;">🧠</span>
+      <div style="flex:1; font-size:11px; line-height:1.5; color:var(--text-muted);">
+        The key is a 7-word passphrase — offered in Khmer or English — that you memorize and never write down. <span style="color:var(--text);">Without it the card is noise. With it, the card is you.</span>
+      </div>
+      <span style="font-family:var(--font-mono); font-size:10px; color:var(--amber);">ទន្លេ-ស្ពាន-អំបិល-…</span>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:flex-start; margin-top:24px;">
+
+    <!-- Border-crossing mode -->
+    <div style="width:360px; flex-shrink:0; background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-lg); overflow:hidden;">
+      <div style="padding:12px 16px; border-bottom:1px solid var(--border2); background:var(--surface2); display:flex; align-items:center; gap:8px;">
+        <span style="font-size:15px;">🛂</span>
+        <span style="font-size:13px; font-weight:700; flex:1;">Border-crossing mode</span>
+        <span class="state-chip priv-state" style="font-size:9px;">device clean</span>
+      </div>
+      <div style="padding:16px;">
+        <div style="font-size:12px; line-height:1.6; margin-bottom:12px;">
+          The device itself temporarily holds <strong>nothing</strong>. An inspection — voluntary or not — finds a fresh OS with an empty home directory, because that is genuinely all that exists on it.
+        </div>
+        <div class="tool-code" style="font-size:11px; line-height:1.8;">
+          <span class="code-key">@data</span>      <span class="code-str">crypto-erased · verifiable</span><br>
+          <span class="code-key">keys</span>       <span class="code-str">none present on device</span><br>
+          <span class="code-key">accounts</span>   <span class="code-str">none configured</span><br>
+          <span class="code-key">state</span>      <span class="code-val">factory image · koompi-restore attested</span>
+        </div>
+        <div style="margin-top:12px; display:flex; align-items:flex-start; gap:8px; background:var(--amber-glow); border:1px solid rgba(245,158,11,0.3); border-radius:var(--radius); padding:10px 12px;">
+          <span style="font-size:13px;">🎭</span>
+          <div style="font-size:11px; line-height:1.5; color:var(--text-muted);"><span style="font-weight:600; color:var(--amber);">Duress-compatible.</span> An export can instead carry a decoy volume: a second passphrase unlocks a plausible, harmless life — the same design as the duress decoy volumes in Backup &amp; Restore. Compliance under coercion reveals nothing.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Restore anywhere -->
+    <div style="flex:1; min-width:280px; background:linear-gradient(135deg, var(--emerald-glow), transparent); border:1px solid rgba(16,185,129,0.4); border-radius:var(--radius-lg); padding:16px;">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+        <span style="color:var(--emerald); font-size:14px;">✦</span>
+        <span style="font-size:13px; font-weight:700;">Restore, anywhere on earth</span>
+      </div>
+      <div style="font-size:13px; line-height:1.6; margin-bottom:12px;">
+        Any KOOMPI machine — borrowed, bought secondhand, handed to you at a community center in another country — accepts the card and the passphrase. Twenty minutes later, your memory palace answers in Khmer, exactly as it did at home.
+      </div>
+      <div class="tool-code" style="font-size:11px; line-height:1.8;">
+        koompi-restore import /dev/mmcblk0<br>
+        <span style="color:var(--text-subtle);">├─</span> <span class="code-key">passphrase</span>  <span class="code-str">verified · argon2id · 4.1s</span><br>
+        <span style="color:var(--text-subtle);">├─</span> <span class="code-key">integrity</span>   <span class="code-str">38 GB · all chunks intact</span><br>
+        <span style="color:var(--text-subtle);">└─</span> <span class="code-key">restore</span>     <span class="code-val">memory palace · keys · postures</span>
+      </div>
+      <div style="height:6px; border-radius:3px; background:var(--surface3); overflow:hidden; margin-top:12px;">
+        <div style="height:100%; width:42%; background:var(--emerald); border-radius:3px;"></div>
+      </div>
+      <div style="font-size:10px; color:var(--text-subtle); font-family:var(--font-mono); margin-top:6px;">restoring · 42% · no network required, no account, no server</div>
+      <div style="font-size:11px; color:var(--text-muted); margin-top:10px; line-height:1.5;">
+        Optionally, the card's Merkle root was anchored to Selendra before departure (ADR-0009) — so you can later prove the restored life is the unaltered original. The chain holds a fingerprint, never the data.
+      </div>
+    </div>
+  </div>
+
+  <div class="callout-group">
+    <div class="callout">
+      <div class="callout-title">A life in a hem and a head <span class="badge new">KOOMPI</span></div>
+      <p>One microSD plus one memorized passphrase carries everything: memory palace, keys, identity, trust postures. No cloud account that can be frozen, subpoenaed, or geo-blocked stands between you and your own past.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Verifiably nothing to find</div>
+      <p>Border-crossing mode is not hiding — it is genuine absence. koompi-restore crypto-erases the device and can attest the factory state. An inspector examining the machine finds the truth: there is nothing on it.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Built where the history demands it</div>
+      <p>An OS designed in Cambodia carries the memory of what happens when people must flee with nothing. Refugee mode is that memory turned into engineering — quiet, factual, and ready before it is ever needed.</p>
+    </div>
+  </div>
+</section>

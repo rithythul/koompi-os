@@ -1,0 +1,118 @@
+<section class="section" id="launcher">
+  <div class="section-header">
+    <h2>Launcher / Search</h2>
+    <span class="tag ai">AI</span>
+  </div>
+  <p class="desc">
+    Semantic launcher triggered by Super+Space or K bar button. Searches files, apps, and AI actions using the Context Engine. Privacy badge shows whether search is local-only.
+  </p>
+
+  <div class="launcher-wrap">
+    <div class="launcher-modal">
+      <!-- Search input row -->
+      <div class="launcher-search">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--text-muted);flex-shrink:0;">
+          <circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5l3 3"/>
+        </svg>
+        <div class="launcher-search-text">quarterly report<span class="cursor"></span></div>
+        <span class="launcher-source-badge">🔒 Local</span>
+        <span class="launcher-kbd">Esc</span>
+      </div>
+
+      <!-- AI Action section -->
+      <div class="launcher-section">
+        <div class="launcher-section-label">✦ AI Action</div>
+        <div class="launcher-item selected">
+          <div class="launcher-icon" style="background:var(--accent-glow);color:var(--accent);">✦</div>
+          <div class="launcher-item-body">
+            <div class="launcher-item-name">Summarize quarterly report</div>
+            <div class="launcher-item-meta">Q4-2025-Report.pdf</div>
+          </div>
+          <span class="launcher-kbd">↵</span>
+        </div>
+      </div>
+
+      <!-- Files section -->
+      <div class="launcher-section">
+        <div class="launcher-section-label">Files (3)</div>
+        <div class="launcher-item">
+          <div class="launcher-icon" style="background:#EF444420;color:#EF4444;">PDF</div>
+          <div class="launcher-item-body">
+            <div class="launcher-item-name">Q4-2025-Report.pdf</div>
+            <div class="launcher-item-meta">~/Documents/Finance/</div>
+          </div>
+        </div>
+        <div class="launcher-item">
+          <div class="launcher-icon" style="background:#10B98120;color:#10B981;">XLS</div>
+          <div class="launcher-item-body">
+            <div class="launcher-item-name">quarterly-data.xlsx</div>
+            <div class="launcher-item-meta">~/Documents/Finance/</div>
+          </div>
+        </div>
+        <div class="launcher-item">
+          <div class="launcher-icon" style="background:#6366F120;color:#6366F1;">MD</div>
+          <div class="launcher-item-body">
+            <div class="launcher-item-name">quarterly-notes.md</div>
+            <div class="launcher-item-meta">~/Documents/Notes/</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Apps section -->
+      <div class="launcher-section">
+        <div class="launcher-section-label">All Apps</div>
+        <div class="launcher-app-grid">
+          <div class="launcher-app-tile">
+            <div class="launcher-app-tile-icon" style="background:linear-gradient(135deg,#FF6600,#FF8C00);">🦊</div>
+            <div class="launcher-app-tile-name">Firefox</div>
+          </div>
+          <div class="launcher-app-tile">
+            <div class="launcher-app-tile-icon" style="background:linear-gradient(135deg,#6366F1,#4F46E5);">✦</div>
+            <div class="launcher-app-tile-name">KOOMPI AI</div>
+          </div>
+          <div class="launcher-app-tile">
+            <div class="launcher-app-tile-icon" style="background:linear-gradient(135deg,#0078D4,#005A9E);">💻</div>
+            <div class="launcher-app-tile-name">VS Code</div>
+          </div>
+          <div class="launcher-app-tile">
+            <div class="launcher-app-tile-icon" style="background:linear-gradient(135deg,#22D3EE,#0891B2);">📁</div>
+            <div class="launcher-app-tile-name">Files</div>
+          </div>
+          <div class="launcher-app-tile">
+            <div class="launcher-app-tile-icon" style="background:linear-gradient(135deg,#10B981,#059669);">⬛</div>
+            <div class="launcher-app-tile-name">Terminal</div>
+          </div>
+          <div class="launcher-app-tile">
+            <div class="launcher-app-tile-icon" style="background:linear-gradient(135deg,#64748B,#475569);">⚙️</div>
+            <div class="launcher-app-tile-name">Settings</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="launcher-footer">
+        <div class="launcher-footer-kbds">
+          <span><span class="launcher-kbd">↑↓</span> Navigate</span>
+          <span><span class="launcher-kbd">↵</span> Open</span>
+          <span><span class="launcher-kbd">Tab</span> AI action</span>
+        </div>
+        <span>Context Engine · 12,847 files indexed</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout-group">
+    <div class="callout">
+      <div class="callout-title">Semantic search</div>
+      <p>Context Engine indexes files, apps, recent activity. Results ranked by relevance, not just filename match. Understands "quarterly report" → finds Q4-2025-Report.pdf.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">AI Actions <span class="badge new">KOOMPI</span></div>
+      <p>Top result can be an AI action (summarize, explain, compare). Tab key selects the AI action. Shows which file will be the context source.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Privacy badge <span class="badge new">KOOMPI</span></div>
+      <p>🔒 Local = search never leaves device. ☁ Cloud = semantic search uses remote embedding model. Badge always visible, toggleable via privacy policy.</p>
+    </div>
+  </div>
+</section>

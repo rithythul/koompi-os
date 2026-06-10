@@ -1,0 +1,128 @@
+<section class="section" id="ambient-intelligence">
+  <div class="section-header">
+    <h2>Ambient Intelligence</h2>
+    <span class="tag ai">AI</span>
+  </div>
+  <p class="desc">
+    The OS is always present, never intrusive. An <strong>awareness layer</strong> reads context signals — time, calendar, file activity, focus, typing cadence, even ambient light — and tunes the environment proactively. Every signal is computed locally; the HUD shows you exactly what the OS senses, so awareness never feels like surveillance.
+  </p>
+
+  <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:flex-start;">
+
+    <!-- Context Pulse HUD -->
+    <div style="width:320px; flex-shrink:0; background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-xl); overflow:hidden;">
+      <div style="display:flex; align-items:center; gap:8px; padding:12px 16px; border-bottom:1px solid var(--border2); background:var(--surface2);">
+        <span style="font-size:13px; color:var(--accent);">✦</span>
+        <span style="font-size:13px; font-weight:700; flex:1;">Context Pulse</span>
+        <span class="state-chip priv-state" style="padding:2px 8px; font-size:9px;">LOCAL</span>
+      </div>
+
+      <div style="padding:16px;">
+        <!-- Focus score ring -->
+        <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
+          <svg viewBox="0 0 64 64" style="width:64px; height:64px; flex-shrink:0;">
+            <circle cx="32" cy="32" r="26" fill="none" stroke="var(--surface3)" stroke-width="6"/>
+            <circle cx="32" cy="32" r="26" fill="none" stroke="var(--accent)" stroke-width="6"
+              stroke-dasharray="163" stroke-dashoffset="34" stroke-linecap="round" transform="rotate(-90 32 32)"/>
+            <text x="32" y="34" text-anchor="middle" font-size="15" font-weight="700" fill="var(--accent)">79</text>
+            <text x="32" y="45" text-anchor="middle" font-size="6" fill="var(--text-muted)">FOCUS</text>
+          </svg>
+          <div style="flex:1;">
+            <div style="font-size:13px; font-weight:600;">Deep work · 47 min in</div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Steady typing · 2.1% error rate · no app-switching for 12 min</div>
+          </div>
+        </div>
+
+        <!-- Inferred signals -->
+        <div class="card-label">Sensed right now</div>
+        <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;">
+          <div style="display:flex; align-items:center; gap:8px; font-size:12px;">
+            <span style="width:7px; height:7px; border-radius:50%; background:var(--emerald);"></span>
+            <span style="flex:1; color:var(--text-muted);">Energy — inferred from cadence</span>
+            <span style="font-weight:600; color:var(--emerald);">High</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; font-size:12px;">
+            <span style="width:7px; height:7px; border-radius:50%; background:var(--accent);"></span>
+            <span style="flex:1; color:var(--text-muted);">Next event — calendar</span>
+            <span style="font-weight:600;">in 20 min</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; font-size:12px;">
+            <span style="width:7px; height:7px; border-radius:50%; background:var(--amber);"></span>
+            <span style="flex:1; color:var(--text-muted);">Uncommitted changes — git</span>
+            <span style="font-weight:600; color:var(--amber);">3 files</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; font-size:12px;">
+            <span style="width:7px; height:7px; border-radius:50%; background:var(--cyan);"></span>
+            <span style="flex:1; color:var(--text-muted);">Ambient light — webcam, local only</span>
+            <span style="font-weight:600;">Dim · 18:40</span>
+          </div>
+        </div>
+
+        <div class="tool-privacy-note">
+          🔒 All signals computed on-device · webcam frames never stored or sent
+        </div>
+      </div>
+    </div>
+
+    <!-- Interruption shield -->
+    <div style="flex:1; min-width:280px; display:flex; flex-direction:column; gap:14px;">
+      <div style="background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-lg); padding:14px 16px;">
+        <div class="card-label" style="margin-bottom:10px;">Interruption Shield — flow protected</div>
+
+        <div style="display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:var(--radius); background:var(--emerald-glow); border:1px solid rgba(16,185,129,0.2); margin-bottom:7px;">
+          <div class="notif-avatar" style="background:#229ED9; color:white; width:26px; height:26px; font-size:11px; flex-shrink:0;">T</div>
+          <div style="flex:1;">
+            <div style="font-size:12px; font-weight:600;">Scovitep · Telegram</div>
+            <div style="font-size:11px; color:var(--text-muted);">"are you free for lunch?"</div>
+          </div>
+          <span class="state-chip priv-state" style="font-size:9px; padding:2px 8px;">HELD · 23m</span>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:var(--radius); background:var(--red-glow); border:1px solid rgba(239,68,68,0.25);">
+          <div class="notif-avatar" style="background:var(--red); color:white; width:26px; height:26px; font-size:13px; flex-shrink:0;">!</div>
+          <div style="flex:1;">
+            <div style="font-size:12px; font-weight:600;">Production alert · Grafana</div>
+            <div style="font-size:11px; color:var(--text-muted);">API error rate &gt; 5% — payments</div>
+          </div>
+          <span class="state-chip danger-state" style="font-size:9px; padding:2px 8px;">BROKE THROUGH</span>
+        </div>
+
+        <p style="font-size:11px; color:var(--text-subtle); margin-top:10px; line-height:1.5;">
+          The AI ranks each notification against your current state. Social pings wait for the next break; a production incident is worth the interrupt. You set the threshold — the OS never decides silently without a log.
+        </p>
+      </div>
+
+      <!-- Ambient cascade timeline -->
+      <div style="background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-lg); padding:14px 16px;">
+        <div class="card-label" style="margin-bottom:12px;">Ambient cascade — warmth &amp; brightness over the day</div>
+        <div style="display:flex; align-items:flex-end; gap:3px; height:54px;">
+          <div style="flex:1; height:30%; border-radius:3px 3px 0 0; background:linear-gradient(to top,#60A5FA,#BFDBFE);" title="06:00 cool"></div>
+          <div style="flex:1; height:55%; border-radius:3px 3px 0 0; background:linear-gradient(to top,#93C5FD,#DBEAFE);"></div>
+          <div style="flex:1; height:90%; border-radius:3px 3px 0 0; background:linear-gradient(to top,#FCD34D,#FEF3C7);" title="12:00 bright"></div>
+          <div style="flex:1; height:100%; border-radius:3px 3px 0 0; background:linear-gradient(to top,#FBBF24,#FDE68A);"></div>
+          <div style="flex:1; height:70%; border-radius:3px 3px 0 0; background:linear-gradient(to top,#FB923C,#FED7AA);"></div>
+          <div style="flex:1; height:45%; border-radius:3px 3px 0 0; background:linear-gradient(to top,#F97316,#FDBA74);" title="19:00 warm"></div>
+          <div style="flex:1; height:25%; border-radius:3px 3px 0 0; background:linear-gradient(to top,#EA580C,#FB923C);" title="22:00 dim warm"></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:9px; color:var(--text-subtle); font-family:var(--font-mono); margin-top:6px;">
+          <span>06</span><span>09</span><span>12</span><span>15</span><span>18</span><span>20</span><span>22</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout-group">
+    <div class="callout">
+      <div class="callout-title">Awareness, not surveillance <span class="badge new">KOOMPI</span></div>
+      <p>The Context Pulse exposes every signal the OS reads. Nothing is inferred behind your back — if the HUD doesn't show it, the OS isn't using it.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Webcam stays a sensor, never a recorder</div>
+      <p>Ambient light is read as a single brightness scalar at the kernel level. Frames are discarded immediately. A hardware LED + system pill confirm the camera was never opened for capture.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">You own the threshold</div>
+      <p>The interruption shield is tunable per state. Every held notification is logged so you can audit what the OS chose to defer — and pull the threshold back if it ever guesses wrong.</p>
+    </div>
+  </div>
+</section>

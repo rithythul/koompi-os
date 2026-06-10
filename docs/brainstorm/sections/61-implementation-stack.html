@@ -1,0 +1,555 @@
+<section class="section" id="implementation-stack">
+  <div class="section-header">
+    <h2>Implementation Stack</h2>
+    <span class="tag sys">Stack</span>
+  </div>
+  <p class="desc">
+    Every screen in this brainstorm resolves to four languages on one machine. <strong>QML/Quickshell</strong> draws it, <strong>Zig</strong> daemons feed it, a <strong>Python</strong> layer thinks for it, and <strong>Rust</strong> guards the bytes that must never leak. This is the engineering contract behind LOCAL-FIRST and PRIVACY-FIRST: the AI runs on your silicon, the daemons hold your context in RAM you own, and the only path off-device is one Rust egress gate you can read. This section is the wiring map — real binaries, real <code>com.koompi.*</code> D-Bus names, real socket paths — not architecture poetry.
+  </p>
+
+  <!-- ============ LAYERED STACK OVERVIEW ============ -->
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;overflow:hidden;margin-bottom:16px;">
+    <div style="padding:12px 18px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;">
+        <span style="width:7px;height:7px;border-radius:50%;background:var(--accent);"></span>
+        Stack Overview <span style="font-family:monospace;font-size:11px;color:var(--text-subtle);font-weight:400;">6 layers · kernel → security</span>
+      </div>
+      <span style="font-size:11px;color:var(--text-subtle);">cold boot to shell ≈ 2.1 s</span>
+    </div>
+    <div style="padding:16px;display:flex;flex-direction:column;gap:8px;">
+
+      <!-- Layer 5: Rust security (top, most trusted) -->
+      <div style="background:rgba(244,114,96,0.07);border:1px solid rgba(244,114,96,0.28);border-radius:9px;padding:11px 14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;">
+          <span style="font-size:11px;font-weight:700;color:#F47260;display:flex;align-items:center;gap:7px;"><span style="width:18px;height:18px;border-radius:5px;background:#F47260;color:#1a0c08;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:800;">5</span>Rust · Security &amp; Crypto</span>
+          <span style="font-family:monospace;font-size:10px;color:var(--text-subtle);">memory-safe · no GC · audited</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <span style="background:rgba(244,114,96,0.12);border:1px solid rgba(244,114,96,0.3);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:#F8A593;">koompi-vault</span>
+          <span style="background:rgba(244,114,96,0.12);border:1px solid rgba(244,114,96,0.3);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:#F8A593;">selendra-client</span>
+          <span style="background:rgba(244,114,96,0.12);border:1px solid rgba(244,114,96,0.3);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:#F8A593;">koompi-vector (HNSW)</span>
+          <span style="background:rgba(244,114,96,0.12);border:1px solid rgba(244,114,96,0.3);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:#F8A593;">did-signer (ed25519)</span>
+        </div>
+      </div>
+
+      <!-- Layer 4: QML / Quickshell UI -->
+      <div style="background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.28);border-radius:9px;padding:11px 14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;">
+          <span style="font-size:11px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:7px;"><span style="width:18px;height:18px;border-radius:5px;background:var(--accent);color:#0c0d1a;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:800;">4</span>QML / Quickshell · Shell UI</span>
+          <span style="font-family:monospace;font-size:10px;color:var(--text-subtle);">Qt6 · QtQuick · hot-reload</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <span style="background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.3);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:#A5B0F8;">Bar.qml</span>
+          <span style="background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.3);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:#A5B0F8;">Launcher.qml</span>
+          <span style="background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.3);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:#A5B0F8;">AiSidebar.qml</span>
+          <span style="background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.3);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:#A5B0F8;">Notifications.qml</span>
+          <span style="background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.3);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:#A5B0F8;">QuickSettings.qml</span>
+          <span style="background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.3);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:#A5B0F8;">EgressLedger.qml</span>
+        </div>
+      </div>
+
+      <!-- Layer 3: Python AI -->
+      <div style="background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.26);border-radius:9px;padding:11px 14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;">
+          <span style="font-size:11px;font-weight:700;color:var(--cyan);display:flex;align-items:center;gap:7px;"><span style="width:18px;height:18px;border-radius:5px;background:var(--cyan);color:#06222a;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:800;">3</span>Python · AI &amp; Reasoning</span>
+          <span style="font-family:monospace;font-size:10px;color:var(--text-subtle);">FastAPI · ollama · transformers</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <span style="background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.28);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:#8EE9F7;">koompi-ai-bridge</span>
+          <span style="background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.28);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:#8EE9F7;">NeuroAgentMemory</span>
+          <span style="background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.28);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:#8EE9F7;">koompi-rag</span>
+          <span style="background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.28);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:#8EE9F7;">koompi-tools</span>
+          <span style="background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.28);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:#8EE9F7;">koompi-model-manager</span>
+        </div>
+      </div>
+
+      <!-- Layer 2: Zig daemons -->
+      <div style="background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.28);border-radius:9px;padding:11px 14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;">
+          <span style="font-size:11px;font-weight:700;color:var(--amber);display:flex;align-items:center;gap:7px;"><span style="width:18px;height:18px;border-radius:5px;background:var(--amber);color:#2a1c04;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:800;">2</span>Zig · System Daemons</span>
+          <span style="font-family:monospace;font-size:10px;color:var(--text-subtle);">static · no libc bloat · &lt;3 MB each</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <span style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.28);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:#F8CE7E;">koompi-contextd</span>
+          <span style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.28);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:#F8CE7E;">koompi-agent-memd</span>
+          <span style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.28);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:#F8CE7E;">koompi-egress</span>
+          <span style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.28);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:#F8CE7E;">koompi-themed</span>
+          <span style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.28);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:#F8CE7E;">koompi-restore</span>
+          <span style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.28);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:#F8CE7E;">koompi-installer</span>
+        </div>
+      </div>
+
+      <!-- Layer 1: Hyprland -->
+      <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.26);border-radius:9px;padding:11px 14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;">
+          <span style="font-size:11px;font-weight:700;color:var(--emerald);display:flex;align-items:center;gap:7px;"><span style="width:18px;height:18px;border-radius:5px;background:var(--emerald);color:#06291c;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:800;">1</span>Hyprland · Wayland Compositor</span>
+          <span style="font-family:monospace;font-size:10px;color:var(--text-subtle);">C++ · wlroots · hyprland-ipc</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <span style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.28);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:#7EE9C2;">hyprland.conf overlay</span>
+          <span style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.28);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:#7EE9C2;">hyprctl IPC socket</span>
+          <span style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.28);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:#7EE9C2;">event socket2</span>
+        </div>
+      </div>
+
+      <!-- Layer 0: kernel -->
+      <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:11px 14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;">
+          <span style="font-size:11px;font-weight:700;color:var(--text-muted);display:flex;align-items:center;gap:7px;"><span style="width:18px;height:18px;border-radius:5px;background:var(--text-subtle);color:var(--surface);font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:800;">0</span>Linux Kernel · systemd · Arch</span>
+          <span style="font-family:monospace;font-size:10px;color:var(--text-subtle);">rolling · zen kernel · systemd user bus</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <span style="background:var(--surface3);border:1px solid var(--border2);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:var(--text-muted);">linux-zen</span>
+          <span style="background:var(--surface3);border:1px solid var(--border2);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:var(--text-muted);">systemd --user</span>
+          <span style="background:var(--surface3);border:1px solid var(--border2);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:var(--text-muted);">pacman / paru</span>
+          <span style="background:var(--surface3);border:1px solid var(--border2);border-radius:5px;padding:3px 9px;font-size:10px;font-family:monospace;color:var(--text-muted);">pipewire · wayland</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============ QML / QUICKSHELL COMPONENT MAP ============ -->
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;overflow:hidden;margin-bottom:16px;">
+    <div style="padding:11px 16px;border-bottom:1px solid var(--border2);font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;justify-content:space-between;">
+      <span style="display:flex;align-items:center;gap:8px;"><span style="width:7px;height:7px;border-radius:50%;background:var(--accent);"></span>Quickshell Component Map <span class="tag ai" style="font-weight:400;">Layer 4</span></span>
+      <span style="font-size:10px;color:var(--text-subtle);">QML files in <code>~/.config/quickshell/koompi/</code></span>
+    </div>
+    <div style="padding:0;">
+      <div style="display:grid;grid-template-columns:1.3fr 1.2fr 1.4fr 0.8fr;gap:0;font-size:11px;">
+        <!-- header -->
+        <div style="padding:9px 14px;background:var(--surface2);color:var(--text-subtle);font-weight:600;border-bottom:1px solid var(--border2);">Component</div>
+        <div style="padding:9px 14px;background:var(--surface2);color:var(--text-subtle);font-weight:600;border-bottom:1px solid var(--border2);">Trigger</div>
+        <div style="padding:9px 14px;background:var(--surface2);color:var(--text-subtle);font-weight:600;border-bottom:1px solid var(--border2);">Data source daemon</div>
+        <div style="padding:9px 14px;background:var(--surface2);color:var(--text-subtle);font-weight:600;border-bottom:1px solid var(--border2);">Cost</div>
+
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--accent);">Bar.qml</div>
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);color:var(--text-muted);">always-on (boot)</div>
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--text);font-size:10px;">contextd · hyprland-ipc</div>
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);"><span style="color:var(--emerald);">●</span><span style="color:var(--text-subtle);">○○</span></div>
+
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--accent);">Launcher.qml</div>
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);color:var(--text-muted);"><kbd style="font-family:monospace;">Super</kbd></div>
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--text);font-size:10px;">koompi-rag · ai-bridge</div>
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);"><span style="color:var(--emerald);">●●</span><span style="color:var(--text-subtle);">○</span></div>
+
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--accent);">AiSidebar.qml</div>
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);color:var(--text-muted);"><kbd style="font-family:monospace;">Super+A</kbd></div>
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--text);font-size:10px;">ai-bridge · agent-memd</div>
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);"><span style="color:var(--amber);">●●●</span></div>
+
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--accent);">Notifications.qml</div>
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);color:var(--text-muted);">D-Bus notify signal</div>
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--text);font-size:10px;">org.freedesktop.Notifications</div>
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);"><span style="color:var(--emerald);">●</span><span style="color:var(--text-subtle);">○○</span></div>
+
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--accent);">QuickSettings.qml</div>
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);color:var(--text-muted);"><kbd style="font-family:monospace;">Super+N</kbd></div>
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--text);font-size:10px;">NetworkManager · pipewire</div>
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);"><span style="color:var(--emerald);">●●</span><span style="color:var(--text-subtle);">○</span></div>
+
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--accent);">MemoryView.qml</div>
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);color:var(--text-muted);">sidebar tab</div>
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--text);font-size:10px;">agent-memd · koompi-vector</div>
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);"><span style="color:var(--amber);">●●●</span></div>
+
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--accent);">EgressLedger.qml</div>
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);color:var(--text-muted);">privacy dash open</div>
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--text);font-size:10px;">koompi-egress</div>
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);"><span style="color:var(--emerald);">●</span><span style="color:var(--text-subtle);">○○</span></div>
+
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--accent);">Osd.qml</div>
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);color:var(--text-muted);">volume / brightness key</div>
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--text);font-size:10px;">pipewire · brightnessctl</div>
+        <div style="padding:9px 14px;border-bottom:1px solid var(--border2);"><span style="color:var(--emerald);">●</span><span style="color:var(--text-subtle);">○○</span></div>
+
+        <div style="padding:9px 14px;font-family:monospace;color:var(--accent);">Overview.qml</div>
+        <div style="padding:9px 14px;color:var(--text-muted);"><kbd style="font-family:monospace;">Super+Tab</kbd></div>
+        <div style="padding:9px 14px;font-family:monospace;color:var(--text);font-size:10px;">hyprland-ipc (workspaces)</div>
+        <div style="padding:9px 14px;"><span style="color:var(--emerald);">●●</span><span style="color:var(--text-subtle);">○</span></div>
+      </div>
+    </div>
+    <div style="padding:10px 16px;font-size:10px;color:var(--text-muted);border-top:1px solid var(--border2);">
+      Cost = render + data weight. <span style="color:var(--emerald);">●</span> cheap reactive binding · <span style="color:var(--amber);">●●●</span> spawns/streams from the Python layer. Every component is a <code>.qml</code> text file — no compiled blob, no recompile to restyle. The whole shell is editable at runtime; that is what makes BEAUTIFUL BY DEFAULT iterable.
+    </div>
+  </div>
+
+  <!-- ============ ZIG DAEMON CARDS ============ -->
+  <div style="font-size:12px;font-weight:700;color:var(--text);margin:0 0 10px 2px;display:flex;align-items:center;gap:8px;"><span style="width:7px;height:7px;border-radius:50%;background:var(--amber);"></span>Zig Daemon Cards <span style="font-weight:400;color:var(--text-subtle);font-size:11px;">Layer 2 · /usr/lib/koompi/</span></div>
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px;">
+
+    <!-- contextd -->
+    <div style="background:var(--surface);border:1px solid rgba(245,158,11,0.25);border-radius:11px;overflow:hidden;">
+      <div style="padding:11px 14px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-family:monospace;font-size:12px;font-weight:700;color:var(--amber);">koompi-contextd</span>
+        <span style="font-size:9px;color:var(--text-subtle);background:var(--surface2);padding:2px 7px;border-radius:4px;">always-on</span>
+      </div>
+      <div style="padding:12px 14px;font-size:10px;color:var(--text-muted);line-height:1.7;">
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">binary size</span><span style="font-family:monospace;color:var(--text);">≤ 2.0 MB static</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">startup</span><span style="font-family:monospace;color:var(--emerald);">≤ 15 ms</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">D-Bus</span><span style="font-family:monospace;color:var(--text);font-size:9px;">com.koompi.contextd</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">socket</span><span style="font-family:monospace;color:var(--text);font-size:9px;">$XDG_RUNTIME_DIR/koompi/ctx.sock</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">syscalls</span><span style="font-family:monospace;color:var(--text);font-size:9px;">inotify · epoll · recvmsg</span></div>
+        <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border2);color:var(--text-muted);"><strong style="color:var(--text);">Produces:</strong> the live "what am I doing now" snapshot — active window, workspace, recent files, idle state. Feeds the bar and the AI's situational prompt.</div>
+      </div>
+    </div>
+
+    <!-- agent-memd -->
+    <div style="background:var(--surface);border:1px solid rgba(245,158,11,0.25);border-radius:11px;overflow:hidden;">
+      <div style="padding:11px 14px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-family:monospace;font-size:12px;font-weight:700;color:var(--amber);">koompi-agent-memd</span>
+        <span style="font-size:9px;color:var(--text-subtle);background:var(--surface2);padding:2px 7px;border-radius:4px;">always-on</span>
+      </div>
+      <div style="padding:12px 14px;font-size:10px;color:var(--text-muted);line-height:1.7;">
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">binary size</span><span style="font-family:monospace;color:var(--text);">≤ 2.8 MB static</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">startup</span><span style="font-family:monospace;color:var(--emerald);">≤ 25 ms</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">D-Bus</span><span style="font-family:monospace;color:var(--text);font-size:9px;">com.koompi.AgentMemory</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">socket</span><span style="font-family:monospace;color:var(--text);font-size:9px;">$XDG_RUNTIME_DIR/koompi/memd.sock</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">syscalls</span><span style="font-family:monospace;color:var(--text);font-size:9px;">mmap · pwrite · fsync · madvise</span></div>
+        <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border2);color:var(--text-muted);"><strong style="color:var(--text);">Produces:</strong> the durable memory store (§58–60) — mmap'd append log + index handles for <code>koompi-vector</code>. Owns the bytes; Python only queries.</div>
+      </div>
+    </div>
+
+    <!-- egress -->
+    <div style="background:var(--surface);border:1px solid rgba(245,158,11,0.25);border-radius:11px;overflow:hidden;">
+      <div style="padding:11px 14px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-family:monospace;font-size:12px;font-weight:700;color:var(--amber);">koompi-egress</span>
+        <span style="font-size:9px;color:#F8A593;background:rgba(244,114,96,0.12);padding:2px 7px;border-radius:4px;">privacy gate</span>
+      </div>
+      <div style="padding:12px 14px;font-size:10px;color:var(--text-muted);line-height:1.7;">
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">binary size</span><span style="font-family:monospace;color:var(--text);">≤ 1.6 MB static</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">startup</span><span style="font-family:monospace;color:var(--emerald);">≤ 12 ms</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">D-Bus</span><span style="font-family:monospace;color:var(--text);font-size:9px;">com.koompi.Egress</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">socket</span><span style="font-family:monospace;color:var(--text);font-size:9px;">$XDG_RUNTIME_DIR/koompi/egress.sock</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">syscalls</span><span style="font-family:monospace;color:var(--text);font-size:9px;">socket · connect · getsockopt(SO_PEERCRED)</span></div>
+        <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border2);color:var(--text-muted);"><strong style="color:var(--text);">Produces:</strong> the append-only egress ledger (§28). Every outbound byte from the AI layer is proxied, logged, and consent-checked here. Nothing leaves unrecorded.</div>
+      </div>
+    </div>
+
+    <!-- themed -->
+    <div style="background:var(--surface);border:1px solid rgba(245,158,11,0.25);border-radius:11px;overflow:hidden;">
+      <div style="padding:11px 14px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-family:monospace;font-size:12px;font-weight:700;color:var(--amber);">koompi-themed</span>
+        <span style="font-size:9px;color:var(--text-subtle);background:var(--surface2);padding:2px 7px;border-radius:4px;">on-event</span>
+      </div>
+      <div style="padding:12px 14px;font-size:10px;color:var(--text-muted);line-height:1.7;">
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">binary size</span><span style="font-family:monospace;color:var(--text);">≤ 1.4 MB static</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">recolor pass</span><span style="font-family:monospace;color:var(--emerald);">≤ 40 ms (§53)</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">D-Bus</span><span style="font-family:monospace;color:var(--text);font-size:9px;">com.koompi.Theme</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">writes</span><span style="font-family:monospace;color:var(--text);font-size:9px;">~/.config/koompi/theme.json</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">syscalls</span><span style="font-family:monospace;color:var(--text);font-size:9px;">openat · rename (atomic) · inotify</span></div>
+        <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border2);color:var(--text-muted);"><strong style="color:var(--text);">Produces:</strong> the CAM16 tonal palette from the active wallpaper, written as one atomic <code>theme.json</code> that Quickshell's <code>FileView</code> watches.</div>
+      </div>
+    </div>
+
+    <!-- restore -->
+    <div style="background:var(--surface);border:1px solid rgba(245,158,11,0.25);border-radius:11px;overflow:hidden;">
+      <div style="padding:11px 14px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-family:monospace;font-size:12px;font-weight:700;color:var(--amber);">koompi-restore</span>
+        <span style="font-size:9px;color:var(--text-subtle);background:var(--surface2);padding:2px 7px;border-radius:4px;">on-demand</span>
+      </div>
+      <div style="padding:12px 14px;font-size:10px;color:var(--text-muted);line-height:1.7;">
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">binary size</span><span style="font-family:monospace;color:var(--text);">≤ 3.0 MB static</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">snapshot</span><span style="font-family:monospace;color:var(--emerald);">btrfs CoW · &lt; 1 s</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">D-Bus</span><span style="font-family:monospace;color:var(--text);font-size:9px;">com.koompi.Restore</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">socket</span><span style="font-family:monospace;color:var(--text);font-size:9px;">root: /run/koompi/restore.sock</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">syscalls</span><span style="font-family:monospace;color:var(--text);font-size:9px;">ioctl(BTRFS_IOC_SNAP) · sendfile</span></div>
+        <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border2);color:var(--text-muted);"><strong style="color:var(--text);">Produces:</strong> factory-reset and rollback snapshots (§30, §41). Separates "the OS" from "your data" so a reset never erases what you own.</div>
+      </div>
+    </div>
+
+    <!-- installer -->
+    <div style="background:var(--surface);border:1px solid rgba(245,158,11,0.25);border-radius:11px;overflow:hidden;">
+      <div style="padding:11px 14px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-family:monospace;font-size:12px;font-weight:700;color:var(--amber);">koompi-installer</span>
+        <span style="font-size:9px;color:var(--text-subtle);background:var(--surface2);padding:2px 7px;border-radius:4px;">ISO only</span>
+      </div>
+      <div style="padding:12px 14px;font-size:10px;color:var(--text-muted);line-height:1.7;">
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">binary size</span><span style="font-family:monospace;color:var(--text);">≤ 2.5 MB static</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">TUI boot</span><span style="font-family:monospace;color:var(--emerald);">≤ 100 ms (§32)</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">runtime</span><span style="font-family:monospace;color:var(--text);font-size:9px;">VT100 TUI · no D-Bus</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">writes</span><span style="font-family:monospace;color:var(--text);font-size:9px;">/mnt · genfstab · pacstrap</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-subtle);">syscalls</span><span style="font-family:monospace;color:var(--text);font-size:9px;">ioctl(TIOCGWINSZ) · mount · clone</span></div>
+        <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border2);color:var(--text-muted);"><strong style="color:var(--text);">Produces:</strong> a partitioned, pacstrap'd KOOMPI install with AI model + Selendra DID configured before first desktop boot.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============ PYTHON AI MODULE MAP ============ -->
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;overflow:hidden;margin-bottom:16px;">
+    <div style="padding:11px 16px;border-bottom:1px solid var(--border2);font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;justify-content:space-between;">
+      <span style="display:flex;align-items:center;gap:8px;"><span style="width:7px;height:7px;border-radius:50%;background:var(--cyan);"></span>Python AI Module Map <span style="font-weight:400;color:var(--text-subtle);font-size:11px;">Layer 3 · uv venv · /opt/koompi-ai/</span></span>
+      <span style="font-size:10px;color:var(--emerald);">one systemd user service · resident RAM budget ≈ 6.4 GB</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1.1fr 1.5fr 1.1fr 1fr 0.7fr;gap:0;font-size:11px;">
+      <div style="padding:9px 14px;background:var(--surface2);color:var(--text-subtle);font-weight:600;border-bottom:1px solid var(--border2);">Module</div>
+      <div style="padding:9px 14px;background:var(--surface2);color:var(--text-subtle);font-weight:600;border-bottom:1px solid var(--border2);">Role</div>
+      <div style="padding:9px 14px;background:var(--surface2);color:var(--text-subtle);font-weight:600;border-bottom:1px solid var(--border2);">Deps</div>
+      <div style="padding:9px 14px;background:var(--surface2);color:var(--text-subtle);font-weight:600;border-bottom:1px solid var(--border2);">Interface</div>
+      <div style="padding:9px 14px;background:var(--surface2);color:var(--text-subtle);font-weight:600;border-bottom:1px solid var(--border2);">RAM</div>
+
+      <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--cyan);font-size:10px;">ai_bridge.py</div>
+      <div style="padding:9px 14px;border-bottom:1px solid var(--border2);color:var(--text-muted);">request router / orchestrator</div>
+      <div style="padding:9px 14px;border-bottom:1px solid var(--border2);color:var(--text);font-size:10px;">fastapi · uvicorn</div>
+      <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--text);font-size:9px;">HTTP :8731 + SSE</div>
+      <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--text-subtle);">~120 MB</div>
+
+      <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--cyan);font-size:10px;">neuro_agent_memory.py</div>
+      <div style="padding:9px 14px;border-bottom:1px solid var(--border2);color:var(--text-muted);">recall / consolidation (§58)</div>
+      <div style="padding:9px 14px;border-bottom:1px solid var(--border2);color:var(--text);font-size:10px;">sentence-transformers</div>
+      <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--text);font-size:9px;">memd.sock (UDS)</div>
+      <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--text-subtle);">~480 MB</div>
+
+      <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--cyan);font-size:10px;">rag.py</div>
+      <div style="padding:9px 14px;border-bottom:1px solid var(--border2);color:var(--text-muted);">retrieval over local index (§12)</div>
+      <div style="padding:9px 14px;border-bottom:1px solid var(--border2);color:var(--text);font-size:10px;">koompi-vector (FFI)</div>
+      <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--text);font-size:9px;">in-proc + UDS</div>
+      <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--text-subtle);">~260 MB</div>
+
+      <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--cyan);font-size:10px;">tools.py</div>
+      <div style="padding:9px 14px;border-bottom:1px solid var(--border2);color:var(--text-muted);">tool calls, gated by approval (§11)</div>
+      <div style="padding:9px 14px;border-bottom:1px solid var(--border2);color:var(--text);font-size:10px;">pydantic · httpx</div>
+      <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--text);font-size:9px;">via koompi-egress</div>
+      <div style="padding:9px 14px;border-bottom:1px solid var(--border2);font-family:monospace;color:var(--text-subtle);">~90 MB</div>
+
+      <div style="padding:9px 14px;font-family:monospace;color:var(--cyan);font-size:10px;">model_manager.py</div>
+      <div style="padding:9px 14px;color:var(--text-muted);">load / swap / quantize models (§43)</div>
+      <div style="padding:9px 14px;color:var(--text);font-size:10px;">ollama · llama.cpp</div>
+      <div style="padding:9px 14px;font-family:monospace;color:var(--text);font-size:9px;">ollama :11434</div>
+      <div style="padding:9px 14px;font-family:monospace;color:var(--text-subtle);">~5.4 GB*</div>
+    </div>
+    <div style="padding:10px 16px;font-size:10px;color:var(--text-muted);border-top:1px solid var(--border2);">
+      *Model weights dominate the budget — an 8B model at Q4 is ≈ 5.4 GB resident. The Python modules themselves are light; the intelligence sits in the model, on <em>your</em> GPU/CPU. The bridge speaks <strong>only</strong> to localhost; any cloud hop must traverse <code>koompi-egress</code> and is logged.
+    </div>
+  </div>
+
+  <!-- ============ IPC WIRING DIAGRAM ============ -->
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;overflow:hidden;margin-bottom:16px;">
+    <div style="padding:11px 16px;border-bottom:1px solid var(--border2);font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;">
+      <span style="width:7px;height:7px;border-radius:50%;background:var(--accent);"></span>IPC Wiring <span style="font-weight:400;color:var(--text-subtle);font-size:11px;">who talks to whom, over what protocol</span>
+    </div>
+    <div style="padding:20px 18px;">
+      <div style="display:flex;align-items:stretch;gap:0;flex-wrap:nowrap;">
+
+        <!-- Hyprland -->
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;">
+          <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);border-radius:9px;padding:12px 10px;text-align:center;">
+            <div style="font-size:11px;font-weight:700;color:var(--emerald);">Hyprland</div>
+            <div style="font-size:9px;color:var(--text-subtle);font-family:monospace;margin-top:3px;">compositor</div>
+          </div>
+        </div>
+
+        <!-- arrow 1 -->
+        <div style="flex:0.7;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:0 4px;">
+          <div style="font-size:8px;color:var(--emerald);font-family:monospace;background:rgba(16,185,129,0.08);padding:2px 5px;border-radius:4px;">hyprland-ipc</div>
+          <div style="width:100%;height:1px;background:linear-gradient(90deg,var(--emerald),var(--amber));position:relative;">
+            <span style="position:absolute;right:-2px;top:-4px;color:var(--amber);font-size:10px;">▸</span>
+          </div>
+          <div style="font-size:8px;color:var(--text-subtle);font-family:monospace;">socket2 events</div>
+        </div>
+
+        <!-- Zig daemons -->
+        <div style="flex:1.1;min-width:0;display:flex;flex-direction:column;gap:8px;">
+          <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);border-radius:9px;padding:12px 10px;text-align:center;">
+            <div style="font-size:11px;font-weight:700;color:var(--amber);">Zig daemons</div>
+            <div style="font-size:9px;color:var(--text-subtle);font-family:monospace;margin-top:3px;">contextd · memd · egress</div>
+          </div>
+        </div>
+
+        <!-- arrow 2 -->
+        <div style="flex:0.7;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:0 4px;">
+          <div style="font-size:8px;color:var(--cyan);font-family:monospace;background:rgba(34,211,238,0.08);padding:2px 5px;border-radius:4px;">Unix socket</div>
+          <div style="width:100%;height:1px;background:linear-gradient(90deg,var(--amber),var(--cyan));position:relative;">
+            <span style="position:absolute;right:-2px;top:-4px;color:var(--cyan);font-size:10px;">▸</span>
+            <span style="position:absolute;left:-2px;top:-4px;color:var(--amber);font-size:10px;">◂</span>
+          </div>
+          <div style="font-size:8px;color:var(--text-subtle);font-family:monospace;">SCM_CREDS · mmap fd</div>
+        </div>
+
+        <!-- Python AI -->
+        <div style="flex:1.1;min-width:0;display:flex;flex-direction:column;gap:8px;">
+          <div style="background:rgba(34,211,238,0.07);border:1px solid rgba(34,211,238,0.3);border-radius:9px;padding:12px 10px;text-align:center;">
+            <div style="font-size:11px;font-weight:700;color:var(--cyan);">Python AI</div>
+            <div style="font-size:9px;color:var(--text-subtle);font-family:monospace;margin-top:3px;">ai-bridge :8731</div>
+          </div>
+        </div>
+
+        <!-- arrow 3 -->
+        <div style="flex:0.7;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:0 4px;">
+          <div style="font-size:8px;color:var(--accent);font-family:monospace;background:rgba(99,102,241,0.1);padding:2px 5px;border-radius:4px;">HTTP / SSE</div>
+          <div style="width:100%;height:1px;background:linear-gradient(90deg,var(--cyan),var(--accent));position:relative;">
+            <span style="position:absolute;right:-2px;top:-4px;color:var(--accent);font-size:10px;">▸</span>
+            <span style="position:absolute;left:-2px;top:-4px;color:var(--cyan);font-size:10px;">◂</span>
+          </div>
+          <div style="font-size:8px;color:var(--text-subtle);font-family:monospace;">localhost only</div>
+        </div>
+
+        <!-- Quickshell -->
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;">
+          <div style="background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.35);border-radius:9px;padding:12px 10px;text-align:center;">
+            <div style="font-size:11px;font-weight:700;color:var(--accent);">Quickshell</div>
+            <div style="font-size:9px;color:var(--text-subtle);font-family:monospace;margin-top:3px;">QML UI</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- secondary wiring notes -->
+      <div style="margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+        <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;">
+          <div style="font-size:10px;font-weight:700;color:var(--accent);margin-bottom:4px;">Quickshell ↔ Zig</div>
+          <div style="font-size:10px;color:var(--text-muted);line-height:1.6;"><strong>D-Bus</strong> on the session bus for state (<code>com.koompi.contextd</code>), plus a direct <strong>Unix socket</strong> for high-rate streams. QML binds reactively — no polling.</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;">
+          <div style="font-size:10px;font-weight:700;color:var(--cyan);margin-bottom:4px;">Quickshell ↔ Python</div>
+          <div style="font-size:10px;color:var(--text-muted);line-height:1.6;"><strong>HTTP + SSE</strong> to <code>127.0.0.1:8731</code>. The AI sidebar streams tokens over Server-Sent Events; never a socket exposed off-box.</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;">
+          <div style="font-size:10px;font-weight:700;color:#F47260;margin-bottom:4px;">Python → world</div>
+          <div style="font-size:10px;color:var(--text-muted);line-height:1.6;">Every outbound call routes through <code>koompi-egress</code> over <strong>Unix socket</strong>, which checks consent and writes the ledger before any TCP <code>connect()</code>.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ TECHNOLOGY DECISION MATRIX ============ -->
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;overflow:hidden;margin-bottom:16px;">
+    <div style="padding:11px 16px;border-bottom:1px solid var(--border2);font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;">
+      <span style="width:7px;height:7px;border-radius:50%;background:var(--emerald);"></span>Technology Decision Matrix <span style="font-weight:400;color:var(--text-subtle);font-size:11px;">why each language earns its layer</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1.3fr 0.5fr 0.5fr 0.5fr 0.5fr 2.4fr;gap:0;font-size:11px;">
+      <div style="padding:9px 14px;background:var(--surface2);color:var(--text-subtle);font-weight:600;border-bottom:1px solid var(--border2);">Component</div>
+      <div style="padding:9px 8px;background:var(--surface2);color:var(--accent);font-weight:600;border-bottom:1px solid var(--border2);text-align:center;">QML</div>
+      <div style="padding:9px 8px;background:var(--surface2);color:var(--amber);font-weight:600;border-bottom:1px solid var(--border2);text-align:center;">Zig</div>
+      <div style="padding:9px 8px;background:var(--surface2);color:var(--cyan);font-weight:600;border-bottom:1px solid var(--border2);text-align:center;">Py</div>
+      <div style="padding:9px 8px;background:var(--surface2);color:#F47260;font-weight:600;border-bottom:1px solid var(--border2);text-align:center;">Rust</div>
+      <div style="padding:9px 14px;background:var(--surface2);color:var(--text-subtle);font-weight:600;border-bottom:1px solid var(--border2);">Why</div>
+
+      <div style="padding:8px 14px;border-bottom:1px solid var(--border2);color:var(--text);">Shell UI / widgets</div>
+      <div style="padding:8px 8px;border-bottom:1px solid var(--border2);text-align:center;color:var(--emerald);">●</div>
+      <div style="padding:8px 8px;border-bottom:1px solid var(--border2);text-align:center;color:var(--text-subtle);">·</div>
+      <div style="padding:8px 8px;border-bottom:1px solid var(--border2);text-align:center;color:var(--text-subtle);">·</div>
+      <div style="padding:8px 8px;border-bottom:1px solid var(--border2);text-align:center;color:var(--text-subtle);">·</div>
+      <div style="padding:8px 14px;border-bottom:1px solid var(--border2);color:var(--text-muted);font-size:10px;">Declarative, GPU-accelerated, hot-reloadable. Designers edit text files; no recompile to restyle.</div>
+
+      <div style="padding:8px 14px;border-bottom:1px solid var(--border2);color:var(--text);">Context / memory daemons</div>
+      <div style="padding:8px 8px;border-bottom:1px solid var(--border2);text-align:center;color:var(--text-subtle);">·</div>
+      <div style="padding:8px 8px;border-bottom:1px solid var(--border2);text-align:center;color:var(--emerald);">●</div>
+      <div style="padding:8px 8px;border-bottom:1px solid var(--border2);text-align:center;color:var(--text-subtle);">·</div>
+      <div style="padding:8px 8px;border-bottom:1px solid var(--border2);text-align:center;color:var(--text-subtle);">·</div>
+      <div style="padding:8px 14px;border-bottom:1px solid var(--border2);color:var(--text-muted);font-size:10px;">Always-resident, tiny binaries, manual mmap control. No GC pauses on the hot path; predictable RAM.</div>
+
+      <div style="padding:8px 14px;border-bottom:1px solid var(--border2);color:var(--text);">AI orchestration / RAG</div>
+      <div style="padding:8px 8px;border-bottom:1px solid var(--border2);text-align:center;color:var(--text-subtle);">·</div>
+      <div style="padding:8px 8px;border-bottom:1px solid var(--border2);text-align:center;color:var(--text-subtle);">·</div>
+      <div style="padding:8px 8px;border-bottom:1px solid var(--border2);text-align:center;color:var(--emerald);">●</div>
+      <div style="padding:8px 8px;border-bottom:1px solid var(--border2);text-align:center;color:var(--text-subtle);">·</div>
+      <div style="padding:8px 14px;border-bottom:1px solid var(--border2);color:var(--text-muted);font-size:10px;">The whole ML ecosystem lives here — ollama, transformers, sentence-transformers. Fighting it in another language is wasted effort.</div>
+
+      <div style="padding:8px 14px;border-bottom:1px solid var(--border2);color:var(--text);">Egress gate</div>
+      <div style="padding:8px 8px;border-bottom:1px solid var(--border2);text-align:center;color:var(--text-subtle);">·</div>
+      <div style="padding:8px 8px;border-bottom:1px solid var(--border2);text-align:center;color:var(--emerald);">●</div>
+      <div style="padding:8px 8px;border-bottom:1px solid var(--border2);text-align:center;color:var(--text-subtle);">·</div>
+      <div style="padding:8px 8px;border-bottom:1px solid var(--border2);text-align:center;color:var(--text-subtle);">·</div>
+      <div style="padding:8px 14px;border-bottom:1px solid var(--border2);color:var(--text-muted);font-size:10px;">Tiny, auditable, no surprise allocations. Zig keeps the gate small enough to read end-to-end in an afternoon.</div>
+
+      <div style="padding:8px 14px;border-bottom:1px solid var(--border2);color:var(--text);">Vault / DID signing</div>
+      <div style="padding:8px 8px;border-bottom:1px solid var(--border2);text-align:center;color:var(--text-subtle);">·</div>
+      <div style="padding:8px 8px;border-bottom:1px solid var(--border2);text-align:center;color:var(--text-subtle);">·</div>
+      <div style="padding:8px 8px;border-bottom:1px solid var(--border2);text-align:center;color:var(--text-subtle);">·</div>
+      <div style="padding:8px 8px;border-bottom:1px solid var(--border2);text-align:center;color:var(--emerald);">●</div>
+      <div style="padding:8px 14px;border-bottom:1px solid var(--border2);color:var(--text-muted);font-size:10px;">Memory safety is non-negotiable for crypto. Mature ed25519/age crates; Selendra client already Rust.</div>
+
+      <div style="padding:8px 14px;color:var(--text);">Vector engine (HNSW)</div>
+      <div style="padding:8px 8px;text-align:center;color:var(--text-subtle);">·</div>
+      <div style="padding:8px 8px;text-align:center;color:var(--text-subtle);">·</div>
+      <div style="padding:8px 8px;text-align:center;color:var(--text-subtle);">·</div>
+      <div style="padding:8px 8px;text-align:center;color:var(--emerald);">●</div>
+      <div style="padding:8px 14px;color:var(--text-muted);font-size:10px;">Performance-critical + memory-safe; exposed to Python via a stable FFI so recall never crashes the daemon.</div>
+    </div>
+  </div>
+
+  <!-- ============ BUILD + DEV WORKFLOW ============ -->
+  <div style="display:flex;gap:14px;margin-bottom:16px;flex-wrap:wrap;">
+
+    <!-- Build system -->
+    <div style="flex:1;min-width:340px;background:#0D1117;border-radius:12px;overflow:hidden;font-family:'JetBrains Mono','Fira Code',monospace;">
+      <div style="padding:10px 16px;background:#161B22;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,0.06);">
+        <div style="display:flex;gap:6px;"><div style="width:11px;height:11px;border-radius:50%;background:#3A3A3A;"></div><div style="width:11px;height:11px;border-radius:50%;background:#3A3A3A;"></div><div style="width:11px;height:11px;border-radius:50%;background:#3A3A3A;"></div></div>
+        <span style="margin-left:8px;font-size:11px;color:rgba(255,255,255,0.4);">build · packaging</span>
+      </div>
+      <div style="padding:16px 18px;font-size:11px;line-height:1.9;">
+        <div style="color:#6366F1;">## Quickshell / QML</div>
+        <div style="color:rgba(255,255,255,0.85);">paru -S quickshell-git</div>
+        <div style="color:rgba(255,255,255,0.4);">→ QML loaded at runtime, no build</div>
+        <div style="height:8px;"></div>
+        <div style="color:#F59E0B;">## Zig daemons</div>
+        <div style="color:rgba(255,255,255,0.85);">zig build -Doptimize=ReleaseSmall</div>
+        <div style="color:rgba(255,255,255,0.4);">→ /usr/lib/koompi/*  (static)</div>
+        <div style="color:rgba(255,255,255,0.4);">→ systemd --user units enabled</div>
+        <div style="height:8px;"></div>
+        <div style="color:#22D3EE;">## Python AI</div>
+        <div style="color:rgba(255,255,255,0.85);">uv sync --frozen</div>
+        <div style="color:rgba(255,255,255,0.4);">→ /opt/koompi-ai/.venv</div>
+        <div style="color:rgba(255,255,255,0.4);">→ koompi-ai-bridge.service</div>
+        <div style="height:8px;"></div>
+        <div style="color:#F47260;">## Rust security</div>
+        <div style="color:rgba(255,255,255,0.85);">cargo build --release</div>
+        <div style="color:rgba(255,255,255,0.4);">→ /usr/bin/koompi-vault, libkoompi_vector.so</div>
+        <div style="height:8px;"></div>
+        <div style="color:#10B981;">## Hyprland</div>
+        <div style="color:rgba(255,255,255,0.85);">pacman -S hyprland</div>
+        <div style="color:rgba(255,255,255,0.4);">→ /etc/koompi/hyprland.conf overlay sourced</div>
+        <div style="height:10px;"></div>
+        <div style="color:rgba(255,255,255,0.3);"># all glued by the koompi-os PKGBUILD set</div>
+      </div>
+    </div>
+
+    <!-- Dev workflow -->
+    <div style="flex:1;min-width:340px;background:#0D1117;border-radius:12px;overflow:hidden;font-family:'JetBrains Mono','Fira Code',monospace;">
+      <div style="padding:10px 16px;background:#161B22;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,0.06);">
+        <div style="display:flex;gap:6px;"><div style="width:11px;height:11px;border-radius:50%;background:#3A3A3A;"></div><div style="width:11px;height:11px;border-radius:50%;background:#3A3A3A;"></div><div style="width:11px;height:11px;border-radius:50%;background:#3A3A3A;"></div></div>
+        <span style="margin-left:8px;font-size:11px;color:rgba(255,255,255,0.4);">dev · iterate per layer</span>
+      </div>
+      <div style="padding:16px 18px;font-size:11px;line-height:1.9;">
+        <div style="color:#6366F1;"># QML — live reload, no restart</div>
+        <div style="color:rgba(255,255,255,0.85);">$ vim Bar.qml   <span style="color:rgba(255,255,255,0.4);"># save → FileView repaints</span></div>
+        <div style="color:rgba(255,255,255,0.5);">Quickshell watches the tree; UI repaints in 1 frame.</div>
+        <div style="height:9px;"></div>
+        <div style="color:#F59E0B;"># Zig — rebuild + hot restart one unit</div>
+        <div style="color:rgba(255,255,255,0.85);">$ zig build && \</div>
+        <div style="color:rgba(255,255,255,0.85);">&nbsp;&nbsp;systemctl --user restart koompi-contextd</div>
+        <div style="color:rgba(255,255,255,0.5);">~15 ms restart; bar reconnects automatically.</div>
+        <div style="height:9px;"></div>
+        <div style="color:#22D3EE;"># Python — autoreload bridge</div>
+        <div style="color:rgba(255,255,255,0.85);">$ uvicorn ai_bridge:app --reload \</div>
+        <div style="color:rgba(255,255,255,0.85);">&nbsp;&nbsp;--port 8731</div>
+        <div style="color:rgba(255,255,255,0.5);">Edits to rag.py / tools.py reload in place.</div>
+        <div style="height:9px;"></div>
+        <div style="color:#10B981;"># Integration — fully local harness</div>
+        <div style="color:rgba(255,255,255,0.85);">$ dbus-run-session -- ./scripts/dev.sh</div>
+        <div style="color:rgba(255,255,255,0.5);">private session bus + mock hyprland socket;</div>
+        <div style="color:rgba(255,255,255,0.5);">no real compositor needed to test wiring.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout-group">
+    <div class="callout">
+      <div class="callout-title">Right tool, right layer — no monoculture <span class="badge new">KOOMPI</span></div>
+      <p>QML for pixels, Zig for daemons, Python for thought, Rust for secrets. Each language sits where its strengths are non-negotiable: QML hot-reloads so the shell stays iterable, Zig stays small enough to audit, Python rides the entire ML ecosystem, and Rust guarantees memory safety on the crypto path. The boundaries are protocols (D-Bus, UDS, HTTP), not shared memory — so any layer can be rewritten without touching the others.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Privacy is enforced by topology</div>
+      <p>The Python AI layer has <em>no</em> network capability of its own — its only route off-device is a Unix socket to <code>koompi-egress</code>, which consent-checks and ledgers every byte (§28). PRIVACY-FIRST isn't a setting you trust; it's the shape of the wiring diagram. There is no second path.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">The AI runs on your silicon</div>
+      <p>The bridge binds <code>127.0.0.1:8731</code> and the model loads via ollama on your own GPU/CPU. LOCAL-FIRST means inference, memory, and retrieval all happen on the machine you own — the default works fully offline, in a village with no fibre, exactly as it does in a datacenter.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Built to be rebuilt in 2046</div>
+      <p>Static Zig binaries, plain-text QML, a uv-locked venv, and reproducible cargo builds — the whole stack is bootstrappable from source with no proprietary toolchain. LIFETIME OS: a KOOMPI machine compiles its own shell two decades from now, on hardware not yet designed, because nothing here depends on a vendor staying alive.</p>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,105 @@
+<section class="section" id="cognitive-os">
+  <div class="section-header">
+    <h2>Cognitive OS</h2>
+    <span class="tag ai">AI</span>
+  </div>
+  <p class="desc">
+    The OS understands your cognitive state and reshapes itself to match. Deep work, meeting, creative flow, mental fatigue — each gets a different shell. The OS becomes a thinking partner, not a tool: it protects your flow, captures fleeting thoughts before they vanish, and writes you a handoff when a session ends so you never lose the thread.
+  </p>
+
+  <!-- Cognitive state → shell behavior -->
+  <div style="max-width:760px;">
+    <div class="card-label" style="margin-bottom:10px;">Detected state reshapes the shell</div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:10px;">
+      <div style="background:var(--surface); border:1px solid var(--accent); border-radius:var(--radius); padding:12px 14px; box-shadow:0 0 0 3px var(--accent-glow);">
+        <div style="font-size:11px; font-weight:700; color:var(--accent); margin-bottom:4px;">⌖ DEEP WORK</div>
+        <div style="font-size:11px; color:var(--text-muted); line-height:1.5;">Bar collapses to a thin line · notifications held · single workspace</div>
+      </div>
+      <div style="background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius); padding:12px 14px;">
+        <div style="font-size:11px; font-weight:700; color:var(--emerald); margin-bottom:4px;">◎ MEETING</div>
+        <div style="font-size:11px; color:var(--text-muted); line-height:1.5;">Comms mode · mic + notes up · screen-share guard on</div>
+      </div>
+      <div style="background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius); padding:12px 14px;">
+        <div style="font-size:11px; font-weight:700; color:var(--cyan); margin-bottom:4px;">✦ CREATIVE</div>
+        <div style="font-size:11px; color:var(--text-muted); line-height:1.5;">Spatial canvas · references fanned out · free-tiling unlocked</div>
+      </div>
+      <div style="background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius); padding:12px 14px;">
+        <div style="font-size:11px; font-weight:700; color:var(--amber); margin-bottom:4px;">◷ FATIGUE</div>
+        <div style="font-size:11px; color:var(--text-muted); line-height:1.5;">Warmer screen · suggests a break · defers hard tasks</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:flex-start; margin-top:24px;">
+
+    <!-- Cognitive handoff -->
+    <div style="width:360px; flex-shrink:0; background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-xl); overflow:hidden;">
+      <div style="padding:12px 16px; border-bottom:1px solid var(--border2); background:var(--surface2); display:flex; align-items:center; gap:8px;">
+        <span style="color:var(--accent);">✦</span>
+        <span style="font-size:13px; font-weight:700; flex:1;">Focus session ended — 1h 52m</span>
+        <span class="state-chip active-state" style="font-size:9px; padding:2px 8px;">HANDOFF</span>
+      </div>
+      <div style="padding:16px;">
+        <div style="font-size:9px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; color:var(--text-subtle); margin-bottom:6px;">What you accomplished</div>
+        <div style="font-size:12px; line-height:1.6; margin-bottom:14px; color:var(--text-muted);">
+          Refactored BarContent.qml into three zone components, fixed the Pomodoro ring offset, and started wiring the AI pill to live state.
+        </div>
+        <div style="font-size:9px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; color:var(--text-subtle); margin-bottom:6px;">Pick up here next</div>
+        <div style="display:flex; align-items:center; gap:8px; font-size:12px; padding:8px 10px; background:var(--accent-glow); border:1px solid rgba(99,102,241,0.2); border-radius:var(--radius-sm);">
+          <span style="color:var(--accent);">▸</span>
+          <span style="flex:1;">AI pill still shows mock data — connect to <span style="font-family:var(--font-mono); font-size:11px;">contextd</span> socket</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Thought capture + flow protection -->
+    <div style="flex:1; min-width:280px; display:flex; flex-direction:column; gap:14px;">
+
+      <!-- Thought capture -->
+      <div style="background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-lg); padding:14px 16px;">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+          <span class="launcher-kbd">Ctrl</span><span style="color:var(--text-subtle);">+</span><span class="launcher-kbd">T</span>
+          <span class="card-label" style="margin:0;">Thought capture — any window, instant</span>
+        </div>
+        <div style="background:var(--surface2); border:1px dashed var(--border); border-radius:var(--radius); padding:10px 12px; font-size:12px; font-style:italic; color:var(--text-muted);">
+          "what if the data dividend funded the Khmer model training?"
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; margin-top:10px; font-size:11px; color:var(--text-muted);">
+          <span style="color:var(--accent);">✦</span> Auto-sorted into
+          <span class="state-chip active-state" style="font-size:9px; padding:2px 8px;">project · Selendra</span>
+        </div>
+      </div>
+
+      <!-- Flow protection log -->
+      <div style="background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-lg); padding:14px 16px;">
+        <div class="card-label" style="margin-bottom:10px;">Flow protection — what was blocked</div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; align-items:center; gap:8px; font-size:11px; color:var(--text-muted);">
+            <span style="color:var(--emerald);">🛡</span><span style="flex:1;">6 social notifications held</span><span style="font-family:var(--font-mono); font-size:10px;">released at break</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; font-size:11px; color:var(--text-muted);">
+            <span style="color:var(--emerald);">🛡</span><span style="flex:1;">2 email pings deferred</span><span style="font-family:var(--font-mono); font-size:10px;">queued</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; font-size:11px; color:var(--text-muted);">
+            <span style="color:var(--red);">⚠</span><span style="flex:1;">1 urgent call let through</span><span style="font-family:var(--font-mono); font-size:10px;">co-founder</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout-group">
+    <div class="callout">
+      <div class="callout-title">The shell adapts to your mind <span class="badge new">KOOMPI</span></div>
+      <p>Deep work, meeting, creative, and fatigue states each get a distinct shell. The OS reads cadence and context locally and changes its own shape to fit the work in front of you.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Never lose a thought</div>
+      <p>Ctrl+T captures a fleeting idea from any window without breaking flow, then files it into the right project automatically. The interruption is two keys; the recall is permanent.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Handoff to your future self</div>
+      <p>When a session ends, the OS writes what you did and what to pick up next — so resuming costs seconds, not the ten minutes of re-loading context that usually evaporates.</p>
+    </div>
+  </div>
+</section>

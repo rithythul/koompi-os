@@ -1,0 +1,139 @@
+<section class="section" id="repair-culture">
+  <div class="section-header">
+    <h2>Repair-Culture OS</h2>
+    <span class="tag">Futures</span>
+    <span class="tag sys">System</span>
+  </div>
+  <p class="desc">
+    Most OSes are written for the machine on the launch keynote; yours will run on hardware that's been opened, swapped, soldered, and saved. KOOMPI knows its own body at the component level — which RAM stick is degrading, which SSD has months left — warns you in time to act, keeps working below the official floor, and keeps a biography. A 20-year machine is a badge, not an embarrassment.
+  </p>
+
+  <!-- Component health board -->
+  <div style="max-width:760px; background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-lg); padding:16px;">
+    <div class="card-label" style="margin-bottom:12px;">Component health — "Dangrek" · assembled 2026 · last opened 11 Mar 2034</div>
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      <div style="display:flex; align-items:center; gap:12px; background:var(--surface2); border:1px solid var(--border2); border-radius:var(--radius); padding:10px 12px;">
+        <span style="font-size:14px;">🧠</span>
+        <span style="font-size:11px; width:190px;">RAM · slot B <span style="color:var(--text-subtle); font-family:var(--font-mono);">8GB DDR4 · 2029</span></span>
+        <div style="flex:1; height:6px; border-radius:3px; background:var(--surface3); overflow:hidden;"><div style="height:100%; width:61%; background:var(--amber); border-radius:3px;"></div></div>
+        <span class="state-chip warn-state" style="font-size:9px;">degrading</span>
+        <span style="font-size:10px; color:var(--text-muted); font-family:var(--font-mono);">14 ECC events / 90d</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px; background:var(--surface2); border:1px solid rgba(239,68,68,0.3); border-radius:var(--radius); padding:10px 12px;">
+        <span style="font-size:14px;">💽</span>
+        <span style="font-size:11px; width:190px;">SSD · nvme0 <span style="color:var(--text-subtle); font-family:var(--font-mono);">512GB · 3rd drive · 2031</span></span>
+        <div style="flex:1; height:6px; border-radius:3px; background:var(--surface3); overflow:hidden;"><div style="height:100%; width:23%; background:var(--red); border-radius:3px;"></div></div>
+        <span class="state-chip" style="font-size:9px; color:var(--red); border-color:rgba(239,68,68,0.35); background:var(--red-glow);">~8 months</span>
+        <span style="font-size:10px; color:var(--text-muted); font-family:var(--font-mono);">94% wear · realloc rising</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px; background:var(--surface2); border:1px solid var(--border2); border-radius:var(--radius); padding:10px 12px;">
+        <span style="font-size:14px;">🔋</span>
+        <span style="font-size:11px; width:190px;">Battery <span style="color:var(--text-subtle); font-family:var(--font-mono);">2nd pack · 2032</span></span>
+        <div style="flex:1; height:6px; border-radius:3px; background:var(--surface3); overflow:hidden;"><div style="height:100%; width:84%; background:var(--emerald); border-radius:3px;"></div></div>
+        <span class="state-chip active-state" style="font-size:9px;">healthy</span>
+        <span style="font-size:10px; color:var(--text-muted); font-family:var(--font-mono);">84% design capacity</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px; background:var(--surface2); border:1px solid var(--border2); border-radius:var(--radius); padding:10px 12px;">
+        <span style="font-size:14px;">🖥️</span>
+        <span style="font-size:11px; width:190px;">Screen <span style="color:var(--text-subtle); font-family:var(--font-mono);">2nd panel · 2030 · donor unit</span></span>
+        <div style="flex:1; height:6px; border-radius:3px; background:var(--surface3); overflow:hidden;"><div style="height:100%; width:90%; background:var(--emerald); border-radius:3px;"></div></div>
+        <span class="state-chip active-state" style="font-size:9px;">healthy</span>
+        <span style="font-size:10px; color:var(--text-muted); font-family:var(--font-mono);">frankensteined · fine</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Migration suggestion -->
+  <div style="max-width:760px; margin-top:16px; background:linear-gradient(135deg, var(--red-glow), transparent); border:1px solid rgba(239,68,68,0.35); border-radius:var(--radius-lg); padding:14px 16px;">
+    <div style="display:flex; align-items:flex-start; gap:12px;">
+      <span style="font-size:18px;">⚠️</span>
+      <div style="flex:1;">
+        <div style="font-size:13px; font-weight:700; margin-bottom:4px;">nvme0 has roughly 8 months — move the episodic store now, not later</div>
+        <div style="font-size:11px; color:var(--text-muted); line-height:1.5; margin-bottom:10px;">
+          Your memory palace (214 GB in BTRFS <span style="font-family:var(--font-mono); color:var(--cyan);">@data</span>) lives on the failing drive. A replacement 512GB drive costs about $24 at the Orussey repair stalls. I can migrate snapshots tonight during T3 idle — verified copy first, old drive untouched until checksums pass.
+        </div>
+        <div style="display:flex; gap:8px;">
+          <span class="state-chip" style="font-size:10px; color:var(--accent); border-color:rgba(99,102,241,0.35); background:var(--accent-glow);">migrate tonight (T3)</span>
+          <span class="state-chip" style="font-size:10px;">remind at 6 months</span>
+          <span class="state-chip" style="font-size:10px;">print shopping note (ខ្មែរ)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:flex-start; margin-top:24px;">
+
+    <!-- Machine biography -->
+    <div style="width:360px; flex-shrink:0; background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-xl); overflow:hidden;">
+      <div style="padding:14px 16px; background:linear-gradient(135deg, var(--emerald-glow), transparent); border-bottom:1px solid var(--border2); display:flex; align-items:center; gap:10px;">
+        <span style="font-size:18px;">🏅</span>
+        <div>
+          <div style="font-size:14px; font-weight:700;">Machine biography</div>
+          <div style="font-size:10px; color:var(--text-muted); font-family:var(--font-mono);">assembled 2026 · 3rd SSD · 2nd screen · served 14 years</div>
+        </div>
+      </div>
+      <div style="padding:16px;">
+        <div style="position:relative; padding-left:18px;">
+          <div style="position:absolute; left:5px; top:6px; bottom:6px; width:2px; background:var(--border);"></div>
+          <div style="position:relative; margin-bottom:11px;">
+            <span style="position:absolute; left:-18px; top:3px; width:9px; height:9px; border-radius:50%; background:var(--accent); border:2px solid var(--surface);"></span>
+            <div style="font-size:12px; font-weight:600;">Assembled · Phnom Penh</div>
+            <div style="font-size:10px; color:var(--text-muted);">Jan 2026 · KOOMPI workshop</div>
+          </div>
+          <div style="position:relative; margin-bottom:11px;">
+            <span style="position:absolute; left:-18px; top:3px; width:9px; height:9px; border-radius:50%; background:var(--cyan); border:2px solid var(--surface);"></span>
+            <div style="font-size:12px; font-weight:600;">Screen replaced (donor panel)</div>
+            <div style="font-size:10px; color:var(--text-muted);">Aug 2030 · repaired by Vathna, Toul Kork</div>
+          </div>
+          <div style="position:relative; margin-bottom:11px;">
+            <span style="position:absolute; left:-18px; top:3px; width:9px; height:9px; border-radius:50%; background:var(--cyan); border:2px solid var(--surface);"></span>
+            <div style="font-size:12px; font-weight:600;">SSD #3 · episodic store migrated, 0 loss</div>
+            <div style="font-size:10px; color:var(--text-muted);">Mar 2031 · self-service, guided</div>
+          </div>
+          <div style="position:relative;">
+            <span style="position:absolute; left:-18px; top:3px; width:9px; height:9px; border-radius:50%; background:var(--emerald); border:2px solid var(--surface);"></span>
+            <div style="font-size:12px; font-weight:600;">Battery #2 · fan cleaned</div>
+            <div style="font-size:10px; color:var(--text-muted);">Jun 2032 · still going</div>
+          </div>
+        </div>
+        <div style="margin-top:14px; display:flex; align-items:center; gap:8px; font-size:10px; color:var(--text-subtle);">
+          <span>🖨️</span><span>Printable repair history — travels with the machine when it's resold or passed down, like a service book for a good motorbike.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Below the floor -->
+    <div style="flex:1; min-width:280px; background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-lg); padding:14px 16px;">
+      <div class="card-label" style="margin-bottom:10px;">Below the floor — graceful, never bricked</div>
+      <div class="tool-code" style="font-size:11px; line-height:1.8;">
+        koompi-hw assess<br>
+        <span style="color:var(--text-subtle);">├─</span> <span class="code-key">platform</span>   <span class="code-str">Core i3-6006U · 4GB (slot B retired)</span><br>
+        <span style="color:var(--text-subtle);">├─</span> <span class="code-key">floor</span>      <span class="code-str">below UHD 620 / 8GB reference</span><br>
+        <span style="color:var(--text-subtle);">├─</span> <span class="code-key">mode</span>       <span class="code-val">lean: capture + recall on, T2 batched weekly</span><br>
+        <span style="color:var(--text-subtle);">└─</span> <span class="code-key">disabled</span>   <span class="code-val">live re-embedding · shell blur · nothing else</span>
+      </div>
+      <p style="font-size:11px; color:var(--text-muted); margin-top:10px; line-height:1.5;">
+        Below the device floor the OS sheds ambition, not function: memory capture and recall stay on, heavy consolidation batches into rarer, longer sleeps. Degrade local, never silent cloud (ADR-0001) — a weak machine gets a patient OS, not an upsell.
+      </p>
+      <div style="margin-top:10px; display:flex; align-items:center; gap:10px; background:var(--surface2); border:1px solid var(--border2); border-radius:var(--radius); padding:10px 12px;">
+        <span style="font-size:16px;">🔧</span>
+        <div style="font-size:11px; color:var(--text-muted); line-height:1.5;"><span style="color:var(--text); font-weight:600;">Frankenstein-friendly by design.</span> Mismatched RAM, a donor screen, an SSD from another laptop — the health board maps whatever is actually inside and plans around it.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout-group">
+    <div class="callout">
+      <div class="callout-title">The OS knows its own body <span class="badge new">KOOMPI</span></div>
+      <p>SMART data, ECC counts, and battery telemetry become plain-language foresight: "this SSD has about 8 months — your memory palace lives there, let's move it tonight." Failures become scheduled maintenance instead of lost decades.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Old machines earn honor, not shame</div>
+      <p>The machine biography — assembled 2026, third SSD, second screen, fourteen years of service — reframes age as proof of stewardship. In repair-stall economies this is reality; KOOMPI makes it identity.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Anti-obsolescence, made concrete</div>
+      <p>Planned obsolescence is a software decision wearing a hardware costume. By running gracefully below the floor and treating every swapped part as routine, the OS removes the manufactured reason to throw a working machine away.</p>
+    </div>
+  </div>
+</section>

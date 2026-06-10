@@ -1,0 +1,102 @@
+<section class="section" id="conversations-past-self">
+  <div class="section-header">
+    <h2>Conversations With Your Past Self</h2>
+    <span class="tag">Futures</span>
+    <span class="tag data">Data</span>
+  </div>
+  <p class="desc">
+    Because the Memory Lifecycle never overwrites a contradiction — it timestamps it — your past selves remain on the record, intact. Ask what 30-year-old you believed, decided, feared. Trace the exact thread where you reversed a conviction. Write a letter the OS will seal and deliver to you in 2040. Across a fifty-year arc, the OS is the only witness who saw all of you.
+  </p>
+
+  <!-- Decadal review -->
+  <div style="max-width:760px; background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-xl); overflow:hidden;">
+    <div style="padding:14px 16px; background:linear-gradient(135deg, var(--accent-glow), transparent); border-bottom:1px solid var(--border2); display:flex; align-items:center; gap:8px;">
+      <span style="font-size:15px;">🪞</span>
+      <div style="flex:1;"><div style="font-size:14px; font-weight:700;">Decadal review — you at 30, read by you at 40</div><div style="font-size:10px; color:var(--text-muted);">compiled from 2,317 episodic records · 2032–2033 · generated locally by koompi-agent-memd</div></div>
+      <span class="state-chip priv-state" style="font-size:9px;">eyes only</span>
+    </div>
+    <div style="padding:16px; display:flex; gap:12px; flex-wrap:wrap;">
+      <div style="flex:1; min-width:200px; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:12px 14px;">
+        <div style="font-size:10px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; color:var(--cyan); margin-bottom:6px;">Believed</div>
+        <div style="font-size:12px; line-height:1.6;">That scale was the only proof of impact. You wrote "small is just slow failure" in 4 separate notes that year.</div>
+      </div>
+      <div style="flex:1; min-width:200px; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:12px 14px;">
+        <div style="font-size:10px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; color:var(--accent); margin-bottom:6px;">Decided</div>
+        <div style="font-size:12px; line-height:1.6;">To stay in Phnom Penh when the Singapore offer came — settled 19 Aug 2032, after 11 days of journals you can reopen.</div>
+      </div>
+      <div style="flex:1; min-width:200px; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:12px 14px;">
+        <div style="font-size:10px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; color:var(--amber); margin-bottom:6px;">Feared</div>
+        <div style="font-size:12px; line-height:1.6;">Becoming "a maintainer of my younger self's ideas." You mentioned it 7 times — last on 30 Dec 2032, then never again.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:flex-start; margin-top:24px;">
+
+    <!-- Belief-diff thread -->
+    <div style="width:380px; flex-shrink:0; background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-lg); padding:16px;">
+      <div class="card-label" style="margin-bottom:12px;">Belief diff — "databases for the indexer"</div>
+      <div style="position:relative; padding-left:18px;">
+        <div style="position:absolute; left:5px; top:6px; bottom:6px; width:2px; background:var(--border);"></div>
+        <div style="position:relative; margin-bottom:14px;">
+          <span style="position:absolute; left:-18px; top:3px; width:9px; height:9px; border-radius:50%; background:var(--cyan); border:2px solid var(--surface);"></span>
+          <div style="font-size:12px; font-weight:600;">2029 — you argued SQL-only</div>
+          <div style="font-size:11px; color:var(--text-muted); line-height:1.5;">"Vector DBs are a fad; Postgres can fake it." — design review note, 3 Apr 2029</div>
+        </div>
+        <div style="position:relative; margin-bottom:14px;">
+          <span style="position:absolute; left:-18px; top:3px; width:9px; height:9px; border-radius:50%; background:var(--amber); border:2px solid var(--surface);"></span>
+          <div style="font-size:12px; font-weight:600;">2030 — first cracks</div>
+          <div style="font-size:11px; color:var(--text-muted); line-height:1.5;">Benchmarks: pgvector recall collapsed past 40M rows. You called the result "annoying" in a note to Vathna.</div>
+        </div>
+        <div style="position:relative;">
+          <span style="position:absolute; left:-18px; top:3px; width:9px; height:9px; border-radius:50%; background:var(--emerald); border:2px solid var(--surface);"></span>
+          <div style="font-size:12px; font-weight:600;">2031 — you reversed</div>
+          <div style="font-size:11px; color:var(--text-muted); line-height:1.5;">ADR-0042 adopts a dedicated index. Your own words: "I was defending a tool, not a requirement."</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; background:var(--surface2); border:1px dashed var(--border); border-radius:var(--radius-sm); padding:8px 12px; margin-top:14px;">
+        <span style="font-size:12px;">🧬</span>
+        <span style="font-size:10px; color:var(--text-muted);">Both positions survive as timestamped records. The 2029 you was not deleted when the 2031 you disagreed — contradiction is history, not error.</span>
+      </div>
+    </div>
+
+    <!-- Future-self composer -->
+    <div style="flex:1; min-width:300px; background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-xl); overflow:hidden;">
+      <div style="padding:12px 16px; background:var(--surface2); border-bottom:1px solid var(--border2); display:flex; align-items:center; gap:8px;">
+        <span style="font-size:14px;">✉️</span>
+        <span style="font-size:12px; font-weight:700; flex:1;">To: Rithy, 10 Jun 2040</span>
+        <span class="state-chip" style="font-size:9px; color:var(--cyan); border-color:rgba(34,211,238,0.3); background:var(--cyan-glow);">sealed until delivery</span>
+      </div>
+      <div style="padding:16px;">
+        <div style="background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:12px 14px; font-size:12px; line-height:1.7; min-height:96px;">
+          You're writing this the week the agent daemon first shipped. You're afraid it's too ambitious and nobody will care. If you're reading this in 2040 — did the schools get it? Was the 50-year bet still worth making? Be honest. I left you the doubt on purpose.<span style="display:inline-block; width:7px; height:14px; background:var(--accent); vertical-align:text-bottom; margin-left:2px;"></span>
+        </div>
+        <div class="tool-code" style="font-size:11px; line-height:1.8; margin-top:12px;">
+          <span class="code-key">written</span>    <span class="code-str">10 Jun 2026 · 23:47</span><br>
+          <span class="code-key">delivery</span>   <span class="code-val">10 Jun 2040 · morning surface</span><br>
+          <span class="code-key">storage</span>    <span class="code-str">@data · sealed with own DEK · exempt from decay ranking</span><br>
+          <span class="code-key">egress</span>     <span class="code-val">none — sender and recipient are the same disk</span>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:12px;">
+          <span style="font-size:11px; font-weight:600; background:var(--accent-glow); border:1px solid rgba(99,102,241,0.4); color:var(--accent); border-radius:var(--radius-sm); padding:6px 14px;">Seal for 14 years</span>
+          <span style="font-size:11px; font-weight:600; background:var(--surface2); border:1px solid var(--border2); color:var(--text-muted); border-radius:var(--radius-sm); padding:6px 14px;">Keep drafting</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout-group">
+    <div class="callout">
+      <div class="callout-title">Contradictions are the feature <span class="badge new">KOOMPI</span></div>
+      <p>The Memory Lifecycle preserves reversed beliefs as timestamped records instead of overwriting them. That one rule makes belief diffs, decadal reviews, and an honest history of your mind possible — most systems silently keep only your latest opinion.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">The only complete witness</div>
+      <p>Friends knew eras of you; the OS saw the whole arc. Fifty years of selves, queryable in plain language — and because it never crosses the egress gate, the only person who can interrogate your past is the one who lived it.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Mail across time, not across networks</div>
+      <p>A future-self letter is sealed under its own key, exempt from forgetting, and delivered by the OS on the date you chose. No service, no server, no company between you and the person you're becoming.</p>
+    </div>
+  </div>
+</section>

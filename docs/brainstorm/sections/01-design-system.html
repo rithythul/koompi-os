@@ -1,0 +1,89 @@
+<section class="section" id="design-system">
+  <div class="section-header">
+    <h2>Design System</h2>
+    <span class="tag">Tokens</span>
+  </div>
+  <p class="desc">
+    Color tokens, typography, and spacing that every Quickshell component shares. Derived from KOOMPI's
+    "data ownership in the AI era" positioning — indigo for intelligence, cyan for data, emerald for private/safe,
+    amber for consent, red for violation.
+  </p>
+
+  <div class="card-label">Color Palette</div>
+  <div class="token-grid">
+    <div class="token-swatch">
+      <div class="color" style="background:#070B13"></div>
+      <div class="info"><div class="name">--bg</div><div class="hex">#070B13</div><div class="role">Desktop background</div></div>
+    </div>
+    <div class="token-swatch">
+      <div class="color" style="background:#0D1422"></div>
+      <div class="info"><div class="name">--surface</div><div class="hex">#0D1422</div><div class="role">Panels, popups</div></div>
+    </div>
+    <div class="token-swatch">
+      <div class="color" style="background:#131E30"></div>
+      <div class="info"><div class="name">--surface2</div><div class="hex">#131E30</div><div class="role">Cards, inputs</div></div>
+    </div>
+    <div class="token-swatch">
+      <div class="color" style="background:#1C2A3E"></div>
+      <div class="info"><div class="name">--surface3</div><div class="hex">#1C2A3E</div><div class="role">Hover states</div></div>
+    </div>
+    <div class="token-swatch">
+      <div class="color" style="background:#6366F1"></div>
+      <div class="info"><div class="name">--accent</div><div class="hex">#6366F1</div><div class="role">AI / intelligence</div></div>
+    </div>
+    <div class="token-swatch">
+      <div class="color" style="background:#22D3EE"></div>
+      <div class="info"><div class="name">--cyan</div><div class="hex">#22D3EE</div><div class="role">Data streams</div></div>
+    </div>
+    <div class="token-swatch">
+      <div class="color" style="background:#10B981"></div>
+      <div class="info"><div class="name">--emerald</div><div class="hex">#10B981</div><div class="role">Private / safe</div></div>
+    </div>
+    <div class="token-swatch">
+      <div class="color" style="background:#F59E0B"></div>
+      <div class="info"><div class="name">--amber</div><div class="hex">#F59E0B</div><div class="role">Consent needed</div></div>
+    </div>
+    <div class="token-swatch">
+      <div class="color" style="background:#EF4444"></div>
+      <div class="info"><div class="name">--red</div><div class="hex">#EF4444</div><div class="role">Danger / violation</div></div>
+    </div>
+  </div>
+
+  <div class="card-label">Semantic Intent → Color Mapping</div>
+  <div class="state-row" style="margin-top:0; margin-bottom:24px;">
+    <span class="state-chip priv-state">● Local-only (safe)</span>
+    <span class="state-chip active-state">● AI active / thinking</span>
+    <span class="state-chip warn-state">● Consent required</span>
+    <span class="state-chip danger-state">● Danger / policy violation</span>
+    <span class="state-chip">● Indexing / idle</span>
+    <span class="state-chip" style="color:var(--cyan); background:var(--cyan-glow); border-color:rgba(34,211,238,0.25);">● Data syncing</span>
+  </div>
+
+  <div class="card-label">Typography Scale</div>
+  <div class="type-scale">
+    <div class="type-row">
+      <span class="type-label">display / 56px</span>
+      <span style="font-size:56px; font-weight:200; color:var(--text); letter-spacing:-2px; line-height:1;">08:42</span>
+    </div>
+    <div class="type-row">
+      <span class="type-label">heading / 22px</span>
+      <span style="font-size:22px; font-weight:700; color:var(--text);">Never find files again.</span>
+    </div>
+    <div class="type-row">
+      <span class="type-label">title / 15px</span>
+      <span style="font-size:15px; font-weight:600; color:var(--text);">Context Engine — Indexing</span>
+    </div>
+    <div class="type-row">
+      <span class="type-label">body / 13px</span>
+      <span style="font-size:13px; color:var(--text-muted);">Found 3 files matching "quarterly report" — from Documents/</span>
+    </div>
+    <div class="type-row">
+      <span class="type-label">label / 11px</span>
+      <span style="font-size:11px; font-weight:600; letter-spacing:0.5px; color:var(--text-subtle); text-transform:uppercase;">Privacy Policy</span>
+    </div>
+    <div class="type-row">
+      <span class="type-label">mono / 12px</span>
+      <span style="font-size:12px; font-family:var(--font-mono); color:var(--cyan);">koompi-contextd · 3.2 MB RSS</span>
+    </div>
+  </div>
+</section>

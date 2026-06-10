@@ -1,0 +1,99 @@
+<section class="section" id="the-gardener">
+  <div class="section-header">
+    <h2>The Gardener</h2>
+    <span class="tag">Futures</span>
+    <span class="tag sys">System</span>
+  </div>
+  <p class="desc">
+    A hundred-year OS cannot wait for a vendor to notice it's sick. The local agent reads its own logs, diagnoses its own daemons, and proposes its own patches — every self-change staged on a BTRFS snapshot, shown to you as a diff, and inert until you approve. This is dangerous if done wrong, and the docs say so in plain words. It is also the honest endpoint of an OS that thinks: a system that tends itself like a garden.
+  </p>
+
+  <!-- Self-diagnosis card -->
+  <div style="max-width:760px; background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-xl); overflow:hidden;">
+    <div style="padding:12px 16px; border-bottom:1px solid var(--border2); background:linear-gradient(135deg, var(--amber-glow), transparent); display:flex; align-items:center; gap:10px;">
+      <span style="font-size:16px;">🌿</span>
+      <span style="font-size:13px; font-weight:700; flex:1;">Gardener — self-diagnosis · koompi-agent-memd crashed 3× this week</span>
+      <span class="state-chip warn-state" style="font-size:9px;">awaiting your approval</span>
+    </div>
+    <div style="padding:16px;">
+      <div style="background:var(--accent-glow); border:1px solid rgba(99,102,241,0.25); border-radius:var(--radius); padding:12px 14px; margin-bottom:14px;">
+        <div style="font-size:10px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; color:var(--accent); margin-bottom:6px;">Root cause, traced locally</div>
+        <div style="font-size:13px; line-height:1.6;">Crashes correlate with consolidation runs over episodes containing &gt;64KB Khmer-script OCR blobs. <span class="code-key" style="font-family:var(--font-mono); font-size:12px;">decay_pass()</span> assumes UTF-8 segment boundaries fall inside its 4KB window — they don't for long Khmer clusters. Buffer split mid-grapheme → panic. Journal evidence: 3 crashes, same backtrace, all at 03:00 consolidation.</div>
+      </div>
+
+      <div class="card-label" style="margin-bottom:8px;">Proposed patch — memd/src/decay.zig</div>
+      <div class="tool-code" style="font-size:11px; line-height:1.8; margin-bottom:14px;">
+        <span style="color:var(--text-subtle)">@@ -211,7 +211,8 @@ fn decay_pass(window: []const u8)</span><br>
+        <span style="color:var(--red);">-    const cut = window[0..WINDOW_MAX];</span><br>
+        <span style="color:var(--emerald);">+    // never split inside a grapheme cluster (Khmer, Thai, emoji)</span><br>
+        <span style="color:var(--emerald);">+    const cut = window[0..graphemeSafeBoundary(window, WINDOW_MAX)];</span><br>
+        <span style="color:var(--text-subtle)">     try consolidate(cut);</span>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:12px; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:10px 14px; margin-bottom:14px;">
+        <span style="font-size:16px;">📸</span>
+        <div style="flex:1; font-size:11px; color:var(--text-muted);">
+          <span style="color:var(--emerald); font-weight:600;">Snapshot guard armed.</span> BTRFS snapshot <span style="font-family:var(--font-mono);">@root-pre-gardener-0142</span> taken. Patch built and staged in a sandbox; 412 replayed consolidation runs pass, zero crashes. Auto-rollback if memd fails twice within 24h of activation.
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <span style="background:var(--emerald-glow); border:1px solid var(--emerald); color:var(--emerald); border-radius:var(--radius-sm); padding:6px 16px; font-size:12px; font-weight:600;">Approve &amp; activate</span>
+        <span style="background:var(--surface2); border:1px solid var(--border2); color:var(--text-muted); border-radius:var(--radius-sm); padding:6px 16px; font-size:12px;">Decline</span>
+        <span style="background:var(--surface2); border:1px solid var(--border2); color:var(--text-muted); border-radius:var(--radius-sm); padding:6px 16px; font-size:12px;">Show full diff &amp; sandbox log</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:flex-start; margin-top:24px;">
+
+    <!-- Upstream contribution -->
+    <div style="width:360px; flex-shrink:0; background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-lg); padding:14px 16px;">
+      <div class="card-label" style="margin-bottom:10px;">Contribute upstream — your fix strengthens the commons</div>
+      <div style="font-size:12px; line-height:1.6; margin-bottom:12px;">
+        This patch likely fixes every machine that consolidates long Khmer text. Share it with the KOOMPI fleet?
+      </div>
+      <div style="display:flex; flex-direction:column; gap:6px; font-size:11px; margin-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:8px;"><span style="color:var(--emerald);">✓</span> <span>Patch + crash signature only — never your logs or memories</span></div>
+        <div style="display:flex; align-items:center; gap:8px;"><span style="color:var(--emerald);">✓</span> <span>ZK-aggregated, like Software Center privacy flags: "1,204 machines hit this" with no machine identified</span></div>
+        <div style="display:flex; align-items:center; gap:8px;"><span style="color:var(--amber);">◷</span> <span>Lands as a normal staged update everywhere else — reviewed, never silent</span></div>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <span class="state-chip active-state" style="font-size:9px;">contribute</span>
+        <span class="state-chip" style="font-size:9px;">keep local</span>
+      </div>
+      <div style="font-size:10px; color:var(--text-subtle); font-family:var(--font-mono); margin-top:10px;">koompi-egress: 1 pending upload · diff 38 lines · 0 bytes of personal data</div>
+    </div>
+
+    <!-- Garden log -->
+    <div style="flex:1; min-width:300px; background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-lg); padding:14px 16px;">
+      <div class="card-label" style="margin-bottom:10px;">Garden log — every self-repair, remembered</div>
+      <div class="tool-code" style="font-size:11px; line-height:1.9;">
+        <span class="code-key">2046-06-10</span>  memd grapheme split fix            <span class="code-str">pending approval</span><br>
+        <span class="code-key">2046-04-22</span>  pruned 11GB stale thumbnail cache  <span class="code-val">approved · kept 90d</span><br>
+        <span class="code-key">2046-03-30</span>  Quickshell leak: panel QML timer   <span class="code-val">approved · upstreamed</span><br>
+        <span class="code-key">2046-02-17</span>  fan-curve tweak after sensor drift <span style="color:var(--red);">declined by you</span><br>
+        <span class="code-key">2046-01-08</span>  egress rule conflict auto-detected <span class="code-val">approved · flagged in ledger</span><br>
+        <span class="code-key">2045-12-02</span>  rollback: own patch regressed wifi <span style="color:var(--amber);">auto-rollback · 41s</span>
+      </div>
+      <p style="font-size:11px; color:var(--text-muted); margin-top:10px; line-height:1.5;">
+        The December entry matters most: the Gardener once shipped itself a bad patch, the watchdog rolled it back in 41 seconds, and the failure is logged in its own handwriting. A system that hides its mistakes can't be trusted to fix them.
+      </p>
+    </div>
+  </div>
+
+  <div class="callout-group">
+    <div class="callout">
+      <div class="callout-title">Self-repair behind a snapshot, always <span class="badge new">KOOMPI</span></div>
+      <p>No self-change touches the live system. Diagnose → patch → sandbox replay → BTRFS snapshot → human-readable diff → your approval → staged activation with auto-rollback. Six gates between an idea and your root filesystem.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Fleet learning without surveillance</div>
+      <p>Upstreamed fixes carry code and crash signatures, never user data — counted by ZK aggregation so the project learns "this bug is everywhere" without learning where. Every machine's garden feeds the seed bank.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Dangerous, and documented as such</div>
+      <p>An OS that patches itself can wound itself; the docs say this on page one rather than in a footnote. The defense is not confidence but architecture: snapshots, sandboxed proof, a declinable diff, and a garden log that remembers every failure.</p>
+    </div>
+  </div>
+</section>

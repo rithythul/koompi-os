@@ -1,0 +1,93 @@
+<section class="section" id="khmer-ai">
+  <div class="section-header">
+    <h2>Khmer-Native Intelligence</h2>
+    <span class="tag">i18n</span>
+  </div>
+  <p class="desc">
+    The first OS where Khmer is not translated — it is <strong>native</strong>. The AI thinks in Khmer, reasons in Khmer, writes in Khmer. For 17 million people whose computing has always been English-first, this changes what is possible: formal vs informal register (<span lang="km">សម្តីច្បាប់</span> vs <span lang="km">សម្តីបុរស</span>), honorifics in business email, the Khmer and Buddhist calendars, and transliteration that respects how names are actually written.
+  </p>
+
+  <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:flex-start;">
+
+    <!-- Khmer launcher / semantic search -->
+    <div style="width:340px; flex-shrink:0;">
+      <div class="card-label" style="margin-bottom:8px;">Semantic search — in Khmer, not transliterated English</div>
+      <div style="background:var(--surface); border:1px solid var(--accent); border-radius:var(--radius-lg); padding:14px; box-shadow:0 0 0 4px var(--accent-glow);">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+          <span style="color:var(--accent);">✦</span>
+          <span lang="km" style="flex:1; font-size:15px;">ឯកសារអំពីសិទ្ធិដីធ្លីនៅកម្ពុជា</span>
+        </div>
+        <div style="font-size:10px; color:var(--text-subtle); margin-bottom:10px;">"documents about land rights in Cambodia" — matched by meaning, in Khmer</div>
+        <div style="display:flex; flex-direction:column; gap:7px;">
+          <div style="display:flex; align-items:center; gap:9px; padding:7px 10px; background:var(--surface2); border-radius:var(--radius-sm);">
+            <span style="color:var(--cyan); font-size:11px;">PDF</span>
+            <span lang="km" style="flex:1; font-size:12px;">របាយការណ៍ដីធ្លី ២០២៥</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:9px; padding:7px 10px; background:var(--surface2); border-radius:var(--radius-sm);">
+            <span style="color:var(--amber); font-size:11px;">NOTE</span>
+            <span lang="km" style="flex:1; font-size:12px;">កំណត់ត្រាប្រជុំសហគមន៍</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Khmer date display -->
+      <div style="background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-lg); padding:14px 16px; margin-top:14px;">
+        <div class="card-label" style="margin-bottom:10px;">Calendar — Khmer + Buddhist + Gregorian</div>
+        <div style="display:flex; align-items:baseline; gap:10px;">
+          <span lang="km" style="font-size:18px; font-weight:700;">ថ្ងៃអាទិត្យ ៨ មិថុនា</span>
+        </div>
+        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">
+          <span lang="km">ខែ មិគសិរ · ឆ្នាំ ២៥៦៨ ពុទ្ធសករាជ</span>
+        </div>
+        <div style="font-size:11px; color:var(--text-subtle); margin-top:2px; font-family:var(--font-mono);">Gregorian: Sun, 8 Jun 2026</div>
+      </div>
+    </div>
+
+    <!-- Register selector + transliteration -->
+    <div style="flex:1; min-width:280px; display:flex; flex-direction:column; gap:14px;">
+      <div style="background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-lg); padding:14px 16px;">
+        <div class="card-label" style="margin-bottom:10px;">Register selector — drafting a business email</div>
+        <div class="state-row" style="margin-top:0; margin-bottom:12px;">
+          <span class="state-chip">មិត្តភាព · informal</span>
+          <span class="state-chip active-state">ផ្លូវការ · formal</span>
+          <span class="state-chip warn-state">រាជសព្ទ · royal</span>
+        </div>
+        <div style="background:var(--surface2); border:1px solid var(--border2); border-radius:var(--radius); padding:12px 14px;">
+          <div style="font-size:9px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; color:var(--accent); margin-bottom:6px;">Formal · with honorifics</div>
+          <div lang="km" style="font-size:13px; line-height:1.8;">ជូនចំពោះលោកប្រធាន<br>ខ្ញុំសូមគោរពជម្រាបជូននូវរបាយការណ៍ត្រីមាសទី៤...</div>
+        </div>
+        <p style="font-size:11px; color:var(--text-muted); margin-top:10px; line-height:1.5;">
+          The AI selects pronouns, honorifics, and sentence-final particles to match the chosen register — not by find-and-replace, but because it reasons in Khmer about who you are addressing.
+        </p>
+      </div>
+
+      <!-- Transliteration -->
+      <div style="background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-lg); padding:14px 16px;">
+        <div class="card-label" style="margin-bottom:10px;">Auto-transliteration for names in English contexts</div>
+        <div class="tool-code" style="font-size:11px; line-height:1.9;">
+          <span lang="km" class="code-key">រិទ្ធី ធុល</span>  →  <span class="code-str">"Rithy Thul"</span>  <span style="color:var(--text-subtle);">(self-spelling honored)</span><br>
+          <span lang="km" class="code-key">វឌ្ឍនា</span>     →  <span class="code-str">"Vathna"</span>      <span style="color:var(--text-subtle);">(not "Vaddhana")</span><br>
+          <span lang="km" class="code-key">ភ្នំពេញ</span>    →  <span class="code-str">"Phnom Penh"</span>  <span style="color:var(--text-subtle);">(canonical place)</span>
+        </div>
+        <p style="font-size:11px; color:var(--text-muted); margin-top:10px; line-height:1.5;">
+          Khmer names rarely round-trip through naive romanization. KOOMPI learns each person's preferred spelling and reuses it everywhere — your name, spelled the way you spell it.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout-group">
+    <div class="callout">
+      <div class="callout-title">Native cognition, not translation <span class="badge new">KOOMPI</span></div>
+      <p>The local model reasons in Khmer end to end. There is no English pivot in the middle — so idiom, register, and honorifics survive instead of being flattened.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Register is a first-class control</div>
+      <p>Informal, formal, and royal registers are selectable per message. The OS treats Khmer's social grammar as structure, not decoration — the way a Khmer writer actually thinks.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">A sovereignty argument too</div>
+      <p>A Khmer-native OS means 17 million people compute in their own language without sending every keystroke to a foreign cloud to be understood. Language independence is data independence.</p>
+    </div>
+  </div>
+</section>

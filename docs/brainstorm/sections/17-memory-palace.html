@@ -1,0 +1,109 @@
+<section class="section" id="memory-palace">
+  <div class="section-header">
+    <h2>Memory Palace</h2>
+    <span class="tag ai">AI</span>
+  </div>
+  <p class="desc">
+    The OS remembers your entire computing life — every document, conversation, decision, and thought you wrote down. A second brain you can interrogate in plain language. You don't search files; you search <em>meaning</em>. And because it all lives on your machine, no one else can ever query your past.
+  </p>
+
+  <!-- Semantic query bar -->
+  <div style="max-width:760px;">
+    <div style="display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--accent); border-radius:var(--radius-lg); padding:12px 16px; box-shadow:0 0 0 4px var(--accent-glow);">
+      <span style="color:var(--accent); font-size:15px;">✦</span>
+      <span style="flex:1; font-size:14px;">What did I decide about the API design back in June 2025?</span>
+      <span class="launcher-kbd" style="font-size:10px;">↵ recall</span>
+    </div>
+
+    <!-- Semantic result card -->
+    <div style="background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-lg); margin-top:14px; overflow:hidden;">
+      <div style="padding:14px 16px; border-bottom:1px solid var(--border2); background:var(--surface2); display:flex; align-items:center; gap:8px;">
+        <span style="font-size:12px; font-weight:700; flex:1;">Meaning match · 1 decision, 4 supporting moments</span>
+        <span class="state-chip" style="font-size:9px; padding:2px 8px;">June 2025</span>
+      </div>
+
+      <div style="padding:16px;">
+        <div style="background:var(--accent-glow); border:1px solid rgba(99,102,241,0.25); border-radius:var(--radius); padding:12px 14px; margin-bottom:14px;">
+          <div style="font-size:10px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; color:var(--accent); margin-bottom:6px;">Decision recalled</div>
+          <div style="font-size:13px; line-height:1.6;">You chose <strong>cursor-based pagination over offset</strong> for the Selendra indexer API. Reason recorded: "offset breaks under concurrent writes — Vathna hit this on the explorer." Settled in a Telegram thread, then written into <span class="ai-context-file">docs/adr/0007-pagination.md</span>.</div>
+        </div>
+
+        <!-- Memory thread -->
+        <div class="card-label" style="margin-bottom:8px;">Memory thread — how you got there</div>
+        <div style="position:relative; padding-left:18px;">
+          <div style="position:absolute; left:5px; top:6px; bottom:6px; width:2px; background:var(--border);"></div>
+
+          <div style="position:relative; margin-bottom:12px;">
+            <span style="position:absolute; left:-18px; top:3px; width:9px; height:9px; border-radius:50%; background:var(--cyan); border:2px solid var(--surface);"></span>
+            <div style="font-size:12px; font-weight:600;">"explorer times out on page 400" — Vathna</div>
+            <div style="font-size:11px; color:var(--text-muted);">Telegram · 11 Jun 2025</div>
+          </div>
+          <div style="position:relative; margin-bottom:12px;">
+            <span style="position:absolute; left:-18px; top:3px; width:9px; height:9px; border-radius:50%; background:var(--amber); border:2px solid var(--surface);"></span>
+            <div style="font-size:12px; font-weight:600;">You read 3 articles on keyset pagination</div>
+            <div style="font-size:11px; color:var(--text-muted);">Firefox · 12 Jun 2025</div>
+          </div>
+          <div style="position:relative; margin-bottom:12px;">
+            <span style="position:absolute; left:-18px; top:3px; width:9px; height:9px; border-radius:50%; background:var(--accent); border:2px solid var(--surface);"></span>
+            <div style="font-size:12px; font-weight:600;">Sketched the cursor scheme in a scratch note</div>
+            <div style="font-size:11px; color:var(--text-muted);">Thought capture · 12 Jun 2025</div>
+          </div>
+          <div style="position:relative;">
+            <span style="position:absolute; left:-18px; top:3px; width:9px; height:9px; border-radius:50%; background:var(--emerald); border:2px solid var(--surface);"></span>
+            <div style="font-size:12px; font-weight:600;">Committed ADR-0007</div>
+            <div style="font-size:11px; color:var(--text-muted);">git · 13 Jun 2025 · 09:14</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Life timeline scrubber -->
+  <div style="max-width:760px; margin-top:24px; background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-lg); padding:16px;">
+    <div class="card-label" style="margin-bottom:12px;">Timeline scrubber — color-coded by project · person · topic</div>
+    <div style="display:flex; gap:2px; height:34px; border-radius:6px; overflow:hidden;">
+      <div style="width:14%; background:var(--cyan); opacity:0.55;" title="Selendra explorer"></div>
+      <div style="width:9%; background:var(--accent); opacity:0.7;" title="KOOMPI OS"></div>
+      <div style="width:6%; background:var(--amber); opacity:0.6;" title="Land rights research"></div>
+      <div style="width:22%; background:var(--accent);" title="KOOMPI OS — heavy"></div>
+      <div style="width:8%; background:var(--emerald); opacity:0.6;" title="Family"></div>
+      <div style="width:18%; background:var(--accent); opacity:0.85;" title="KOOMPI OS"></div>
+      <div style="width:11%; background:var(--cyan); opacity:0.7;" title="Selendra"></div>
+      <div style="width:12%; background:var(--amber); opacity:0.5;" title="Research"></div>
+    </div>
+    <div style="display:flex; justify-content:space-between; font-size:9px; color:var(--text-subtle); font-family:var(--font-mono); margin-top:6px;">
+      <span>2023</span><span>2024</span><span>2025</span><span>2026 — today</span>
+    </div>
+    <div class="state-row" style="margin-top:12px;">
+      <span class="state-chip active-state">KOOMPI OS</span>
+      <span class="state-chip" style="color:var(--cyan); border-color:rgba(34,211,238,0.3); background:var(--cyan-glow);">Selendra</span>
+      <span class="state-chip warn-state">Land rights research</span>
+      <span class="state-chip priv-state">Family</span>
+    </div>
+  </div>
+
+  <!-- Privacy tombstone -->
+  <div style="max-width:760px; margin-top:16px; display:flex; align-items:center; gap:12px; background:var(--surface2); border:1px dashed var(--border); border-radius:var(--radius); padding:12px 16px;">
+    <span style="font-size:18px; opacity:0.5;">🪦</span>
+    <div style="flex:1;">
+      <div style="font-size:12px; font-weight:600; color:var(--text-muted);">Memory destroyed</div>
+      <div style="font-size:11px; color:var(--text-subtle);">"Notes on 2024 salary negotiation" — destroyed by you on 3 Mar 2026, after a 7-day ceremony. Key shredded, derived traces purged. The OS will never recall this. No copy exists.</div>
+    </div>
+    <span class="state-chip" style="font-size:9px;">irreversible</span>
+  </div>
+
+  <div class="callout-group">
+    <div class="callout">
+      <div class="callout-title">Meaning search, not file search <span class="badge new">KOOMPI</span></div>
+      <p>Queries run against a local vector index built by koompi-contextd. "Everything I read about Cambodian land rights" returns moments across PDFs, browser history, and chats — not a folder of matching filenames.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">The right to forget</div>
+      <p>Forgetting is three verbs, not one: <strong>Suppress</strong> quiets a memory, <strong>Seal</strong> locks it until a future date, <strong>Destroy</strong> erases it cryptographically after a waiting period — see Ceremonial Forgetting. Destruction leaves a tombstone, never a copy: the AI is told the memory existed and is gone — it cannot reconstruct it. Sovereignty includes the power to erase.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Only possible because it's local</div>
+      <p>A cloud AI cannot legally or ethically hold a decade of your inner life. A local one can — the recall surface and the privacy guarantee are the same machine.</p>
+    </div>
+  </div>
+</section>

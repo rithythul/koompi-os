@@ -1,0 +1,110 @@
+<section class="section" id="spatial-shell">
+  <div class="section-header">
+    <h2>Spatial Shell</h2>
+    <span class="tag">Futures</span>
+  </div>
+  <p class="desc">
+    Hyprland tiles beautifully on a flat monitor today. In five years it's an XR headset; in twenty, there may be no screen at all. KOOMPI's shell extends into space: windows become objects in a room, workspaces become actual rooms you walk between, notifications become spatial sounds, and the AI becomes a presence — a quiet glow in the corner, or just a voice.
+  </p>
+
+  <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:flex-start;">
+
+    <!-- 3D workspace overhead projection -->
+    <div style="width:360px; flex-shrink:0; background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-xl); overflow:hidden;">
+      <div style="padding:12px 16px; border-bottom:1px solid var(--border2); background:var(--surface2); font-size:13px; font-weight:700;">Workspace — overhead view of a 3D room</div>
+      <div style="padding:16px; background:radial-gradient(ellipse at center, var(--surface2), var(--surface));">
+        <svg viewBox="0 0 320 200" style="width:100%; height:auto;">
+          <!-- floor -->
+          <polygon points="40,170 280,170 230,60 90,60" fill="var(--surface3)" stroke="var(--border)" stroke-width="1"/>
+          <!-- you -->
+          <circle cx="160" cy="150" r="9" fill="var(--accent)"/>
+          <text x="160" y="153" text-anchor="middle" font-size="7" fill="white">you</text>
+          <!-- floating panels -->
+          <rect x="70"  y="90"  width="50" height="34" rx="4" fill="var(--surface)" stroke="var(--cyan)" stroke-width="1.5"/>
+          <text x="95"  y="110" text-anchor="middle" font-size="7" fill="var(--cyan)">editor</text>
+          <rect x="205" y="92"  width="48" height="32" rx="4" fill="var(--surface)" stroke="var(--amber)" stroke-width="1.5"/>
+          <text x="229" y="111" text-anchor="middle" font-size="7" fill="var(--amber)">docs</text>
+          <rect x="140" y="72"  width="44" height="28" rx="4" fill="var(--surface)" stroke="var(--emerald)" stroke-width="1.5"/>
+          <text x="162" y="89"  text-anchor="middle" font-size="7" fill="var(--emerald)">chat</text>
+          <!-- AI presence glow -->
+          <circle cx="255" cy="70" r="14" fill="var(--accent-glow)"/>
+          <circle cx="255" cy="70" r="6"  fill="var(--accent)" opacity="0.7"/>
+          <text x="255" y="95" text-anchor="middle" font-size="6" fill="var(--accent)">✦ AI</text>
+        </svg>
+        <div style="font-size:10px; color:var(--text-subtle); text-align:center;">Windows float around you · grab, throw, or pin to a wall</div>
+      </div>
+    </div>
+
+    <!-- Space map (floor plan) -->
+    <div style="flex:1; min-width:280px; display:flex; flex-direction:column; gap:14px;">
+      <div style="background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-lg); padding:14px 16px;">
+        <div class="card-label" style="margin-bottom:12px;">Space map — workspaces as rooms you walk between</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+          <div style="border:2px solid var(--accent); background:var(--accent-glow); border-radius:8px; padding:14px 10px; text-align:center;">
+            <div style="font-size:16px;">🛠</div>
+            <div style="font-size:11px; font-weight:700; color:var(--accent); margin-top:3px;">Work room</div>
+            <div style="font-size:9px; color:var(--text-subtle);">you are here</div>
+          </div>
+          <div style="border:1px solid var(--border); background:var(--surface2); border-radius:8px; padding:14px 10px; text-align:center;">
+            <div style="font-size:16px;">🎨</div>
+            <div style="font-size:11px; font-weight:600; margin-top:3px;">Creative room</div>
+            <div style="font-size:9px; color:var(--text-subtle);">spatial canvas</div>
+          </div>
+          <div style="border:1px solid var(--border); background:var(--surface2); border-radius:8px; padding:14px 10px; text-align:center;">
+            <div style="font-size:16px;">💬</div>
+            <div style="font-size:11px; font-weight:600; margin-top:3px;">Comms room</div>
+            <div style="font-size:9px; color:var(--text-subtle);">people &amp; calls</div>
+          </div>
+          <div style="border:1px solid var(--border); background:var(--surface2); border-radius:8px; padding:14px 10px; text-align:center;">
+            <div style="font-size:16px;">🌙</div>
+            <div style="font-size:11px; font-weight:600; margin-top:3px;">Rest room</div>
+            <div style="font-size:9px; color:var(--text-subtle);">quiet · dimmed</div>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; margin-top:12px; font-size:11px; color:var(--text-muted);">
+          <span class="state-chip active-state" style="font-size:9px; padding:2px 8px;">Work room</span>
+          <span style="color:var(--text-subtle);">— walk →</span>
+          <span class="state-chip" style="font-size:9px; padding:2px 8px;">Creative room</span>
+          <span style="font-size:10px; color:var(--text-subtle);">windows stay where you left them</span>
+        </div>
+      </div>
+
+      <!-- AI presence -->
+      <div style="background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-lg); padding:14px 16px;">
+        <div class="card-label" style="margin-bottom:10px;">Where does the AI live in the room?</div>
+        <div class="state-row" style="margin-top:0;">
+          <span class="state-chip active-state">A glow in the corner</span>
+          <span class="state-chip">A voice, no form</span>
+          <span class="state-chip">A shape you can face</span>
+        </div>
+        <p style="font-size:11px; color:var(--text-muted); margin-top:10px; line-height:1.5;">
+          Default: a soft, breathing glow at the room's edge — present but never in your sightline. Speak and it answers from there; it never blocks your work or stares back.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- No-screen mode -->
+  <div style="max-width:760px; margin-top:16px; display:flex; align-items:center; gap:14px; background:#0E1320; border:1px solid var(--border); border-radius:var(--radius); padding:16px 18px; color:#E2E8F0;">
+    <div style="width:36px; height:36px; border-radius:50%; background:radial-gradient(circle, var(--accent), transparent); flex-shrink:0; animation:pulse-dot 2.5s infinite;"></div>
+    <div style="flex:1;">
+      <div style="font-size:12px; font-weight:700; color:#A5B4FC;">No-screen mode — ambient + voice only</div>
+      <div style="font-size:11px; opacity:0.7; line-height:1.5;">When there's no display, KOOMPI is a presence in the space: a notification is a soft tone from your left; the briefing is spoken; a decision is a question in the air. The shell becomes sound, light, and language.</div>
+    </div>
+  </div>
+
+  <div class="callout-group">
+    <div class="callout">
+      <div class="callout-title">From tiling to rooms <span class="badge new">KOOMPI</span></div>
+      <p>Hyprland's window model extends naturally into space: workspaces become rooms you physically move between, and windows persist where you placed them — spatial memory instead of a flat z-order.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">The AI as a presence, not a popup</div>
+      <p>In space the assistant has a place — a glow at the edge, a voice, or an avatable shape. It stays out of your line of sight and answers from where it lives, never intruding into the work.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Designed for the screenless future</div>
+      <p>The same OS degrades gracefully to sound and light when there's no display at all. The shell is an idea — context, intent, presence — not a rectangle of pixels.</p>
+    </div>
+  </div>
+</section>

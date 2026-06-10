@@ -1,0 +1,117 @@
+<section class="section" id="data-sovereignty">
+  <div class="section-header">
+    <h2>Data Sovereignty</h2>
+    <span class="tag data">Data</span>
+  </div>
+  <p class="desc">
+    Your data has economic value — KOOMPI makes that visible and actionable. See exactly which apps touch your data, what it's worth, what you consented to, and revoke or monetize any of it with one tap. Selendra acts as the on-chain ledger of consent: a tamper-proof record of every share, owned by you, readable by no one you didn't permit.
+  </p>
+
+  <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:flex-start;">
+
+    <!-- Data map web graph -->
+    <div style="width:330px; flex-shrink:0; background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-xl); overflow:hidden;">
+      <div style="padding:12px 16px; border-bottom:1px solid var(--border2); background:var(--surface2); font-size:13px; font-weight:700;">Data Map — who holds what</div>
+      <div style="padding:16px;">
+        <svg viewBox="0 0 300 200" style="width:100%; height:auto;">
+          <!-- spokes -->
+          <line x1="150" y1="100" x2="60"  y2="40"  stroke="var(--emerald)" stroke-width="1.5"/>
+          <line x1="150" y1="100" x2="245" y2="45"  stroke="var(--amber)"   stroke-width="1.5"/>
+          <line x1="150" y1="100" x2="55"  y2="160" stroke="var(--emerald)" stroke-width="1.5"/>
+          <line x1="150" y1="100" x2="250" y2="155" stroke="var(--red)"     stroke-width="1.5" stroke-dasharray="3 3"/>
+          <!-- center: you -->
+          <circle cx="150" cy="100" r="26" fill="var(--accent)"/>
+          <text x="150" y="104" text-anchor="middle" font-size="11" font-weight="700" fill="white">YOU</text>
+          <!-- nodes -->
+          <circle cx="60"  cy="40"  r="16" fill="var(--emerald-glow)" stroke="var(--emerald)" stroke-width="1.5"/>
+          <text x="60"  y="43"  text-anchor="middle" font-size="7" fill="var(--emerald)">Files</text>
+          <circle cx="245" cy="45"  r="16" fill="var(--amber-glow)" stroke="var(--amber)" stroke-width="1.5"/>
+          <text x="245" y="48"  text-anchor="middle" font-size="7" fill="var(--amber)">Maps</text>
+          <circle cx="55"  cy="160" r="16" fill="var(--emerald-glow)" stroke="var(--emerald)" stroke-width="1.5"/>
+          <text x="55"  y="163" text-anchor="middle" font-size="7" fill="var(--emerald)">Mail</text>
+          <circle cx="250" cy="155" r="16" fill="var(--red-glow)" stroke="var(--red)" stroke-width="1.5"/>
+          <text x="250" y="158" text-anchor="middle" font-size="7" fill="var(--red)">AdSDK</text>
+        </svg>
+        <div class="state-row" style="margin-top:6px;">
+          <span class="state-chip priv-state">local only</span>
+          <span class="state-chip warn-state">limited share</span>
+          <span class="state-chip danger-state">leaking · revoke</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Consent timeline + dividend -->
+    <div style="flex:1; min-width:280px; display:flex; flex-direction:column; gap:14px;">
+
+      <!-- Consent timeline -->
+      <div style="background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-lg); padding:14px 16px;">
+        <div class="card-label" style="margin-bottom:10px;">Consent timeline — every share, revocable in one tap</div>
+        <div style="display:flex; flex-direction:column; gap:7px;">
+          <div style="display:flex; align-items:center; gap:9px; font-size:12px; padding:8px 10px; background:var(--surface2); border-radius:var(--radius-sm);">
+            <span style="color:var(--amber);">📍</span>
+            <span style="flex:1;">Maps app — coarse location</span>
+            <span style="font-size:10px; color:var(--text-subtle); font-family:var(--font-mono);">3 Mar</span>
+            <span class="state-chip" style="font-size:9px; padding:2px 8px; cursor:pointer;">revoke</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:9px; font-size:12px; padding:8px 10px; background:var(--red-glow); border:1px solid rgba(239,68,68,0.2); border-radius:var(--radius-sm);">
+            <span style="color:var(--red);">📡</span>
+            <span style="flex:1;">AdSDK — behavioral profile</span>
+            <span style="font-size:10px; color:var(--text-subtle); font-family:var(--font-mono);">1 Apr</span>
+            <span class="state-chip danger-state" style="font-size:9px; padding:2px 8px; cursor:pointer;">revoke now</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:9px; font-size:12px; padding:8px 10px; background:var(--surface2); border-radius:var(--radius-sm);">
+            <span style="color:var(--emerald);">📄</span>
+            <span style="flex:1;">Tax app — read 2 PDFs</span>
+            <span style="font-size:10px; color:var(--text-subtle); font-family:var(--font-mono);">expired</span>
+            <span class="state-chip priv-state" style="font-size:9px; padding:2px 8px;">auto-revoked</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data dividend -->
+      <div style="background:linear-gradient(135deg, var(--cyan-glow), transparent); border:1px solid rgba(34,211,238,0.3); border-radius:var(--radius-lg); padding:14px 16px;">
+        <div class="card-label" style="margin-bottom:8px;">Data dividend — if you chose to sell</div>
+        <div style="display:flex; align-items:baseline; gap:8px;">
+          <span style="font-size:28px; font-weight:800; color:var(--cyan); letter-spacing:-1px;">$41.20</span>
+          <span style="font-size:12px; color:var(--text-muted);">/ month est. for your behavioral data</span>
+        </div>
+        <p style="font-size:11px; color:var(--text-muted); margin-top:8px; line-height:1.5;">
+          Today this value is captured by ad networks — and you see none of it. KOOMPI flips it: your data stays yours, and if you opt in to a data market, the payment routes to <em>you</em> on-chain.
+        </p>
+        <div class="state-row" style="margin-top:10px;">
+          <span class="state-chip active-state">Keep private (default)</span>
+          <span class="state-chip" style="color:var(--cyan); border-color:rgba(34,211,238,0.3); background:var(--cyan-glow);">Monetize on my terms</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Blockchain attestation card -->
+  <div style="max-width:760px; margin-top:16px; background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-lg); padding:14px 16px;">
+    <div class="card-label" style="margin-bottom:10px;">On-chain attestation — Selendra ledger</div>
+    <div class="tool-code" style="font-size:11px; line-height:1.9;">
+      <span class="code-key">event</span>   : <span class="code-str">"identity_verified"</span><br>
+      <span class="code-key">at</span>      : <span class="code-val">2024-03-15 09:42:11 UTC</span><br>
+      <span class="code-key">tx</span>      : <span class="code-str">0x7a1f…c3e9</span> <span style="color:var(--emerald);">✓ confirmed</span><br>
+      <span class="code-key">scope</span>   : <span class="code-val">attestation only — no personal data on chain</span>
+    </div>
+    <p style="font-size:11px; color:var(--text-muted); margin-top:10px; line-height:1.5;">
+      Selendra stores <em>proofs</em>, never your data. The chain records that a consent or verification happened — the data itself never leaves your device. Tamper-proof receipts for a private life.
+    </p>
+  </div>
+
+  <div class="callout-group">
+    <div class="callout">
+      <div class="callout-title">Consent you can see and revoke <span class="badge new">KOOMPI</span></div>
+      <p>Every data share is a line item with a revoke button. No buried settings, no dark patterns — the data map shows leaks in red and lets you cut them instantly.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Proofs on chain, data on device</div>
+      <p>Selendra is the ledger of consent, not a store of your information. It attests that events happened; your files, location, and habits stay local. Sovereignty without exposure.</p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Your dividend, not theirs</div>
+      <p>The value of your attention is made explicit. The default is to keep it private; if you opt to sell, the payment flows to you — inverting the surveillance economy.</p>
+    </div>
+  </div>
+</section>
