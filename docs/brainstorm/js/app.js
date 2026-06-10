@@ -309,6 +309,7 @@ var sectionFiles = [
   'sections/27-privacy-dash.html',
   'sections/28-egress-ledger.html',
   'sections/42-app-permissions.html',
+  'sections/85-web3-native.html',
   'sections/35-first-boot.html',
   'sections/29-settings.html',
   'sections/30-factory-reset.html',

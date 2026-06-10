@@ -109,6 +109,12 @@ Structure the response into these 5 sections:
   autonomous runs, and a "page tried to instruct your agent" violation surface (red,
   logged, teachable).
 
+- **Web3-native, brokered:** How do dApps get a provider (EIP-1193 / Substrate
+  signer) whose every signature routes through the OS Vault's signing ceremony —
+  multichain (Selendra home; EVM, Bitcoin, and beyond via the same custody),
+  per-canvas wallet identity, local transaction simulation, drainer-pattern refusal,
+  and constitutional spend limits? Keys must never exist in a page context.
+
 ### 4. Hardware-Efficient & Builder-Centric Innovations
 Provide **5+ unique, highly specific features** unlocked by tight integration with a
 lightweight Wayland/Linux desktop. Consider: terminal interop (pipe a page into a
@@ -132,8 +138,8 @@ shared with the shell, never a "your PC is too weak" wall).
 - **v1 vs. the horizon:** Name the smallest shippable browser (v1 "Naga" companion:
   engine + contextd ingestion + reader re-render + Tool-Approval automation on a few
   flows) versus what waits for 1.x (Builder Canvases, busd capabilities, Detonation
-  Chamber integration, IPFS). The browser must be demoable at CODE-C 2026 and still
-  coherent in 2076.
+  Chamber integration, IPFS). The browser must be real for daily use the day it
+  ships — and still coherent in 2076.
 
 Close with the three hardest open problems — the places where partner-grade agency and
 web reality collide — stated honestly, with your recommended bets.

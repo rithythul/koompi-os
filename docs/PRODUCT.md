@@ -10,7 +10,7 @@ KOOMPI OS users: students and teachers in Cambodian schools, developers, founder
 
 ## Product Purpose
 
-KOOMPI OS is "The OS That Thinks": an AI-first, local-first Linux OS where the index, models, and memory stay on-device by default. The deeper thesis: KOOMPI turns the computer from a tool into a partner — it thinks, remembers, evolves, and grows with its user across decades. The brainstorm page's desktop sims exist to make the shell vision tangible: a reader should feel what the real OS will feel like — calm, precise, private, alive. Success: a stakeholder clicks through a sim and believes the OS is real and premium.
+KOOMPI OS is "The OS That Thinks": an AI-first, local-first Linux OS where the index, models, and memory stay on-device by default. The deeper thesis: KOOMPI turns the computer from a tool into a partner — it thinks, remembers, evolves, and grows with its user across decades. It is also Web3-native: self-sovereign keys, identity, and payments are OS primitives (Selendra-default), consent-first and never chain-gated. The brainstorm page's desktop sims exist to make the shell vision tangible: a reader should feel what the real OS will feel like — calm, precise, private, alive. Success: a stakeholder clicks through a sim and believes the OS is real and premium.
 
 ## Brand Personality
 

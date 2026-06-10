@@ -4,7 +4,9 @@ Visual system of the KOOMPI OS brainstorm page (`docs/brainstorm/`), mirroring t
 
 ## Theme
 
-Page chrome is light; desktop sims support `theme-light` (default) and `theme-dark` via a toggle. Semantic color meaning is identical in both.
+**"Reading room over the engine"** (June 2026, inspired by anthropic.com warmth + openhands.dev dark-premium): the page chrome is warm ivory paper — the document is a *book* about the OS — while the OS itself (desktop sims, panel stages, aurora heroes) stays the deep indigo-night world. Editorial serif display (`Source Serif 4`) for section headings and the logo; Inter for everything else. Shadows are warm-tinted (`rgba(64,55,38,…)`), never cool slate. Desktop sims support `theme-light`/`theme-dark` with their own `--t-*` tokens — the OS's own themes are documented product decisions (§53), independent of page chrome.
+
+Page neutrals: bg `#F0EDE5` · surface `#FBFAF6` · surface2 `#F4F0E7` · surface3 `#EAE4D7` · surface4 `#DDD5C4` · borders `#D3CCBC`/`#E5DFD2` · text `#1F1C17` / muted `#6B6457` / subtle `#9A9183`. The five semantic accents are unchanged — they are contracts, not decoration.
 
 ## Color palette
 
