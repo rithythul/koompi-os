@@ -25,3 +25,21 @@ silent cloud fallback ([[0001-degrade-local-never-silent-cloud]]).
 
 The exact chat model per tier is pinned at build **after a Khmer eval** — no specific model
 mandated yet.
+
+## Addendum — 2026-06-11 (evidence update; the Open item narrows)
+
+Verified facts (sources: brainstorm §87) that sharpen, not change, this decision:
+
+- **Chat candidates are now concrete:** **Sailor2 1B/8B** (Apache-2.0, Qwen2.5-base —
+  passes the gate) for the Floor and 16 GB tiers; SEA-LION v4 *Qwen-based* variants
+  are eligible, while *Gemma-based variants fail the license gate by the policy
+  above*. The pin happens via gate **G-KM-CHAT-1** (`blueprint.md §3`), which is the
+  named form of this ADR's Open item.
+- **SEA-LION-Embedding (released 2026-03)** is the first credible BGE-M3 successor
+  for SEA retrieval. The welded-dim risk this ADR accepted is therefore **dated, not
+  hypothetical**: the era-tag + re-embed runbook moves from roadmap nicety to **v1
+  schema requirement**, and succession happens only through gate **G-EMB-2** (must
+  beat BGE-M3 on KOOMPI-EVAL-RETRIEVAL, pass the license gate, and execute the
+  runbook in CI).
+- **SEA-Guard (2026-02)** is noted as the 1.x guardrail-model candidate for
+  Khmer/SEA-language agency.
