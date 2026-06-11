@@ -18,7 +18,12 @@ still coherent in year 30.
 > The trust seam survives as a *layer* rule: a page renders into a sheet, never
 > into the stream. §2's chrome described below (ask-bar, canvas rail) is
 > superseded by this conversation-first anatomy; the engine, containment,
-> automation, memory, and Web3 architecture are unchanged.
+> automation, memory, and Web3 architecture are unchanged. A **fourth mount**
+> extends the surface to phone and tablet (thin partner over a thick home:
+> mesh → tunnel-home → on-device 3B with an encrypted 30-day cache; biometric
+> hold-to-approve on consent cards; sheets minimize to a mini-player chip;
+> tablets split stream|sheet). Companion-app limits on Android are stated
+> honestly: the layer rule is only hardware-guaranteed on KOOMPI-controlled builds.
 
 ## 1 · OS-Native Intelligence: One Brain, Not Two
 

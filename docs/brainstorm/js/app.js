@@ -297,6 +297,7 @@ var sectionFiles = [
   'sections/45-file-manager.html',
   'sections/46-clipboard-manager.html',
   'sections/82-browser.html',
+  'sections/86-partner-mobile.html',
   'sections/83-app-suite.html',
   'sections/11-tool-approval.html',
   'sections/12-rag-sources.html',
