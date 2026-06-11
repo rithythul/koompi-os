@@ -282,7 +282,9 @@ window.initObserver = initObserver;
 // ── Async section loader ─────────────────────────────────────
 var sectionFiles = [
   'sections/00-what-is.html',
+  'sections/00a-document-map.html',
   'sections/84-system-map.html',
+  'sections/87-near-future.html',
   'sections/01-design-system.html',
   'sections/02-shell-bar.html',
   'sections/03-launcher.html',
