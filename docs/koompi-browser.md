@@ -259,9 +259,9 @@ tracked as the 2030s candidate behind the same boundary.
 | layer | language | components |
 |---|---|---|
 | stream / composer / reader | QML/Quickshell | trusted chrome, hot-reload, shell tokens |
-| session daemon | Zig | `koompi-webd`: threads, capture, capsules, CLI |
+| session daemon | Rust (ADR-0004) | `koompi-webd`: threads, capture, capsules, CLI |
 | security surfaces | Rust | egress hooks, broker client, semantic selectors, taint runtime |
-| AI tools | Python (in assistantd) | research / summarize / compare as busd capabilities |
+| AI tools | Rust (in assistantd) | research / summarize / compare as busd capabilities (MCP, ADR-0013) |
 
 **Privacy by topology**: sheets reach the network only through the OS egress gate
 (per-thread cgroup rules); the AI tool layer has no network socket at all. Ledger

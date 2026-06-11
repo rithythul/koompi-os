@@ -71,7 +71,7 @@
   </div>
 
   <!-- ───────────────── 2. BIOMETRIC UNLOCK CEREMONY ───────────────── -->
-  <div style="font-size:13px;font-weight:700;color:var(--text);margin:6px 0 10px;">Biometric ceremony — liveness, fallback &amp; the states between</div>
+  <div style="font-size:13px;font-weight:700;color:var(--text);margin:6px 0 10px;">Biometric ceremony — fingerprint first, honest fallback. Face unlock exists only on IR-depth hardware; an RGB webcam is photo-spoofable and is never sold as "liveness."</div>
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
     <!-- scanning -->
     <div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:16px;text-align:center;">
@@ -88,7 +88,7 @@
         <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="9" stroke="var(--cyan)" stroke-width="1.3"/><circle cx="10" cy="11" r="1.2" fill="var(--cyan)"/><circle cx="16" cy="11" r="1.2" fill="var(--cyan)"/><path d="M10 16c1.5 1.2 4.5 1.2 6 0" stroke="var(--cyan)" stroke-width="1.3" stroke-linecap="round"/></svg>
       </div>
       <div style="font-size:12px;color:#0E7490;font-weight:600;">Liveness ✓</div>
-      <div style="font-size:10px;color:var(--text-muted);margin-top:3px;">IR depth · blink + warmth</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:3px;">IR-depth hardware only · blink + warmth</div>
     </div>
     <!-- success -->
     <div style="background:var(--surface);border:1px solid rgba(16,185,129,.35);border-radius:12px;padding:16px;text-align:center;">
@@ -225,25 +225,22 @@
       </div>
     </div>
 
-    <!-- 7. DURESS / DECOY (silent mechanism, NOT a button) -->
-    <div style="flex:1;min-width:300px;background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:16px 18px;">
+    <!-- 7. DURESS / DECOY — refused (C-11) -->
+    <div style="flex:1;min-width:300px;background:var(--surface);border:1px solid rgba(239,68,68,0.3);border-radius:14px;padding:16px 18px;">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-        <span style="font-size:12px;font-weight:700;color:var(--text);">Duress unlock · silent decoy</span>
-        <span style="font-size:10px;background:var(--emerald-glow);color:#047857;border-radius:10px;padding:2px 8px;">enrolled in Settings</span>
+        <span style="font-size:12px;font-weight:700;color:var(--text);">Duress decoys · refused</span>
+        <span style="font-size:10px;background:var(--red-glow);color:#B91C1C;border-radius:10px;padding:2px 8px;">✕ security theater</span>
       </div>
-      <div style="font-size:11px;color:var(--text-muted);margin-bottom:12px;line-height:1.5;">There is <b>no button</b> on the greeter. An attacker watching the screen sees nothing — that is the whole point.</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:12px;line-height:1.6;">An earlier draft designed a silent decoy profile here. It is <b>cut, honestly</b>: a second LUKS keyslot and a decoy subvolume are visible to any competent forensic examination — fake deniability is worse than none, and a discovered decoy can convert into an obstruction charge. KOOMPI does not ship protections that only work if the adversary is careless.</div>
       <div style="display:flex;flex-direction:column;gap:9px;">
         <div style="display:flex;gap:10px;align-items:flex-start;padding:9px 11px;background:var(--surface2);border-radius:8px;">
-          <span style="font-size:14px;"><i class="fa-solid fa-hand-pointer"></i></span>
-          <div><div style="font-size:12px;color:var(--text);font-weight:600;">A specific finger</div><div style="font-size:11px;color:var(--text-muted);">Left ring finger → boots the decoy profile. Looks like a normal unlock.</div></div>
+          <span style="font-size:14px;"><i class="fa-solid fa-power-off"></i></span>
+          <div><div style="font-size:12px;color:var(--text);font-weight:600;">The honest protections</div><div style="font-size:11px;color:var(--text-muted);">Power off — LUKS at rest is the real defense. Lockout throttling. A guest profile that genuinely holds nothing.</div></div>
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start;padding:9px 11px;background:var(--surface2);border-radius:8px;">
-          <span style="font-size:14px;"><i class="fa-solid fa-arrow-down-1-9"></i></span>
-          <div><div style="font-size:12px;color:var(--text);font-weight:600;">A duress PIN</div><div style="font-size:11px;color:var(--text-muted);">A second valid PIN. Unlocks to a clean profile; real data stays sealed &amp; mounts nothing.</div></div>
+          <span style="font-size:14px;"><i class="fa-solid fa-flask"></i></span>
+          <div><div style="font-size:12px;color:var(--text);font-weight:600;">If the science arrives</div><div style="font-size:11px;color:var(--text-muted);">Credible deniable storage for a Linux root earns a capability-gate row first (<code>blueprint.md §3</code>) — never a quiet checkbox.</div></div>
         </div>
-      </div>
-      <div style="margin-top:12px;padding:10px;background:var(--emerald-glow);border:1px solid rgba(16,185,129,.25);border-radius:8px;">
-        <div style="font-size:11px;color:var(--text);line-height:1.5;">The decoy profile has its own believable files. The real LUKS volume is never even unsealed — no tell, no timing difference. Ties to §41 threat model.</div>
       </div>
     </div>
   </div>
@@ -276,7 +273,7 @@
     </div>
   </div>
   <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;line-height:1.5;background:var(--surface2);border-radius:8px;padding:10px 12px;">
-    Each user is a fully separate vault — own Selendra DID, own TPM-sealed key, own LUKS keyslot, own AI memory (koompi-agent-memd). Switching users <b>unmounts</b> the previous vault; there is no shared decryptable state. Ties to §44 profiles.
+    Each user is a fully separate vault — own Selendra DID, own TPM-sealed key, own LUKS keyslot, own AI memory (assistantd's per-user store). Switching users <b>unmounts</b> the previous vault; there is no shared decryptable state. Ties to §44 profiles.
   </div>
 
   <!-- ───────────────── CALLOUTS ───────────────── -->
@@ -298,8 +295,8 @@
       <p>Every privilege escalation routes through polkit with the AI named as requester. The agent can <i>ask</i>; only a human biometric or passphrase grants. Each grant is logged, attributable, and reversible — the consent gate the rest of the OS leans on.</p>
     </div>
     <div class="callout">
-      <div class="callout-title">Duress is invisible by design</div>
-      <p>A duress button would be a tell. KOOMPI uses a silent alternate credential — a specific finger or a second PIN — that boots a decoy profile while the real vault stays sealed. The threat model assumes someone is watching you type.</p>
+      <div class="callout-title">Theater refused — no duress decoys</div>
+      <p>A decoy that forensics can find is a trap dressed as a feature: it teaches a user to rely on deniability that evaporates exactly when it matters, and its discovery can make things legally worse. The honest answers are boring and real — LUKS at rest, lockout throttling, a guest profile that holds nothing. Honesty over capability, even here.</p>
     </div>
     <div class="callout">
       <div class="callout-title">Ages across a lifetime</div>

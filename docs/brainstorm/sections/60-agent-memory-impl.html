@@ -4,7 +4,7 @@
     <span class="tag ai">AI</span>
   </div>
   <p class="desc">
-    The implementation design for <code style="color:var(--accent)">koompi-agent-memd</code> — the neuromorphic memory daemon. A Zig system process owns the durable substrate and IPC; a <code style="color:#0E7490">NeuroAgentMemory</code> controller encodes the four-layer cognitive logic. Two invariants govern everything: <strong style="color:#047857">the durability split</strong> (forget the index, never the record) and <strong style="color:#B45309">embedding-model obsolescence</strong> (raw episodic text is immortal so the index can be re-embedded under future models). Forgetting is a ranking property; remembering is reconstruction with citations.
+    The implementation design for the <code style="color:var(--accent)">memory engine inside koompi-assistantd</code> (Rust, per ADR-0004 — memory shares the one per-user SQLite DB with L1, arch §7). The Rust core owns the durable substrate and IPC; a <code style="color:#0E7490">NeuroAgentMemory</code> spec encodes the four-layer cognitive logic. Two invariants govern everything: <strong style="color:#047857">the durability split</strong> (forget the index, never the record) and <strong style="color:#B45309">embedding-model obsolescence</strong> (raw episodic text is immortal so the index can be re-embedded under future models). Forgetting is a ranking property; remembering is reconstruction with citations.
   </p>
 
   <!-- ───────────────────────── 1. SYSTEM ARCHITECTURE DIAGRAM ───────────────────────── -->
@@ -15,43 +15,43 @@
         <div style="width:12px;height:12px;border-radius:50%;background:#3A3A3A;"></div>
         <div style="width:12px;height:12px;border-radius:50%;background:#3A3A3A;"></div>
       </div>
-      <span style="margin-left:8px;font-size:12px;color:rgba(255,255,255,0.4);">koompi-agent-memd · process topology</span>
+      <span style="margin-left:8px;font-size:12px;color:rgba(255,255,255,0.4);">assistantd · memory engine topology</span>
     </div>
     <div style="padding:22px 28px;font-size:11.5px;line-height:1.85;color:rgba(255,255,255,0.6);white-space:pre;overflow-x:auto;">
 <span style="color:#6366F1;">┌─────────────────────────────────────────────────────────────────────┐</span>
 <span style="color:#6366F1;">│</span>  <span style="color:#22D3EE;">Quickshell / QML</span>   MemoryService.qml · AskBar · Timeline widget       <span style="color:#6366F1;">│</span>
 <span style="color:#6366F1;">└────────────────────────────────┬────────────────────────────────────┘</span>
-                                 <span style="color:#F59E0B;">│</span>  D-Bus  <span style="color:rgba(255,255,255,0.35);">org.koompi.AgentMem  (session bus)</span>
-                                 <span style="color:#F59E0B;">│</span>  + Unix socket fallback  <span style="color:rgba(255,255,255,0.35);">$XDG_RUNTIME_DIR/koompi-memd.sock</span>
+                                 <span style="color:#F59E0B;">│</span>  D-Bus  <span style="color:rgba(255,255,255,0.35);">org.koompi.Assistant1  (session bus)</span>
+                                 <span style="color:#F59E0B;">│</span>  + Unix socket fallback  <span style="color:rgba(255,255,255,0.35);">$XDG_RUNTIME_DIR/koompi/memd.sock</span>
 <span style="color:#10B981;">┌────────────────────────────────▼────────────────────────────────────┐</span>
-<span style="color:#10B981;">│</span>  <span style="color:#10B981;">koompi-agent-memd</span>  <span style="color:rgba(255,255,255,0.45);">(Zig daemon — owns sockets, mmap, crypto, sched)</span>  <span style="color:#10B981;">│</span>
-<span style="color:#10B981;">│</span>    ├─ ipc.zig        newline-JSON / D-Bus router, backpressure         <span style="color:#10B981;">│</span>
-<span style="color:#10B981;">│</span>    ├─ store.zig      sqlite-vec + FTS5 + graph tables (one file)       <span style="color:#10B981;">│</span>
-<span style="color:#10B981;">│</span>    ├─ libgraph.zig   in-proc weighted traversal (no Neo4j)             <span style="color:#10B981;">│</span>
-<span style="color:#10B981;">│</span>    ├─ crypto.zig     age/XChaCha20 at-rest seal for @data              <span style="color:#10B981;">│</span>
-<span style="color:#10B981;">│</span>    └─ sched.zig      T0..T3 sleep-cycle tiers, AC/idle gating          <span style="color:#10B981;">│</span>
+<span style="color:#10B981;">│</span>  <span style="color:#10B981;">koompi-assistantd · memory engine</span>  <span style="color:rgba(255,255,255,0.45);">(Rust — owns sockets, store, crypto)</span>  <span style="color:#10B981;">│</span>
+<span style="color:#10B981;">│</span>    ├─ ipc.rs         newline-JSON / D-Bus (zbus) router, backpressure  <span style="color:#10B981;">│</span>
+<span style="color:#10B981;">│</span>    ├─ store.rs       sqlite-vec + FTS5 + graph tables (one per-user DB)<span style="color:#10B981;">│</span>
+<span style="color:#10B981;">│</span>    ├─ graph.rs       in-proc weighted traversal (no Neo4j)             <span style="color:#10B981;">│</span>
+<span style="color:#10B981;">│</span>    ├─ crypto.rs      per-object AEAD at-rest seal (O-1, koompi-vault)  <span style="color:#10B981;">│</span>
+<span style="color:#10B981;">│</span>    └─ sched.rs       S0..S3 sleep-cycle stages, AC/idle/temp gating    <span style="color:#10B981;">│</span>
 <span style="color:#10B981;">└──────┬─────────────────────────────────────────────┬─────────────────┘</span>
-       <span style="color:#F59E0B;">│</span> embedded pyo3 / FFI bridge                  <span style="color:#F59E0B;">│</span> ONNX runtime (local)
+       <span style="color:#F59E0B;">│</span> Rust-native port of the spec below          <span style="color:#F59E0B;">│</span> llama-server / ONNX (local)
 <span style="color:#6366F1;">┌──────▼──────────────────────────────┐</span>      <span style="color:#22D3EE;">┌───────▼──────────────┐</span>
-<span style="color:#6366F1;">│</span> <span style="color:#6366F1;">NeuroAgentMemory</span> <span style="color:rgba(255,255,255,0.4);">(controller logic)</span> <span style="color:#6366F1;">│</span>      <span style="color:#22D3EE;">│</span> bge-small-en-v1.5     <span style="color:#22D3EE;">│</span>
+<span style="color:#6366F1;">│</span> <span style="color:#6366F1;">NeuroAgentMemory</span> <span style="color:rgba(255,255,255,0.4);">(executable spec)</span>  <span style="color:#6366F1;">│</span>      <span style="color:#22D3EE;">│</span> BGE-M3 (ADR-0006)     <span style="color:#22D3EE;">│</span>
 <span style="color:#6366F1;">│</span>   ① Working   (PFC · RAM ring)       <span style="color:#6366F1;">│</span>      <span style="color:#22D3EE;">│</span> + local LLM (gguf)    <span style="color:#22D3EE;">│</span>
 <span style="color:#6366F1;">│</span>   ② Episodic  (Hippocampus · @data)  <span style="color:#6366F1;">│</span>      <span style="color:#22D3EE;">└──────────────────────┘</span>
 <span style="color:#6366F1;">│</span>   ③ Semantic  (Temporal · graph)     <span style="color:#6366F1;">│</span>   <span style="color:rgba(255,255,255,0.35);">NEVER egresses to cloud.</span>
 <span style="color:#6366F1;">│</span>   ④ Procedural(Basal · DAG)          <span style="color:#6366F1;">│</span>
 <span style="color:#6366F1;">└─────────────────────────────────────┘</span>
-   <span style="color:#10B981;">@data</span> <span style="color:rgba(255,255,255,0.35);">/var/lib/koompi/data  ← IMMORTAL, encrypted, synced opt-in (E2EE)</span>
-   <span style="color:#F59E0B;">index</span> <span style="color:rgba(255,255,255,0.35);">~/.local/state/koompi (chattr +C) ← DISPOSABLE, rebuildable, never synced</span>
+   <span style="color:#10B981;">episodic</span> <span style="color:rgba(255,255,255,0.35);">$XDG_DATA_HOME/koompi (per-user, under @home — §2.1 settled) ← durable, encrypted, synced opt-in (E2EE)</span>
+   <span style="color:#F59E0B;">index</span> <span style="color:rgba(255,255,255,0.35);">$XDG_STATE_HOME/koompi (chattr +C) ← DISPOSABLE, rebuildable, never synced</span>
     </div>
   </div>
 
   <p class="desc" style="margin-bottom:16px;">
-    The Zig daemon is the only process that touches disk, sockets, and the encryption key. The Python controller is the <em>executable specification</em> of the cognitive logic — in the shipping binary this is Rust-native, but the architecture is language-neutral and shown here for readability. Every vector carries an <code style="color:#0E7490">embed_model_id</code> so a 2050 model never silently re-interprets who you were at 25.
+    The Rust core is the only code path that touches disk, sockets, and the encryption key. The Python class below is the <em>executable specification</em> of the cognitive logic — the shipping implementation is Rust inside <code>assistantd</code> (ADR-0004); Python stays on dev machines for spec and evals, never resident on user hardware. Every vector carries an <code style="color:#0E7490">embed_model_id</code> so a 2050 model never silently re-interprets who you were at 25.
   </p>
 
   <!-- ───────────────────────── 2. NeuroAgentMemory CLASS ───────────────────────── -->
   <div style="background:#0D1117;border-radius:12px;padding:0;margin-bottom:16px;overflow:hidden;font-family:'JetBrains Mono','Fira Code',monospace;">
     <div style="padding:10px 16px;background:#161B22;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.06);">
-      <span style="font-size:12px;color:rgba(255,255,255,0.4);">controller/neuro_agent_memory.py</span>
+      <span style="font-size:12px;color:rgba(255,255,255,0.4);">spec/neuro_agent_memory.py · ships as Rust in assistantd</span>
       <span style="font-size:10px;color:var(--accent);">executable spec · LOCAL-FIRST</span>
     </div>
     <div style="padding:20px 24px;font-size:11.5px;line-height:1.7;color:rgba(255,255,255,0.75);white-space:pre;overflow-x:auto;">
@@ -82,7 +82,7 @@
         <span style="color:#FFA657;">self</span>.working.append(slot)
 
     <span style="color:#FF7B72;">async</span> <span style="color:#FF7B72;">def</span> <span style="color:#D2A8FF;">consolidate_sleep_cycle</span>(<span style="color:#FFA657;">self</span>):
-        <span style="color:#A5D6FF;">"""T2 deep: local-LLM distils episodic logs → semantic graph.
+        <span style="color:#A5D6FF;">"""S2 deep sleep: local-LLM distils episodic logs → semantic graph.
         Append-and-reconcile; contradictions timestamped, never overwritten.
         Returns early (defers) if no AC power / idle / capable local LLM —
         LOCAL-FIRST is a control-flow guarantee, never a cloud fallback."""</span>
@@ -207,12 +207,12 @@
   <!-- ───────────────────────── 4. IPC INTERFACE ───────────────────────── -->
   <div style="background:#0D1117;border-radius:12px;padding:0;margin-bottom:16px;overflow:hidden;font-family:'JetBrains Mono','Fira Code',monospace;">
     <div style="padding:10px 16px;background:#161B22;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.06);">
-      <span style="font-size:12px;color:rgba(255,255,255,0.4);">IPC · Quickshell/QML ↔ koompi-agent-memd</span>
+      <span style="font-size:12px;color:rgba(255,255,255,0.4);">IPC · Quickshell/QML ↔ assistantd memory engine</span>
       <span style="font-size:10px;color:var(--amber);">D-Bus primary · Unix socket fallback</span>
     </div>
     <div style="padding:18px 24px;font-size:11.5px;line-height:1.7;color:rgba(255,255,255,0.75);white-space:pre;overflow-x:auto;">
-<span style="color:#6A737D;"># D-Bus interface — session bus, introspectable, no root</span>
-<span style="color:#79C0FF;">org.koompi.AgentMem</span> <span style="color:rgba(255,255,255,0.4);">@ /org/koompi/AgentMem</span>
+<span style="color:#6A737D;"># D-Bus interface — session bus, introspectable, no root (assistantd's memory object)</span>
+<span style="color:#79C0FF;">org.koompi.Assistant1</span> <span style="color:rgba(255,255,255,0.4);">@ /org/koompi/Assistant1/Memory</span>
   <span style="color:#FF7B72;">method</span> <span style="color:#D2A8FF;">Perceive</span>(s:event_json)            -&gt; ()           <span style="color:#6A737D;"># fire-and-forget, async</span>
   <span style="color:#FF7B72;">method</span> <span style="color:#D2A8FF;">Reconstruct</span>(s:context_json)       -&gt; s:result_json <span style="color:#6A737D;"># narrative + sources[]</span>
   <span style="color:#FF7B72;">method</span> <span style="color:#D2A8FF;">AuditTrail</span>(x:since_ts, u:limit)   -&gt; s:entries_json<span style="color:#6A737D;"># every read/write logged</span>
@@ -220,7 +220,7 @@
 
 <span style="color:#6A737D;"># QML caller — MemoryService.qml (Quickshell)</span>
 DBusInterface {
-  service: <span style="color:#A5D6FF;">"org.koompi.AgentMem"</span>; path: <span style="color:#A5D6FF;">"/org/koompi/AgentMem"</span>
+  service: <span style="color:#A5D6FF;">"org.koompi.Assistant1"</span>; path: <span style="color:#A5D6FF;">"/org/koompi/Assistant1/Memory"</span>
   function ask(goal) {
     Reconstruct(JSON.stringify({ goal, era: timeline.cursor }),
       function(res) { askBar.render(JSON.parse(res)) })   <span style="color:#6A737D;"># spans: recorded|inferred</span>
@@ -228,7 +228,7 @@ DBusInterface {
 }
 
 <span style="color:#6A737D;"># Fallback path when no bus (TTY / headless / early boot):</span>
-<span style="color:#F59E0B;">$XDG_RUNTIME_DIR/koompi-memd.sock</span>  <span style="color:rgba(255,255,255,0.4);">— newline-delimited JSON, same verbs</span>
+<span style="color:#F59E0B;">$XDG_RUNTIME_DIR/koompi/memd.sock</span>  <span style="color:rgba(255,255,255,0.4);">— newline-delimited JSON, same verbs</span>
   &gt; {<span style="color:#A5D6FF;">"op"</span>:<span style="color:#A5D6FF;">"reconstruct"</span>,<span style="color:#A5D6FF;">"goal"</span>:<span style="color:#A5D6FF;">"how did I get better at Rust"</span>}
   &lt; {<span style="color:#A5D6FF;">"narrative"</span>:[...],<span style="color:#A5D6FF;">"sources"</span>:[8841,9007],<span style="color:#A5D6FF;">"reconstructed"</span>:true}
     </div>
@@ -269,10 +269,10 @@ base(n)     = emotional_intensity(n) · novelty(n)
         <span style="font-size:13px;color:#047857;font-weight:600;">Privacy Guarantees</span>
       </div>
       <div style="font-size:11.5px;line-height:1.9;color:rgba(255,255,255,0.65);">
-        <div style="margin-bottom:8px;"><span style="color:#047857;">✓ All processing local.</span> Embedding + LLM + graph run on-device. Episodic data <strong>never</strong> egresses for consolidation — T2/T3 defer until a capable local session exists.</div>
-        <div style="margin-bottom:8px;"><span style="color:#047857;">✓ Encryption at rest.</span> <code>@data</code> sealed with XChaCha20 (age). Key in TPM / Selendra-derived keystore, never on disk in cleartext.</div>
-        <div style="margin-bottom:8px;"><span style="color:#047857;">✓ User audit trail.</span> <code>AuditTrail()</code> exposes every read/write/inference the daemon made — who asked, what surfaced, which sources cited.</div>
-        <div><span style="color:#047857;">✓ Sovereignty.</span> Sync is opt-in E2EE; <code>--full</code> wipes the index but leaves <code>@data</code>; user can export or destroy episodic at will.</div>
+        <div style="margin-bottom:8px;"><span style="color:#047857;">✓ All processing local.</span> Embedding + LLM + graph run on-device. Episodic data <strong>never</strong> egresses for consolidation — S2/S3 defer until a capable local session exists.</div>
+        <div style="margin-bottom:8px;"><span style="color:#047857;">✓ Encryption at rest.</span> Per-object AEAD via <code>koompi-vault</code> (O-1); key in the per-user keyring, TPM-sealed where hardware exists. Honest residual: a session-unlocked keyring is readable by same-UID code (arch §9).</div>
+        <div style="margin-bottom:8px;"><span style="color:#047857;">✓ User audit trail.</span> <code>AuditTrail()</code> exposes every read/write/inference the engine made — who asked, what surfaced, which sources cited.</div>
+        <div><span style="color:#047857;">✓ Sovereignty.</span> Sync is opt-in E2EE; index decay never touches episodic; <code>--full</code> (hand-off) wipes <em>both</em> for the leaving user — destruction is real when asked (§30, §73); Lifeboat exports episodic at will.</div>
       </div>
     </div>
 
@@ -288,8 +288,8 @@ base(n)     = emotional_intensity(n) · novelty(n)
         <div style="display:flex;justify-content:space-between;"><span>semantic query (vec⊕FTS)</span><span style="color:#047857;">&lt; 50 ms</span></div>
         <div style="display:flex;justify-content:space-between;"><span>graph_expand depth-2</span><span style="color:#0E7490;">&lt; 20 ms</span></div>
         <div style="display:flex;justify-content:space-between;"><span>full reconstruct (+LLM)</span><span style="color:#B45309;">≈ goal_lat</span></div>
-        <div style="display:flex;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.08);margin-top:6px;padding-top:6px;"><span>sleep cycle T2/T3</span><span style="color:var(--accent);">async · non-blocking</span></div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:8px;font-family:system-ui,sans-serif;">Floor: 4 GB / CPU-only. Hot path never blocks on consolidation; sleep tiers run off the UI thread on AC + idle.</div>
+        <div style="display:flex;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.08);margin-top:6px;padding-top:6px;"><span>sleep cycle S2/S3</span><span style="color:var(--accent);">async · non-blocking</span></div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:8px;font-family:system-ui,sans-serif;">Latency targets, to be measured on the Floor (8 GB, ADR-0006). On T0 (4 GB) the retrieval hot path still runs; LLM-dependent consolidation and narration defer or stay extractive — never silent cloud.</div>
       </div>
     </div>
   </div>
@@ -302,7 +302,7 @@ base(n)     = emotional_intensity(n) · novelty(n)
     </div>
     <div class="callout">
       <div class="callout-title">Re-embeddable across decades <span class="badge new">2050-proof</span></div>
-      <p><code>bge-small-en-v1.5</code> will not exist in 2050. Because raw text is immortal and every vector carries <code>embed_model_id</code>, the index can be re-embedded under future models — and "who you were at 25" is reconstructed from era-correct vectors, never silently re-framed by a 2050 lens.</p>
+      <p><code>BGE-M3</code> will not exist in 2050 — its first credible successor appeared within a year of the pin (§87, G-EMB-2). Because raw text is immortal and every vector carries <code>embed_model_id</code>, the index re-embeds under future models via a runbook exercised in CI — and "who you were at 25" is reconstructed from era-correct vectors, never silently re-framed by a 2050 lens.</p>
     </div>
     <div class="callout">
       <div class="callout-title">Recorded vs inferred, always</div>

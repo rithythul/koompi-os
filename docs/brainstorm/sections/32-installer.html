@@ -113,9 +113,9 @@
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
       <div style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:8px;padding:14px;">
         <div style="font-size:12px;color:#6366F1;margin-bottom:6px;">Local Model</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:10px;">Runs entirely on your hardware. No internet required for AI features.</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:10px;">Runs entirely on your hardware, from signed weight packages (ADR-0014). The installer detects your tier and says what it gets: search and recall at 4 GB, local chat from 8 GB — never a silent cloud fallback.</div>
         <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.35);">
-          <div style="width:8px;height:8px;border-radius:50%;border:2px solid #6366F1;background:#6366F1;"></div> Recommended · Llama 3.1 8B
+          <div style="width:8px;height:8px;border-radius:50%;border:2px solid #6366F1;background:#6366F1;"></div> Detected 8 GB (T1) · Khmer-capable 1–3B Q4 — license-gated (ADR-0006)
         </div>
       </div>
       <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:14px;">
@@ -135,7 +135,7 @@
     </div>
     <div class="callout">
       <div class="callout-title">AI setup is step 4, not optional</div>
-      <p>AI configuration is a first-class install step — not buried in settings post-install. The local model is selected, downloaded, and tested before the user ever reaches the desktop.</p>
+      <p>AI configuration is a first-class install step — not buried in settings post-install. The local model is selected from the signed packages and verified before the user ever reaches the desktop — and the detected tier is printed honestly: a 4 GB machine is told it gets search and recall, with chat by explicit consent or an upgrade, never by stealth.</p>
     </div>
     <div class="callout">
       <div class="callout-title">Selendra ID at install time</div>
