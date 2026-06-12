@@ -283,6 +283,7 @@ window.initObserver = initObserver;
 var sectionFiles = [
   'sections/00-what-is.html',
   'sections/00a-document-map.html',
+  'sections/00b-blueprint.html',
   'sections/84-system-map.html',
   'sections/87-near-future.html',
   'sections/01-design-system.html',
