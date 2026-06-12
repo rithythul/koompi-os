@@ -4,7 +4,7 @@
     <span class="tag ai">AI</span>
   </div>
   <p class="desc">
-    <code>koompi-agent-memd</code> is not a database — it is a <em>neuromorphic</em> memory system modelled on how a brain stores a life. Four layers, each with a biological role: <strong>Working</strong> (prefrontal attention), <strong>Episodic</strong> (hippocampal append-only log), <strong>Semantic</strong> (temporal-lobe knowledge graph), and <strong>Procedural</strong> (basal-ganglia habit DAGs). One load-bearing rule governs the whole stack: <strong>forgetting is a ranking property, never a delete.</strong> Decay and pruning touch only the rebuildable retrieval index — the raw episodic record in <code>@data</code> is immortal by default, encrypted, and yours: only you can destroy it, through Ceremonial Forgetting, never the OS. This is the structure that lets an OS watch you from 18 and, decades later, reconstruct not just <em>what</em> you did but <em>how you thought</em>.
+    <code>koompi-assistantd</code>'s memory engine is not a database — it is a <em>neuromorphic</em> memory system modelled on how a brain stores a life. Four layers, each with a biological role: <strong>Working</strong> (prefrontal attention), <strong>Episodic</strong> (hippocampal append-only log), <strong>Semantic</strong> (temporal-lobe knowledge graph), and <strong>Procedural</strong> (basal-ganglia habit DAGs). One load-bearing rule governs the whole stack: <strong>forgetting is a ranking property, never a delete.</strong> Decay and pruning touch only the rebuildable retrieval index — the raw episodic record in <code>@data</code> is immortal by default, encrypted, and yours: only you can destroy it, through Ceremonial Forgetting, never the OS. This is the structure that lets an OS watch you from 18 and, decades later, reconstruct not just <em>what</em> you did but <em>how you thought</em>.
   </p>
 
   <!-- ============ THE 4-LAYER STACK + DATA FLOW ============ -->
@@ -12,7 +12,7 @@
     <div style="padding:11px 18px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;">
       <span style="font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;">
         <span style="width:7px;height:7px;border-radius:50%;background:var(--accent);"></span>
-        Four-Layer Stack <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-subtle);font-weight:400;">koompi-agent-memd · single embedded store</span>
+        Four-Layer Stack <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-subtle);font-weight:400;">koompi-assistantd · single embedded store</span>
       </span>
       <span style="font-size:10px;color:#047857;display:flex;align-items:center;gap:5px;"><span style="width:6px;height:6px;border-radius:50%;background:var(--emerald);"></span>all layers local · 0 bytes egress</span>
     </div>
@@ -80,7 +80,7 @@
       <div style="padding:14px 16px;">
         <!-- current task -->
         <div style="font-size:10px;font-weight:600;color:var(--text-subtle);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Current task</div>
-        <div style="border:1px solid rgba(99,102,241,.35);background:var(--surface2);border-radius:6px;padding:9px 12px;margin-bottom:14px;font-size:12px;color:var(--text);">Debugging borrow-checker error <code>E0502</code> in <code>memd/src/retrieve.rs</code></div>
+        <div style="border:1px solid rgba(99,102,241,.35);background:var(--surface2);border-radius:6px;padding:9px 12px;margin-bottom:14px;font-size:12px;color:var(--text);">Debugging borrow-checker error <code>E0502</code> in <code>assistantd/src/retrieve.rs</code></div>
 
         <!-- context budget meter -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
@@ -125,7 +125,7 @@
         <div style="display:flex;flex-wrap:wrap;gap:6px;">
           <span style="font-size:10px;color:#0E7490;background:var(--cyan-glow);padding:3px 8px;border-radius:11px;">◆ E0502 <span style="opacity:.6;">concept</span></span>
           <span style="font-size:10px;color:#0E7490;background:var(--cyan-glow);padding:3px 8px;border-radius:11px;">◆ borrow-checker <span style="opacity:.6;">concept</span></span>
-          <span style="font-size:10px;color:var(--accent);background:var(--accent-glow);padding:3px 8px;border-radius:11px;">▣ koompi-agent-memd <span style="opacity:.6;">project</span></span>
+          <span style="font-size:10px;color:var(--accent);background:var(--accent-glow);padding:3px 8px;border-radius:11px;">▣ koompi-assistantd <span style="opacity:.6;">project</span></span>
           <span style="font-size:10px;color:#047857;background:var(--emerald-glow);padding:3px 8px;border-radius:11px;">○ retrieve.rs <span style="opacity:.6;">file</span></span>
         </div>
         <div style="font-size:10px;color:var(--text-muted);margin-top:12px;">An evicted slot is <strong>not lost</strong> — it flushes to the episodic log (it happened) and its co-activation with the surviving set is recorded as a graph edge (it shaped the session). Rehearsal → consolidation, in miniature.</div>
@@ -163,7 +163,7 @@
               <span style="font-size:9px;color:#047857;background:var(--emerald-glow);padding:1px 6px;border-radius:9px;">valence +0.5 · arousal 0.5</span>
             </div>
             <div style="display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;">
-              <span style="font-size:9px;color:var(--accent);">↳ koompi-agent-memd</span>
+              <span style="font-size:9px;color:var(--accent);">↳ koompi-assistantd</span>
               <span style="font-size:9px;color:#0E7490;">↳ relief</span>
             </div>
           </div>

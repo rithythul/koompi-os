@@ -12,8 +12,8 @@
     <div style="background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-xl); overflow:hidden;">
       <!-- Header: uncertainty band -->
       <div style="display:flex; align-items:center; gap:8px; padding:12px 16px; border-bottom:1px solid var(--border2); background:var(--surface2);">
-        <span style="font-size:13px; font-weight:700; color:var(--text); flex:1;">✦ KOOMPI AI · local · Llama 3.1 8B</span>
-        <span style="font-size:10px; font-weight:600; padding:2px 8px; border-radius:20px; background:var(--amber-glow); color:#B45309; border:1px solid rgba(245,158,11,0.3);">Confidence 38% — not sure</span>
+        <span style="font-size:13px; font-weight:700; color:var(--text); flex:1;">✦ KOOMPI AI · local · Sailor2-8B Q4</span>
+        <span style="font-size:10px; font-weight:600; padding:2px 8px; border-radius:20px; background:var(--amber-glow); color:#B45309; border:1px solid rgba(245,158,11,0.3);">Grounding 38% — not sure</span>
       </div>
 
       <!-- Calibration band: a real meter, not a vibe -->
@@ -54,7 +54,7 @@
       <!-- Local-only footer -->
       <div style="padding:9px 16px; border-top:1px solid var(--border2); background:var(--surface2); font-size:10px; color:var(--text-subtle); display:flex; align-items:center; gap:6px;">
         <span style="color:#047857;"><i class="fa-solid fa-lock"></i></span>
-        Inference + confidence computed on-device · nothing left this machine
+        Inference + grounding computed on-device · nothing left this machine
       </div>
     </div>
   </div>
@@ -77,7 +77,7 @@
         <!-- Provenance preview row -->
         <div style="display:flex; align-items:center; gap:8px; padding:9px 11px; border-radius:8px; background:var(--emerald-glow); border:1px solid rgba(16,185,129,0.3); margin-bottom:14px;">
           <span style="font-size:9px; font-weight:700; padding:2px 6px; border-radius:5px; background:var(--emerald); color:#fff; flex-shrink:0;">→ MEMORY</span>
-          <div style="font-size:11px; color:var(--text); flex:1;">Writes to <strong>koompi-agent-memd</strong> · type <code style="font-size:10px;">USER</code> · precedence <code style="font-size:10px;">asserted</code> · source <code style="font-size:10px;">manual-correction</code></div>
+          <div style="font-size:11px; color:var(--text); flex:1;">Writes to <strong>the assistant's memory store</strong> · type <code style="font-size:10px;">USER</code> · precedence <code style="font-size:10px;">asserted</code> · source <code style="font-size:10px;">manual-correction</code></div>
         </div>
 
         <div style="display:flex; gap:8px;">
@@ -109,7 +109,7 @@
         </div>
         <div style="margin-top:12px; padding:8px 11px; border-radius:8px; background:var(--surface2); border:1px solid var(--border2); font-size:10px; color:var(--text-subtle); display:flex; align-items:center; gap:6px;">
           <span style="color:#047857;"><i class="fa-solid fa-lock"></i></span>
-          Undo receipt persisted in koompi-agent-memd — the action stays reversible across reboot, not just until this toast fades.
+          Undo receipt persisted in the assistant's memory store — the action stays reversible across reboot, not just until this toast fades.
         </div>
       </div>
     </div>
@@ -166,9 +166,9 @@
       <div style="padding:14px 16px;">
         <div style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Honesty check: across recent proactive calls, what I <em>claimed</em> vs what turned out true.</div>
 
-        <!-- Calibration drift: stated confidence vs empirical accuracy -->
+        <!-- Calibration drift: stated grounding vs empirical accuracy -->
         <div style="margin-bottom:6px; display:flex; justify-content:space-between; font-size:11px;">
-          <span style="color:var(--accent); font-weight:600;">Stated confidence</span><span style="color:var(--accent); font-family:var(--font-mono);">avg 79%</span>
+          <span style="color:var(--accent); font-weight:600;">Stated grounding</span><span style="color:var(--accent); font-family:var(--font-mono);">avg 79%</span>
         </div>
         <div style="height:7px; border-radius:4px; background:var(--surface3); margin-bottom:10px; overflow:hidden;"><div style="width:79%; height:100%; background:var(--accent); border-radius:4px;"></div></div>
         <div style="margin-bottom:6px; display:flex; justify-content:space-between; font-size:11px;">
@@ -223,19 +223,19 @@
   <div class="callout-group">
     <div class="callout">
       <div class="callout-title">Corrections outrank inference <span class="badge new">KOOMPI</span></div>
-      <p>A user-asserted fact is written to koompi-agent-memd with a <code>precedence: asserted</code> flag. When a future model update or a fresh inference disagrees, it <strong>cannot silently overwrite</strong> what you told it — the correction wins, and the conflict is surfaced, not buried. This is value #6 made durable: corrections compound into a more honest system over a lifetime.</p>
+      <p>A user-asserted fact is written to assistant memory with a <code>precedence: asserted</code> flag. When a future model update or a fresh inference disagrees, it <strong>cannot silently overwrite</strong> what you told it — the correction wins, and the conflict is surfaced, not buried. This is value #6 made durable: corrections compound into a more honest system over a lifetime.</p>
     </div>
     <div class="callout">
-      <div class="callout-title">Calibration, not confidence theatre</div>
-      <p>macOS, Windows 11 Copilot, and GNOME present every AI answer with the same flat certainty. KOOMPI shows a real meter and, on a bad streak, plots <strong>stated confidence vs measured accuracy</strong>. "Recalibrate" acts on that drift — it raises the proactive threshold so the OS earns back the right to speak up.</p>
+      <div class="callout-title">Grounding, not confidence theatre</div>
+      <p>macOS, Windows 11 Copilot, and GNOME present every AI answer with the same flat certainty. KOOMPI's meter is <strong>grounding</strong> — sources found, retrieval match, recency — never a raw model logit, which local models cannot calibrate. On a bad streak it plots <strong>stated grounding vs measured accuracy</strong>; "Recalibrate" acts on that drift, raising the proactive threshold so the OS earns back the right to speak up.</p>
     </div>
     <div class="callout">
       <div class="callout-title">Undo survives the daemon</div>
-      <p>A reversed proactive action isn't toast state that vanishes on dismiss. The undo receipt is persisted, so a wrongly-held OTP or a misfiled note stays restorable across a reboot or a koompi-agent-memd restart — for the receipt's full TTL, not just until you look away.</p>
+      <p>A reversed proactive action isn't toast state that vanishes on dismiss. The undo receipt is persisted, so a wrongly-held OTP or a misfiled note stays restorable across a reboot or an assistantd restart — for the receipt's full TTL, not just until you look away.</p>
     </div>
     <div class="callout">
       <div class="callout-title">Failure stays on-device</div>
-      <p>Confidence scoring, the correction loop, and the hallucination bundle all run locally. The report defaults to <code>~/.local/share/koompi-ai/reports/</code> and is <strong>never auto-sent</strong> — even your AI's mistakes are your sovereign data, shared only by an explicit, reviewable choice.</p>
+      <p>Grounding scores, the correction loop, and the hallucination bundle all run locally. The report defaults to <code>~/.local/share/koompi-ai/reports/</code> and is <strong>never auto-sent</strong> — even your AI's mistakes are your sovereign data, shared only by an explicit, reviewable choice.</p>
     </div>
   </div>
 </section>

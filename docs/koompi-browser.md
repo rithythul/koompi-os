@@ -30,8 +30,8 @@ as a Model Manager tier so they update and roll back like every other model:
 
 **Process model.** QML/Quickshell chrome — the stream, composer, thread rail (trusted
 layer, hot-reload, shell tokens) · QtWebEngine renderer processes for sheets (Chromium
-sandbox intact) · `koompi-webd`, a Zig daemon owning thread state, the capture pipeline,
-capsules, and the CLI · Rust crates (shared with the OS) for egress hooks, the
+sandbox intact) · `koompi-webd`, a Rust daemon (ADR-0004) owning thread state, the capture
+pipeline, capsules, and the CLI · Rust crates (shared with the OS) for egress hooks, the
 semantic-selector engine, and the credential-broker client.
 
 ### 1.2 Hybrid routing under ADR-0001
@@ -64,7 +64,7 @@ stores:
 navigation → readability extract (local, Rust)
           → consent gate (Policy Engine: per-site scope)
           → contextd ingest (chunk + embed → the one index)
-          → agent-memd episodic event (visit record → the one memory)
+          → assistantd episodic event (visit record → the one memory)
 ```
 
 - **Per-site scopes** (Policy Engine, clipboard-style): `metadata-only` (URL + title —
@@ -259,9 +259,9 @@ tracked as the 2030s candidate behind the same boundary.
 | layer | language | components |
 |---|---|---|
 | stream / composer / reader | QML/Quickshell | trusted chrome, hot-reload, shell tokens |
-| session daemon | Zig | `koompi-webd`: threads, capture, capsules, CLI |
+| session daemon | Rust (ADR-0004) | `koompi-webd`: threads, capture, capsules, CLI |
 | security surfaces | Rust | egress hooks, broker client, semantic selectors, taint runtime |
-| AI tools | Python (in assistantd) | research / summarize / compare as busd capabilities |
+| AI tools | Rust (in assistantd) | research / summarize / compare as busd capabilities (MCP, ADR-0013) |
 
 **Privacy by topology**: sheets reach the network only through the OS egress gate
 (per-thread cgroup rules); the AI tool layer has no network socket at all. Ledger

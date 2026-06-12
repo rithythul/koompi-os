@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Zig-Powered Global Menu for Quickshell — Technical Design Document</title>
+<title>Rust-Powered Global Menu for Quickshell — Technical Design Document</title>
 <style>
   :root {
     --bg: #0f141c;
@@ -290,7 +290,7 @@
       <li><a href="#header" data-nav>Document Header</a></li>
       <li><a href="#overview" data-nav>1. Overview</a></li>
       <li><a href="#components" data-nav>2. Component Architecture</a></li>
-      <li><a href="#daemon" data-nav>3. Zig Daemon Spec</a></li>
+      <li><a href="#daemon" data-nav>3. Rust Daemon Spec</a></li>
       <li><a href="#daemon-fr" data-nav class="sub">3.1 Functional Reqs</a></li>
       <li><a href="#daemon-dbus" data-nav class="sub">3.2 D-Bus Mapping</a></li>
       <li><a href="#daemon-json" data-nav class="sub">3.3 JSON Payload</a></li>
@@ -312,14 +312,14 @@
 
     <!-- HEADER -->
     <section id="header">
-      <h1>Technical Design Document: Zig-Powered Global Menu for Quickshell</h1>
+      <h1>Technical Design Document: Rust-Powered Global Menu for Quickshell</h1>
       <p class="lead">A native bridge between Linux application D-Bus menus and a Quickshell top panel, for the KOOMPI desktop session.</p>
       <table class="meta-table">
-        <tr><th>Version</th><td>1.0</td></tr>
-        <tr><th>Date</th><td>2026-06-08</td></tr>
+        <tr><th>Version</th><td>1.1</td></tr>
+        <tr><th>Date</th><td>2026-06-12</td></tr>
         <tr><th>Status</th><td><span class="badge draft">Draft</span></td></tr>
         <tr><th>Target Stack</th><td>
-          <span class="tag">Zig 0.14</span>
+          <span class="tag">Rust (ADR-0004)</span>
           <span class="tag">Quickshell 0.1</span>
           <span class="tag">Hyprland</span>
           <span class="tag">D-Bus</span>
@@ -344,7 +344,7 @@
         window's menu to a panel. Each shell has to discover and assemble it independently.
       </p>
       <p>
-        This design closes that gap with a small native <strong>Zig daemon</strong>,
+        This design closes that gap with a small native <strong>Rust daemon</strong> (ADR-0004),
         <code>koompi-globalmenu</code>, which:
       </p>
       <ol>
@@ -369,7 +369,7 @@
 │                                                                        │
 │  ┌─────────────────┐    IPC Socket      ┌────────────────────────┐   │
 │  │   Hyprland      │◄──────────────────►│   koompi-globalmenu    │   │
-│  │  Compositor     │  /tmp/hypr/...     │      (Zig daemon)      │   │
+│  │  Compositor     │  /tmp/hypr/...     │     (Rust daemon)      │   │
 │  └────────┬────────┘                   └──────────┬─────────────┘   │
 │           │ active window addr                     │                  │
 │           │ (window class, PID)                    │ D-Bus query      │
@@ -407,7 +407,7 @@
           </tr>
           <tr>
             <td><code>koompi-globalmenu</code></td>
-            <td>Zig 0.14</td>
+            <td>Rust — zbus + tokio (ADR-0004)</td>
             <td>Hyprland IPC + D-Bus + stdout</td>
             <td>Bridge daemon. Watches focus, resolves the menu registration, fetches the menu tree, and streams JSON.</td>
           </tr>
@@ -433,9 +433,9 @@
       </table>
     </section>
 
-    <!-- 3. ZIG DAEMON SPEC -->
+    <!-- 3. RUST DAEMON SPEC -->
     <section id="daemon">
-      <h2>3. Zig Daemon Specification</h2>
+      <h2>3. Rust Daemon Specification</h2>
 
       <h3 id="daemon-fr">3.1 Functional Requirements</h3>
       <ol>
@@ -457,70 +457,60 @@
         <code>GetLayout</code> to retrieve the menu tree. The structs below model the parsed result and
         the registration call.
       </p>
-      <div class="codeblock"><span class="lang">zig</span><pre><code>const std = @import("std");
-const dbus = @cImport(@cInclude("dbus/dbus.h"));
+      <div class="codeblock"><span class="lang">rust</span><pre><code>use std::time::Duration;
 
-pub const MenuNode = struct {
-    id: i32,
-    label: []const u8,
-    enabled: bool,
-    visible: bool,
-    children: []MenuNode,
-    separator: bool,
-};
+use serde::Serialize;
+use zbus::{zvariant::OwnedObjectPath, Connection};
 
-pub const MenuPayload = struct {
-    app_name: []const u8,
-    window_id: u64,
-    service: []const u8,
-    object_path: []const u8,
-    menus: ?[]MenuNode,
-};
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MenuNode {
+    pub id: i32,
+    pub label: String,
+    pub enabled: bool,
+    pub visible: bool,
+    pub children: Vec&lt;MenuNode&gt;,
+    pub separator: bool,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MenuPayload {
+    pub app_name: String,
+    pub window_id: u64,
+    pub service: String,
+    pub object_path: String,
+    pub menus: Option&lt;Vec&lt;MenuNode&gt;&gt;,
+}
+
+// Method call: com.canonical.AppMenu.Registrar
+//              /com/canonical/AppMenu/Registrar
+//              com.canonical.AppMenu.Registrar.GetMenuForWindow
+#[zbus::proxy(
+    interface = "com.canonical.AppMenu.Registrar",
+    default_service = "com.canonical.AppMenu.Registrar",
+    default_path = "/com/canonical/AppMenu/Registrar"
+)]
+trait AppMenuRegistrar {
+    fn get_menu_for_window(&amp;self, window_id: u32) -&gt; zbus::Result&lt;(String, OwnedObjectPath)&gt;;
+}
 
 /// Query AppMenu.Registrar for the menu service/path of the focused window.
-pub fn getMenuRegistration(
-    conn: *dbus.DBusConnection,
+pub async fn get_menu_registration(
+    conn: &amp;Connection,
     window_id: u64,
-    allocator: std.mem.Allocator,
-) !struct { service: []u8, path: []u8 } {
-    // Build method call: com.canonical.AppMenu.Registrar
-    //                    /com/canonical/AppMenu/Registrar
-    //                    com.canonical.AppMenu.Registrar.GetMenuForWindow
-    const msg = dbus.dbus_message_new_method_call(
-        "com.canonical.AppMenu.Registrar",
-        "/com/canonical/AppMenu/Registrar",
-        "com.canonical.AppMenu.Registrar",
-        "GetMenuForWindow",
-    ) orelse return error.DbusMessageAlloc;
-    defer dbus.dbus_message_unref(msg);
+) -&gt; anyhow::Result&lt;(String, String)&gt; {
+    let registrar = AppMenuRegistrarProxy::new(conn).await?;
 
-    var iter: dbus.DBusMessageIter = undefined;
-    dbus.dbus_message_iter_init_append(msg, &iter);
-    _ = dbus.dbus_message_iter_append_basic(&iter, dbus.DBUS_TYPE_UINT32, &window_id);
+    // Parse (s, o) reply → service name + object path (2000 ms reply timeout)
+    let (service, path) = tokio::time::timeout(
+        Duration::from_millis(2000),
+        registrar.get_menu_for_window(window_id as u32),
+    )
+    .await
+    .map_err(|_| anyhow::anyhow!("no registrar reply within 2000 ms"))??;
 
-    var err: dbus.DBusError = undefined;
-    dbus.dbus_error_init(&err);
-    defer dbus.dbus_error_free(&err);
-
-    const reply = dbus.dbus_connection_send_with_reply_and_block(
-        conn, msg, 2000, &err,
-    ) orelse return error.DbusNoReply;
-    defer dbus.dbus_message_unref(reply);
-
-    // Parse (s, o) reply → service name + object path
-    var reply_iter: dbus.DBusMessageIter = undefined;
-    _ = dbus.dbus_message_iter_init(reply, &reply_iter);
-
-    var service_ptr: [*:0]const u8 = undefined;
-    var path_ptr: [*:0]const u8 = undefined;
-    _ = dbus.dbus_message_iter_get_basic(&reply_iter, &service_ptr);
-    _ = dbus.dbus_message_iter_next(&reply_iter);
-    _ = dbus.dbus_message_iter_get_basic(&reply_iter, &path_ptr);
-
-    return .{
-        .service = try allocator.dupe(u8, std.mem.span(service_ptr)),
-        .path    = try allocator.dupe(u8, std.mem.span(path_ptr)),
-    };
+    Ok((service, path.to_string()))
 }</code></pre></div>
 
       <h3 id="daemon-json">3.3 JSON Payload Structure</h3>
@@ -568,55 +558,56 @@ pub fn getMenuRegistration(
   "menus": null
 }</code></pre></div>
 
-      <h3 id="daemon-ipc">3.4 Hyprland IPC Event Loop (Zig)</h3>
+      <h3 id="daemon-ipc">3.4 Hyprland IPC Event Loop (Rust)</h3>
       <p>
         The daemon connects to Hyprland's event socket (<code>.socket2.sock</code>) and reads
         newline-delimited <code>eventname&gt;&gt;data</code> records. On each <code>activewindow</code>
         event it resolves the window address, performs the D-Bus lookup, and writes the serialized
         payload to stdout.
       </p>
-      <div class="codeblock"><span class="lang">zig</span><pre><code>pub fn connectHyprlandIpc(allocator: std.mem.Allocator) !std.net.Stream {
-    const sig = std.posix.getenv("HYPRLAND_INSTANCE_SIGNATURE") orelse
-        return error.HyprlandNotRunning;
-    const xdg_runtime = std.posix.getenv("XDG_RUNTIME_DIR") orelse "/run/user/1000";
-    const socket_path = try std.fmt.allocPrint(
-        allocator, "{s}/hypr/{s}/.socket2.sock", .{ xdg_runtime, sig },
-    );
-    defer allocator.free(socket_path);
-    return std.net.connectUnixSocket(socket_path);
+      <div class="codeblock"><span class="lang">rust</span><pre><code>use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
+use tokio::net::UnixStream;
+
+pub async fn connect_hyprland_ipc() -&gt; anyhow::Result&lt;UnixStream&gt; {
+    let sig = std::env::var("HYPRLAND_INSTANCE_SIGNATURE")
+        .map_err(|_| anyhow::anyhow!("Hyprland not running"))?;
+    let xdg_runtime = std::env::var("XDG_RUNTIME_DIR")
+        .unwrap_or_else(|_| "/run/user/1000".to_string());
+    let socket_path = format!("{xdg_runtime}/hypr/{sig}/.socket2.sock");
+    Ok(UnixStream::connect(socket_path).await?)
 }
 
-pub fn eventLoop(
-    stream: std.net.Stream,
-    dbus_conn: *dbus.DBusConnection,
-    allocator: std.mem.Allocator,
-) !void {
-    var reader = stream.reader();
-    var buf: [4096]u8 = undefined;
-    const stdout = std.io.getStdOut().writer();
+pub async fn event_loop(stream: UnixStream, conn: &amp;Connection) -&gt; anyhow::Result&lt;()&gt; {
+    let mut lines = BufReader::new(stream).lines();
+    let mut stdout = tokio::io::stdout();
 
-    while (true) {
-        const line = try reader.readUntilDelimiterOrEof(&buf, '\n') orelse break;
-        // Events arrive as "eventname>>data\n"
-        if (std.mem.startsWith(u8, line, "activewindow>>")) {
-            const data = line["activewindow>>".len..];
+    while let Some(line) = lines.next_line().await? {
+        // Events arrive as "eventname&gt;&gt;data\n"
+        if let Some(data) = line.strip_prefix("activewindow&gt;&gt;") {
             // data = "windowClass,windowTitle"
-            var it = std.mem.splitScalar(u8, data, ',');
-            const window_class = it.next() orelse continue;
-            _ = window_class; // use for appName fallback
+            let _window_class = data.split(',').next().unwrap_or(""); // use for appName fallback
             // Get window address for D-Bus lookup
-            const addr = try getActiveWindowAddress(allocator);
-            defer allocator.free(addr);
-            const window_id = try std.fmt.parseUnsigned(u64, addr, 16);
-            const payload = fetchMenuPayload(dbus_conn, window_id, allocator) catch |err| blk: {
-                std.log.warn("menu fetch failed: {}", .{err});
-                break :blk MenuPayload{ .app_name = "Unknown", .window_id = window_id,
-                                        .service = "", .object_path = "", .menus = null };
+            let addr = get_active_window_address().await?;
+            let window_id = u64::from_str_radix(&amp;addr, 16)?;
+            let payload = match fetch_menu_payload(conn, window_id).await {
+                Ok(p) =&gt; p,
+                Err(err) =&gt; {
+                    eprintln!("menu fetch failed: {err}");
+                    MenuPayload {
+                        app_name: "Unknown".to_string(),
+                        window_id,
+                        service: String::new(),
+                        object_path: String::new(),
+                        menus: None,
+                    }
+                }
             };
-            try std.json.stringify(payload, .{}, stdout);
-            try stdout.writeByte('\n');
+            let json = serde_json::to_string(&amp;payload)?;
+            stdout.write_all(json.as_bytes()).await?;
+            stdout.write_all(b"\n").await?;
         }
     }
+    Ok(())
 }</code></pre></div>
     </section>
 
@@ -638,7 +629,7 @@ import QtQuick
 QtObject {
     id: root
 
-    // Parsed menu data from the Zig daemon
+    // Parsed menu data from the Rust daemon
     property var currentMenus: []
     property string currentApp: ""
 
@@ -892,24 +883,32 @@ Item {
     <section id="build">
       <h2>6. Build &amp; Packaging (Quickshell Module)</h2>
       <p>
-        The daemon is built as a standalone executable linked against <code>dbus-1</code> and installed to
+        The daemon is built as a standalone executable with <code>cargo build --release</code>
+        (<code>zbus</code> is a pure-Rust D-Bus implementation — no <code>dbus-1</code> C linkage) and installed to
         <code>/usr/lib/koompi/koompi-globalmenu</code>, the path referenced by the Quickshell
         <code>Process</code> command.
       </p>
-      <div class="codeblock"><span class="lang">zig — build.zig</span><pre><code># Add to koompi-os PKGBUILD or build.zig.zon
+      <div class="codeblock"><span class="lang">toml — Cargo.toml</span><pre><code># Add to koompi-os PKGBUILD: cargo build --release
 # Binary installed to: /usr/lib/koompi/koompi-globalmenu
+# Crate layout: koompi-globalmenu/Cargo.toml + src/main.rs
 
-# build.zig excerpt
-const daemon = b.addExecutable(.{
-    .name = "koompi-globalmenu",
-    .root_source_file = b.path("src/globalmenu/main.zig"),
-    .target = target,
-    .optimize = optimize,
-});
-daemon.linkSystemLibrary("dbus-1");
-daemon.addIncludePath(.{ .cwd_relative = "/usr/include/dbus-1.0" });
-daemon.addIncludePath(.{ .cwd_relative = "/usr/lib/dbus-1.0/include" });
-b.installArtifact(daemon);</code></pre></div>
+[package]
+name = "koompi-globalmenu"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+zbus = { version = "5", default-features = false, features = ["tokio"] }
+tokio = { version = "1", features = ["rt", "net", "io-util", "io-std", "time", "macros"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+anyhow = "1"
+
+# Small, stripped release binary for the session daemon
+[profile.release]
+lto = true
+strip = true
+codegen-units = 1</code></pre></div>
     </section>
 
   </main>

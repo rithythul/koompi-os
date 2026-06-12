@@ -1,10 +1,10 @@
 <section class="section" id="subsystem">
   <div class="section-header">
-    <h2>Subsystem Modes</h2>
+    <h2>Profiles</h2>
     <span class="tag sys">System</span>
   </div>
   <p class="desc">
-    KOOMPI OS can reshape itself for different contexts. Subsystem Modes switch the shell layout, AI behavior, privacy posture, and power profile in one action — like changing the OS's "personality" for the task at hand.
+    KOOMPI OS can reshape itself for different contexts. Profiles switch the shell layout, AI behavior, privacy posture, and power profile in one action — changing the OS's posture for the task at hand. Naming note: <strong>"Subsystem" is reserved</strong> for the isolation system (Light / App Window / Detonation Chamber — <code>CONTEXT.md</code>); these are Profiles.
   </p>
 
   <!-- Mode grid -->
@@ -117,8 +117,8 @@
 
   <div class="callout-group">
     <div class="callout">
-      <div class="callout-title">Mode switch in &lt; 200ms <span class="badge new">Shell</span></div>
-      <p>Mode switching is handled by the shell daemon — no process restarts. Bar, sidebar, AI behavior, and firewall rules all transition atomically via a single IPC message.</p>
+      <div class="callout-title">One atomic switch <span class="badge new">Shell</span></div>
+      <p>Profile switching is handled by the shell daemon — no process restarts. Bar, sidebar, AI behavior, and firewall rules all transition atomically via a single IPC message. Fast enough to feel instant; measured before promised.</p>
     </div>
     <div class="callout">
       <div class="callout-title">AI-triggered auto-mode</div>
