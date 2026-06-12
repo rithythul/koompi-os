@@ -138,7 +138,7 @@
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Restoring <strong style="color:var(--accent);">3 days ago · 14:00</strong> will bring back, and replace nothing without showing you:</div>
         <div style="display:flex;flex-direction:column;gap:8px;">
           <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--emerald-glow);border-radius:8px;"><svg width="13" height="13" viewBox="0 0 13 13"><path d="M3 6.5L5.5 9L10 4" stroke="var(--emerald)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:var(--text);">~/Documents — 14,203 files</span><span style="margin-left:auto;font-size:10px;color:#047857;">42 newer files kept aside</span></div>
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--emerald-glow);border-radius:8px;"><svg width="13" height="13" viewBox="0 0 13 13"><path d="M3 6.5L5.5 9L10 4" stroke="var(--emerald)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:var(--text);">AI Memory (agent-memd) — 8,902 entries</span></div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--emerald-glow);border-radius:8px;"><svg width="13" height="13" viewBox="0 0 13 13"><path d="M3 6.5L5.5 9L10 4" stroke="var(--emerald)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:12px;color:var(--text);">AI Memory (assistantd) — 8,902 entries</span></div>
           <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--cyan-glow);border-radius:8px;"><svg width="13" height="13" viewBox="0 0 13 13"><circle cx="6.5" cy="6.5" r="4.5" stroke="var(--cyan)" stroke-width="1.2" fill="none"/></svg><span style="font-size:12px;color:var(--text);">Context index — will rebuild after restore (~6 min)</span></div>
           <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--amber-glow);border-radius:8px;"><svg width="13" height="13" viewBox="0 0 13 13"><path d="M6.5 2L12 11H1L6.5 2Z" stroke="var(--amber)" stroke-width="1.2" fill="none" stroke-linejoin="round"/><line x1="6.5" y1="6" x2="6.5" y2="8.5" stroke="var(--amber)" stroke-width="1.2"/></svg><span style="font-size:12px;color:var(--text);">5 files edited since then will be moved to ~/.restore-conflicts/</span></div>
         </div>
@@ -195,34 +195,26 @@
     </div>
   </div>
 
-  <!-- ───────────────── PANEL 6 · DURESS / DECOY ───────────────── -->
-  <div style="background:linear-gradient(180deg,var(--surface),var(--surface2));border:1.5px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px;">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2L15.5 4.5V9C15.5 13 12.5 15.5 9 16.5C5.5 15.5 2.5 13 2.5 9V4.5L9 2Z" stroke="var(--text-muted)" stroke-width="1.3" stroke-linejoin="round"/><circle cx="9" cy="8" r="2" stroke="var(--text-muted)" stroke-width="1.2"/><path d="M9 10v2.5" stroke="var(--text-muted)" stroke-width="1.2" stroke-linecap="round"/></svg>
-      <div style="font-size:14px;font-weight:700;color:var(--text);">Duress unlock — for when "just open it" isn't a request</div>
+  <!-- ───────────────── PANEL 6 · DURESS / DECOY — refused (C-15) ───────────────── -->
+  <div style="background:var(--surface);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:24px;margin-bottom:16px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+      <span style="font-size:14px;font-weight:700;color:var(--text);">Duress unlock · refused</span>
+      <span style="font-size:10px;background:var(--red-glow);color:#B91C1C;border-radius:10px;padding:2px 8px;">✕ security theater</span>
     </div>
-    <div style="font-size:12px;color:var(--text-muted);margin-bottom:18px;max-width:760px;">A border agent, a raid, a kidnapping for a wallet seed. A lock you can be forced to open is not a lock. So KOOMPI lets you set a <em>second</em> PIN that opens a different, plausible, complete life — and there is no setting, badge, or indicator anywhere that admits the first life exists. That absence is the whole feature.</div>
-
-    <div style="display:flex;gap:16px;flex-wrap:wrap;">
-      <!-- what the observer sees -->
-      <div style="flex:1;min-width:280px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:16px;">
-        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-subtle);margin-bottom:10px;">What the person holding your laptop sees</div>
-        <div style="background:var(--surface2);border-radius:8px;padding:12px;font-size:12px;color:var(--text);line-height:1.7;">
-          A normal desktop. Real-looking documents, a few months of browser history, photos of food and family, a half-finished spreadsheet. Backups, settings, Selendra ID — all present and consistent. <strong>Nothing reports a hidden volume.</strong> <code style="font-size:10px;color:var(--text-subtle);">cryptsetup luksDump</code> shows exactly the slots a single-profile install would.
-        </div>
-        <div style="margin-top:10px;font-size:11px;color:#047857;display:flex;align-items:center;gap:6px;"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 6L5 8L9 3.5" stroke="var(--emerald)" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Indistinguishable from a person who has nothing to hide</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;max-width:760px;">An earlier draft of this page demoed a duress PIN unsealing a decoy hidden volume, silently severing the backup link, and firing a coercion heartbeat over Selendra. It is <b>cut, honestly</b>: a second LUKS keyslot and a decoy volume are visible to any competent forensic examination — fake deniability is worse than none, because it teaches you to lean on a story that evaporates exactly when it matters, and a discovered decoy can convert a search into an obstruction charge. KOOMPI does not ship protections that only work if the adversary is careless.</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:240px;display:flex;gap:10px;align-items:flex-start;padding:11px 13px;background:var(--surface2);border-radius:8px;">
+        <span style="font-size:14px;color:var(--text-muted);"><i class="fa-solid fa-power-off"></i></span>
+        <div><div style="font-size:12px;color:var(--text);font-weight:600;">The honest protections</div><div style="font-size:11px;color:var(--text-muted);line-height:1.5;">FDE at rest — power off is the real defense. Lockout throttling makes guessing expensive; a wipe discards the key in under a second.</div></div>
       </div>
-      <!-- what actually happened -->
-      <div style="flex:1;min-width:280px;background:var(--surface);border:1px solid var(--accent);border-radius:10px;padding:16px;">
-        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:10px;">What actually happened (only you can know)</div>
-        <div style="background:var(--accent-glow);border-radius:8px;padding:12px;font-size:12px;color:var(--text);line-height:1.7;">
-          The duress PIN unsealed a decoy hidden volume. Your real home — fifty years of memory, your true Selendra keys, your real backup credentials — sits in unallocated-looking space the decoy cannot see and cannot prove is there. Entering duress also <strong>silently severs the live backup link</strong>, so an attacker can't follow it to your off-site copy.
-        </div>
-        <div style="margin-top:10px;font-size:11px;color:var(--text-muted);">Optional: duress unlock fires a signed Selendra heartbeat to your guardians — <em>"opened under coercion"</em> — that looks like nothing on this screen.</div>
+      <div style="flex:1;min-width:240px;display:flex;gap:10px;align-items:flex-start;padding:11px 13px;background:var(--surface2);border-radius:8px;">
+        <span style="font-size:14px;color:var(--text-muted);"><i class="fa-solid fa-map"></i></span>
+        <div><div style="font-size:12px;color:var(--text);font-weight:600;">The data outlives the device</div><div style="font-size:11px;color:var(--text-muted);line-height:1.5;">The 3-2-1 map above means a confiscated laptop costs you hardware, not your life's data — it still exists elsewhere, for you and no one else.</div></div>
       </div>
-    </div>
-    <div style="margin-top:14px;padding:10px 14px;background:var(--amber-glow);border-radius:8px;font-size:11px;color:var(--text-muted);line-height:1.5;">
-      <strong style="color:#B45309;">Engineering honesty:</strong> plausible deniability is only as strong as your discipline. If the decoy's clock is frozen at install or its backups never run, a careful adversary notices. KOOMPI keeps the decoy <em>alive</em> — it ages, syncs, and accumulates plausible noise on its own — but no software can protect you from admitting it exists. We document that limit rather than pretend it away.
+      <div style="flex:1;min-width:240px;display:flex;gap:10px;align-items:flex-start;padding:11px 13px;background:var(--surface2);border-radius:8px;">
+        <span style="font-size:14px;color:var(--text-muted);"><i class="fa-solid fa-flask"></i></span>
+        <div><div style="font-size:12px;color:var(--text);font-weight:600;">If the science arrives</div><div style="font-size:11px;color:var(--text-muted);line-height:1.5;">Credible deniable storage earns a capability-gate row first (<code>blueprint.md §3</code>) — never a quiet checkbox.</div></div>
+      </div>
     </div>
   </div>
 
@@ -285,11 +277,11 @@
     </div>
     <div class="callout">
       <div class="callout-title">A stolen laptop is not a catastrophe</div>
-      <p>Concentrating fifty years of memory locally is only defensible if the disk being gone or taken is survivable. FDE turns a stolen drive into ciphertext; remote and dead-man wipes discard the key in under a second; and duress mode means even forced cooperation surrenders a decoy life, not your real one. The 3-2-1 map guarantees the data still exists elsewhere — for you, and no one else.</p>
+      <p>Concentrating fifty years of memory locally is only defensible if the disk being gone or taken is survivable. FDE turns a stolen drive into ciphertext; remote and dead-man wipes discard the key in under a second. The 3-2-1 map guarantees the data still exists elsewhere — for you, and no one else.</p>
     </div>
     <div class="callout">
-      <div class="callout-title">Decoy mode that admits nothing</div>
-      <p>A "hidden vault" toggle that shows up in settings is theatre — it proves a second volume exists the moment anyone looks. KOOMPI's duress unlock leaves no badge, no setting, no keyslot, no metadata an adversary can point to. The real protection is the absence of evidence. We also document where deniability ends: no software survives you confessing it exists.</p>
+      <div class="callout-title">Theater refused — no duress decoys</div>
+      <p>An earlier draft shipped a duress PIN that opened a decoy life, with "the absence of evidence" as its protection. Cut: a second keyslot and a decoy volume <em>are</em> evidence — visible to competent forensics — so the deniability fails exactly when it matters, and a discovered decoy can make things legally worse. The limit we documented then is the reason it is gone now: no software survives you confessing it exists. The honest answers are boring and real — FDE at rest, lockout throttling, key-discard wipes, and three copies of your data that travel without the laptop.</p>
     </div>
     <div class="callout">
       <div class="callout-title">Backups proven, not assumed</div>

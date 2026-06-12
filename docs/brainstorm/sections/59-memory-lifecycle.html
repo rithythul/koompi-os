@@ -4,7 +4,7 @@
     <span class="tag ai">AI</span>
   </div>
   <p class="desc">
-    How a single perception event travels through <code style="color:#0E7490;">koompi-agent-memd</code> — the neuromorphic memory daemon. Perception → Working Memory → Episodic log → Sleep consolidation → Semantic graph → Reconstructive retrieval. Two invariants hold the whole pipeline up: <strong style="color:var(--text);">raw episodic records are immortal by default</strong>, and <strong style="color:var(--text);">the derived index is disposable and rebuildable</strong>. Forgetting is a ranking property, never a delete — with one owner-only exception: cryptographic destruction through Ceremonial Forgetting, never automatic, never a side effect. Everything runs on-device — no episodic data ever egresses to cloud.
+    How a single perception event travels through <code style="color:#0E7490;">koompi-assistantd</code>'s neuromorphic memory engine. Perception → Working Memory → Episodic log → Sleep consolidation → Semantic graph → Reconstructive retrieval. Two invariants hold the whole pipeline up: <strong style="color:var(--text);">raw episodic records are immortal by default</strong>, and <strong style="color:var(--text);">the derived index is disposable and rebuildable</strong>. Forgetting is a ranking property, never a delete — with one owner-only exception: cryptographic destruction through Ceremonial Forgetting, never automatic, never a side effect. Everything runs on-device — no episodic data ever egresses to cloud.
   </p>
 
   <!-- ─────────────────────── TWO INVARIANTS ─────────────────────── -->
@@ -385,7 +385,7 @@ retrieval_rank =
 
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:24px;font-family:var(--font-mono);font-size:11.5px;">
     <div style="padding:10px 16px;background:var(--surface2);border-bottom:1px solid var(--border);color:var(--text-subtle);">
-      memd consolidate --tier T2 · 2026-06-09 03:00:11 · AC ✓ idle 41m ✓ llm:phi-3-mini ✓ · window: 7d (214 episodic rows)
+      assistantd consolidate --tier T2 · 2026-06-09 03:00:11 · AC ✓ idle 41m ✓ llm:phi-3-mini ✓ · window: 7d (214 episodic rows)
     </div>
     <div style="padding:8px 16px;border-bottom:1px solid var(--border);color:#047857;display:flex;gap:10px;">
       <span style="flex-shrink:0;">PROMOTE</span><span style="color:var(--text-muted);">"UI Design Habit" · salience 0.40→0.61 · S↑ · pinned to semantic (high access + valence)</span>

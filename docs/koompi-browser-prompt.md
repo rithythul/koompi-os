@@ -17,7 +17,7 @@ and it must be a *citizen* of the OS, not a parallel universe. KOOMPI OS already
 
 - **koompi-contextd (L1)** — the on-device semantic index (vectors + FTS, BGE-M3 class
   embedder, Khmer-capable). There is exactly one index on this machine.
-- **koompi-agent-memd / koompi-assistantd (L2)** — the neuromorphic memory daemon
+- **koompi-assistantd (L2)** — one daemon: the neuromorphic memory engine
   (immortal episodic store in `@data`, forgetting = ranking, Ceremonial Forgetting for
   owner-only destruction) and the agent runtime (tool-calling, RAG, injection
   mitigation).
@@ -51,7 +51,7 @@ Structure the response into these 5 sections:
 
 ### 1. OS-Native Intelligence: One Brain, Not Two
 - **Runtime integration, not embedding:** The OS already runs the models. How does the
-  browser consume L1/L2 (contextd queries, assistantd agent loops, agent-memd memory)
+  browser consume L1/L2 (contextd queries, assistantd agent loops and memory)
   over the local bus instead of bundling its own inference? Where does in-process
   acceleration (WebGPU / Vulkan / shared RAM for a 1.5–3B SLM) still make sense — e.g.
   per-page tasks where IPC latency dominates — and how does that SLM register itself as

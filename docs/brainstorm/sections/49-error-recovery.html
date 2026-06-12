@@ -66,7 +66,7 @@
         <div style="display:flex;flex-direction:column;gap:7px;">
           <div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:8px 10px;">
             <div style="width:8px;height:8px;border-radius:2px;background:var(--cyan);flex-shrink:0;"></div>
-            <div style="flex:1;min-width:0;"><div style="font-size:12px;color:var(--text);">Old AI model snapshots</div><div style="font-size:10.5px;color:var(--text-subtle);font-family:var(--font-mono);">~/.cache/koompi/models · Llama-3.1-8B v2,v3</div></div>
+            <div style="flex:1;min-width:0;"><div style="font-size:12px;color:var(--text);">Old AI model snapshots</div><div style="font-size:10.5px;color:var(--text-subtle);font-family:var(--font-mono);">~/.cache/koompi/models · Sailor2-8B v2,v3</div></div>
             <span style="font-size:11px;font-weight:700;color:#047857;">18.4 GB</span>
           </div>
           <div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:8px 10px;">
@@ -268,7 +268,7 @@
     </div>
     <div class="callout">
       <div class="callout-title">Degraded, not dead</div>
-      <p>When <span style="font-family:var(--font-mono);">koompi-contextd</span> or <span style="font-family:var(--font-mono);">koompi-agent-memd</span> crash, the desktop keeps working — search falls back to filenames, the AI sidebar pauses cleanly, daemons auto-restart and re-index silently. A Principal-Engineer detail: the watchdog uses exponential backoff and surfaces the degraded banner only after the second failed restart, so a single transient crash never nags the user.</p>
+      <p>When <span style="font-family:var(--font-mono);">koompi-contextd</span> or <span style="font-family:var(--font-mono);">koompi-assistantd</span> crash, the desktop keeps working — search falls back to filenames, the AI sidebar pauses cleanly, daemons auto-restart and re-index silently. A Principal-Engineer detail: the watchdog uses exponential backoff and surfaces the degraded banner only after the second failed restart, so a single transient crash never nags the user.</p>
     </div>
     <div class="callout">
       <div class="callout-title">Recovery that survives decades</div>

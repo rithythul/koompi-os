@@ -61,7 +61,7 @@
 <span style="color:#FF7B72;">class</span> <span style="color:#22D3EE;">NeuroAgentMemory</span>:
     <span style="color:#FF7B72;">def</span> <span style="color:#D2A8FF;">__init__</span>(<span style="color:#FFA657;">self</span>, store, embedder, local_llm, ctx_window_tokens: <span style="color:#FF7B72;">int</span>):
         <span style="color:#A5D6FF;">"""Initialise all four cognitive layers over ONE embedded store."""</span>
-        <span style="color:#FFA657;">self</span>.store     = store            <span style="color:#6A737D;"># sqlite-vec + FTS5 + graph (Zig-owned)</span>
+        <span style="color:#FFA657;">self</span>.store     = store            <span style="color:#6A737D;"># sqlite-vec + FTS5 + graph (assistantd-owned)</span>
         <span style="color:#FFA657;">self</span>.embedder  = embedder         <span style="color:#6A737D;"># local ONNX; .model_id is the tag</span>
         <span style="color:#FFA657;">self</span>.llm       = local_llm        <span style="color:#6A737D;"># LOCAL ONLY; never cloud for episodic</span>
         <span style="color:#FFA657;">self</span>.working   = []               <span style="color:#6A737D;"># ① PFC: in-RAM attention ring buffer</span>

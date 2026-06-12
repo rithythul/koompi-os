@@ -74,9 +74,9 @@
           <div style="font-size:13px;font-weight:600;color:var(--text);">Rithy <span style="font-size:11px;color:var(--accent);font-weight:500;">· you</span></div>
         </div>
         <div style="font-size:11px;color:var(--text-muted);line-height:1.6;">
-          14 windows · agent-memd <span style="color:var(--accent);">paused &amp; sealed</span><br>
+          14 windows · assistantd memory <span style="color:var(--accent);">paused &amp; sealed</span><br>
           contextd index → flushed to encrypted store<br>
-          GPU VRAM (Llama 3.1 8B) → swapped to host RAM
+          GPU VRAM (Sailor2 8B) → swapped to host RAM
         </div>
       </div>
       <!-- target session card -->
@@ -107,7 +107,7 @@
         </div>
         <div style="font-size:12px;color:var(--text-muted);line-height:1.7;">
           ✓ Home mounted on RAM-backed overlay<br>
-          ✓ agent-memd started with <code style="font-family:var(--font-mono);color:#0E7490;">--no-persist</code><br>
+          ✓ assistantd started with <code style="font-family:var(--font-mono);color:#0E7490;">--no-persist</code><br>
           ✓ contextd indexing disabled<br>
           ✓ No Selendra DID attached
         </div>
@@ -124,7 +124,7 @@
         <div style="position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:var(--border);"></div>
         <div style="position:relative;margin-bottom:12px;">
           <div style="position:absolute;left:-17px;top:3px;width:10px;height:10px;border-radius:50%;background:var(--accent);"></div>
-          <div style="font-size:12px;color:var(--text);"><strong>21:40</strong> Rithy locks. agent-memd dumps working set → <code style="font-family:var(--font-mono);font-size:11px;">sealed</code></div>
+          <div style="font-size:12px;color:var(--text);"><strong>21:40</strong> Rithy locks. assistantd dumps memory working set → <code style="font-family:var(--font-mono);font-size:11px;">sealed</code></div>
         </div>
         <div style="position:relative;margin-bottom:12px;">
           <div style="position:absolute;left:-17px;top:3px;width:10px;height:10px;border-radius:50%;background:var(--amber);"></div>
@@ -203,7 +203,7 @@
       </div>
     </div>
     <div style="margin-top:14px;font-size:12px;color:var(--text-muted);text-align:center;line-height:1.7;">
-      Even <code style="font-family:var(--font-mono);color:var(--text);">root</code> reads only ciphertext at rest. The key lives in the <strong style="color:var(--text);">kernel keyring of the unlocked session</strong> and is dropped on lock. koompi-agent-memd and koompi-contextd run <strong>per-UID, never shared</strong>. There is no global memory.
+      Even <code style="font-family:var(--font-mono);color:var(--text);">root</code> reads only ciphertext at rest. The key lives in the <strong style="color:var(--text);">kernel keyring of the unlocked session</strong> and is dropped on lock. koompi-assistantd and koompi-contextd run <strong>per-UID, never shared</strong>. There is no global memory.
     </div>
   </div>
 
@@ -220,7 +220,7 @@
           <div style="width:30%;background:var(--cyan);" title="Memory + index"></div>
           <div style="width:34%;background:var(--surface4);" title="Files"></div>
         </div>
-        <div style="font-size:10px;color:var(--text-subtle);margin-top:4px;font-family:var(--font-mono);">Llama 3.1 8B Q5 21GB · palace+index 17GB · files 20GB</div>
+        <div style="font-size:10px;color:var(--text-subtle);margin-top:4px;font-family:var(--font-mono);">Sailor2 8B Q5 21GB · palace+index 17GB · files 20GB</div>
       </div>
       <!-- Sophea row -->
       <div style="margin-bottom:14px;">
@@ -273,7 +273,7 @@
     </div>
     <div class="callout">
       <div class="callout-title">The OS thinks about you, never to someone else</div>
-      <p>macOS Fast User Switching and GNOME both share a system-wide assistant and search index — your Siri suggestions and tracker results can bleed across logins. KOOMPI runs koompi-agent-memd and koompi-contextd per-UID. There is no global memory to leak from. A second user's AI greets a cold context that has never heard of you.</p>
+      <p>macOS Fast User Switching and GNOME both share a system-wide assistant and search index — your Siri suggestions and tracker results can bleed across logins. KOOMPI runs koompi-assistantd and koompi-contextd per-UID. There is no global memory to leak from. A second user's AI greets a cold context that has never heard of you.</p>
     </div>
     <div class="callout">
       <div class="callout-title">Guardrails are rules, not wiretaps</div>
