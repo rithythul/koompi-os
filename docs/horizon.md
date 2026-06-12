@@ -1,6 +1,6 @@
 # KOOMPI OS — Horizon (the vision shelf)
 
-**v1.0 · 2026-06-11 · status: explicitly non-roadmap**
+**v1.1 · 2026-06-12 · status: explicitly non-roadmap**
 
 This document holds the long-arc essays of the brainstorm — Acts IX and X, the
 50–100-year material. It exists so the vision can stay ambitious **without leaking
@@ -25,11 +25,13 @@ threshold. No gate, no graduation.
 | 19 | Proactive OS | Prepares freely, proposes visibly, never sends unasked | L4 timers → headless READ-only runs | 1.x |
 | 20 | App-less Computing | Intent assembles capabilities | Composer + MCP capability calls (ADR-0013) | with L3 |
 | 21 | Khmer-Native AI | Reasons in Khmer — registers, honorifics, idiom | Eval-gated Khmer chat (G-KM-CHAT-1); register-correct strings | v1 strings |
+| 22 | Data Sovereignty | Every flow visible and revocable; priced by no one | Per-app revocation + local consent receipts (valuation CUT, C-12) | 1.x |
 | 23 | Cognitive OS | The shell reshapes to your mental state | Profiles presets (renamed §31) | 1.x |
 | 24 | Lifetime OS | Eras, reflections, ceremonies across 50 years | Lifeboat `legacy` preset | 1.x |
 | 25 | Spatial Shell | Workspaces as rooms; AI as presence | — | stays here |
 | 57a | The Thinking OS | A 52-year continuous thread | The era-tagged store *is* the thread | v1 schema |
 | 58/59 | Memory Architecture / Lifecycle | Neuromorphic layers; sleep consolidation | Schema + consolidation batch job | v1 / 1.x |
+| 60/61 | Memory Blueprint / Impl. Stack | The executable spec of a mind that is yours | Rewritten to ADR-0004 reality (C-2, C-3): the schema + the wiring | v1 arch |
 | 62 | Death & Digital Estate | Wills per memory-domain; consultable, never impersonated | Lifeboat `legacy` + documented inheritance | 1.x |
 | 63 | The OS That Raises You | Autonomy grows with the child | Per-user policy LOCK floor | exists |
 | 64 | Aging With Dignity | Silent adaptation; assist always, diagnose never | A11y scaling profiles | 2.x |
@@ -46,7 +48,7 @@ threshold. No gate, no graduation.
 | 75 | Household Constitution | Approve policies, not invocations | Policy floor file + amendment cooling-off | 1.x |
 | 76 | Memory Etiquette | The first OS with manners | **RULE** — others' content excluded from index by default | v1 default |
 | 77 | OS as Witness | Provenance against the deepfake century | C2PA-class capture provenance | 2.x watch |
-| 81 | The Exit Door | Full-fidelity leave | Lifeboat engine (v1) + `exit` preset | 1.x |
+| 81 | The Exit Door | Full-fidelity leave | Lifeboat engine (v1) + `exit` preset | engine v1 / preset 1.x |
 
 ## Cut from the shelf entirely
 

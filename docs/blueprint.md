@@ -1,6 +1,6 @@
 # KOOMPI OS — The Blueprint (design register)
 
-**v1.0 · 2026-06-11 · status: binding**
+**v1.1 · 2026-06-12 · status: binding**
 
 This is the binding map from every design surface in the brainstorm to a build
 commitment. Where the brainstorm and this register disagree, **this register wins**;
@@ -59,21 +59,25 @@ above its tier.**
 
 ## 3 · Capability gates registry
 
-A gate names the external unlock and a measurable threshold; the feature ships when
-the gate passes. **A post-v1 feature without a gate row is fiction by definition.**
-A gate row needs an owner and an eval artifact before the feature may appear in any
-public roadmap.
+A gate names the unlock — usually external (a model, a corpus, a backend), sometimes a
+named internal artifact (an eval harness, a founder decision) — and a measurable
+threshold; the feature ships when the gate passes. **A post-v1 capability that waits on
+an unlock and has no gate row is fiction by definition**; plain 1.x work waits on no
+unlock and is sequenced by the roadmap's track order instead. A gate row needs an owner
+and an eval artifact before the feature may appear in any public roadmap. Owners are
+role-level (roadmap §10.1 convention) until a named human is confirmed; **UNASSIGNED ⚠
+blocks public-roadmap listing.**
 
-| Gate | Capability | External unlock | Threshold | Target |
-|---|---|---|---|---|
-| **G-KM-CHAT-1** | Per-tier Khmer chat pin | Sailor2 / SEA-LION v4 | KOOMPI-EVAL-KM chat suite thresholds + license CI pass | v1 (closes the ADR-0006 open item) |
-| **G-KM-STT-1** | Khmer dictation | Whisper-km fine-tune on the 106 h corpus | CER ≤ 15% on KOOMPI-EVAL-KM-STT (classroom mic, formal register) | 1.x |
-| **G-KM-TTS-1** | One Khmer TTS voice | Piper/VITS + open recipe | Intelligibility MOS ≥ 4.0, panel n ≥ 30 | 1.x |
-| **G-EMB-2** | Embedder succession | SEA-LION-Embedding (2026-03) or later | ≥ +5% on KOOMPI-EVAL-RETRIEVAL **and** license gate **and** re-embed runbook executed in CI | 1.x |
-| **G-NPU-1** | NPU tier detect/offload | llama.cpp OpenVINO / Hexagon backends | Stable on ≥ 2 devices KOOMPI owns | 1.x |
-| **G-AGENT-1** | Bounded agent threads | Injection eval harness | Budgets + leash enforced; red-team pass on the lethal-trifecta scenarios (arch §9) | late 1.x |
-| **G-A11Y-2** | Khmer screen reader assembly | AccessKit/Qt + Newton + G-KM-TTS-1 | Task-completion study with blind Khmer users | 2.x |
-| **G-HOME-1** | Home Node beta | Founder D-1 + E2EE sync | External audit of the sync path | 2.x |
+| Gate | Capability | Unlock | Threshold | Owner | Target |
+|---|---|---|---|---|---|
+| **G-KM-CHAT-1** | Per-tier Khmer chat pin | Sailor2 / SEA-LION v4 | KOOMPI-EVAL-KM chat suite thresholds + license CI pass | UNASSIGNED ⚠ | v1 (closes the ADR-0006 open item) |
+| **G-KM-STT-1** | Khmer dictation | Whisper-km fine-tune on the 106 h corpus | CER ≤ 15% on KOOMPI-EVAL-KM-STT (classroom mic, formal register) | KOOMPI community/team (D-3 default) | 1.x |
+| **G-KM-TTS-1** | One Khmer TTS voice | Piper/VITS + open recipe | Intelligibility MOS ≥ 4.0, panel n ≥ 30 | KOOMPI community/team (D-3 default) | 1.x |
+| **G-EMB-2** | Embedder succession | SEA-LION-Embedding (2026-03) or later | ≥ +5% on KOOMPI-EVAL-RETRIEVAL **and** license gate **and** re-embed runbook executed in CI | UNASSIGNED ⚠ | 1.x |
+| **G-NPU-1** | NPU tier detect/offload | llama.cpp OpenVINO / Hexagon backends | Stable on ≥ 2 devices KOOMPI owns | KOOMPI hardware | 1.x |
+| **G-AGENT-1** | Bounded agent threads | Injection eval harness | Budgets + leash enforced; red-team pass on the lethal-trifecta scenarios (arch §9) | UNASSIGNED ⚠ | late 1.x |
+| **G-A11Y-2** | Khmer screen reader assembly | AccessKit/Qt + Newton + G-KM-TTS-1 | Task-completion study with blind Khmer users | UNASSIGNED ⚠ (same gap as roadmap X-8) | 2.x |
+| **G-HOME-1** | Home Node beta | Founder D-1 + E2EE sync | External audit of the sync path | founder (D-1) | 2.x |
 
 ## 4 · The register — Acts I–VIII (the buildable blueprint)
 
@@ -136,7 +140,7 @@ public roadmap.
 | 31 | ~~Subsystem Modes~~ → Profiles | **1.x** | C-4: renamed — `CONTEXT.md` owns "Subsystem" (isolation). Two profiles first (Focus, Privacy); no latency promises. |
 | 32 | Installer | **v1** | Close G1/G2/G3. C-10: 4 GB copy → Reduced-local honesty. |
 | 33 | Khmer / i18n | **v1-partial** | I-1/2/3/5 ship together if resourced; I-4 (segmentation) with L1. Voice → GATED(G-KM-STT-1, G-KM-TTS-1). Dialect voice CUT (no corpus); register-correct *strings* yes, register-aware *generation* no. |
-| 37 | Auth & Lock | **v1-reduced** | TPM2-sealed LUKS + fprintd where hardware exists. C-11: liveness claims and duress mode CUT (RGB cams can't do liveness; decoy slots are forensically visible and legally hazardous). |
+| 37 | Auth & Lock | **v1-reduced** | TPM2-sealed LUKS + fprintd where hardware exists. C-11: RGB liveness claims and duress mode CUT (RGB cams can't do liveness; decoy slots are forensically visible and legally hazardous). Liveness exists only behind IR-depth hardware detection. |
 | 38 | Accessibility | **v1 gates** | CI = contrast + keyboard-nav. AccessKit roles 1.x as components are touched. Screen reader GATED(G-A11Y-2). "A11y as build gate" scoped to what tooling can actually check. |
 | 39 | Updates | **v1** | Snapshot-first; **manual** snapshot boot via grub-btrfs at v1; automated health-gated rollback 1.x. Risk groups by repo origin, not hand labels. |
 | 40 | Network | **1.x** | Trust postures via NM dispatcher + nftables zones; stricter-wins via Policy. |
@@ -223,14 +227,21 @@ this register supersedes them.
 | C-8 | §36 | confidence-% meters | grounding indicators (sources, similarity, recency); local logprobs are uncalibrated |
 | C-9 | `koompi-browser.md` §5.1 | Zig `koompi-webd`; "Python (in assistantd)" | Rust per ADR-0004 |
 | C-10 | §32 | "degrades to 4 GB without refusing" | Degrades to Reduced-local *honestly*; chat refused-with-consent-option below T1 |
-| C-11 | §37 | liveness biometrics; duress decoys | fprintd + TPM2; liveness and duress CUT |
+| C-11 | §37 | liveness biometrics; duress decoys | fprintd + TPM2; RGB liveness and duress CUT; liveness only where IR-depth hardware proves it |
 | C-12 | §22 | "see what your data is worth" | CUT valuation; keep revocation + local receipts |
-| C-13 | ~17 sections (§26, §39, §40, §43, §44, §48, §49, §57a, §58, §59, §66, §68, §71, §76, §78, §80, §81) | reference `koompi-agent-memd` | the memory engine lives inside `koompi-assistantd` (no separate daemon) — rename owed; §36/§37/§60/§61/§83 already corrected |
-| C-14 | §35, §43, §44, §46, §48, §52, §54 | mockups name "Llama 3.1" | Llama-MAU fails the license gate (ADR-0006) — replace with the eval-pinned tier model (Sailor2-class) |
+| C-13 | 20 sections (§26, §39, §40, §41, §43, §44, §48, §49, §57, §57a, §58, §59, §66, §68, §71, §76, §78, §80, §81, §82) | reference `koompi-agent-memd` | the memory engine lives inside `koompi-assistantd` (no separate daemon) — renamed 2026-06-12; §36/§37/§60/§61/§83 were already correct |
+| C-14 | §35, §43, §44, §46, §48, §49, §52, §54, §56 | mockups name "Llama 3.1" (plus 3.2/70B strays) | Llama-MAU fails the license gate (ADR-0006) — replaced with the eval-pinned tier model (Sailor2-class) 2026-06-12; prose references model-agnostic per §74 |
 | C-15 | §41 | "duress PIN" backup decoys | same refusal as C-11 — cut on the same grounds |
+| C-16 | `global-menu-arch.html` | specs the global-menu *session daemon* in Zig | daemons are Rust (ADR-0004 — zbus is the whole point for a DBusMenu consumer); ported to Rust + zbus 2026-06-12 (doc v1.1, wire format unchanged) |
 
-**Status 2026-06-11: C-1 … C-12 are applied to the pages.** C-13/C-14/C-15 are the
-remaining consistency sweep.
+**Status 2026-06-12: C-1 … C-16 are applied to the pages.** The 2026-06-12 audit
+closed the stragglers: the C-9 remainder (`koompi-browser.md` §1 process model still
+said Zig), the C-3 remainder (§60's "Zig-owned" store annotation; Zig paths/syntax in
+§26/§80 ported to Rust), the three pages C-13's list had missed (§41, §57, §82) plus
+`agent-memd` references in `koompi-browser.md` §2.1 and `koompi-browser-prompt.md`,
+the two pages C-14's list had missed (§49, §56), the Document Map cards that still
+sold cut features (§33 dialect voice, §41 duress decoys, §50 ZK crowd flags, §43
+"hot-swap"), and C-16 (found during repair verification).
 
 ## 7 · Open founder decisions
 
