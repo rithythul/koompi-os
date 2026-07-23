@@ -14,6 +14,7 @@ TabButton {
     property string buttonText
     property bool expanded: false
     property bool showToggledHighlight: true
+    property bool showCollapsedLabel: true // false: collapsed state is icon-only
     readonly property real visualWidth: root.expanded ? root.baseSize + 20 + itemText.implicitWidth : root.baseSize
 
     property real baseSize: 56
@@ -41,7 +42,7 @@ TabButton {
         }
         
         implicitWidth: root.visualWidth
-        implicitHeight: root.expanded ? itemIconBackground.implicitHeight : itemIconBackground.implicitHeight + itemText.implicitHeight 
+        implicitHeight: (root.expanded || !root.showCollapsedLabel) ? itemIconBackground.implicitHeight : itemIconBackground.implicitHeight + itemText.implicitHeight
 
         Rectangle {
             id: itemBackground
@@ -116,6 +117,7 @@ TabButton {
 
         StyledText {
             id: itemText
+            visible: root.expanded || root.showCollapsedLabel
             anchors {
                 top: itemIconBackground.bottom
                 topMargin: 2

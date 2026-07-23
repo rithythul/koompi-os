@@ -166,10 +166,36 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.fillHeight: false
             implicitHeight: Math.max(titleText.implicitHeight, windowControlsRow.implicitHeight)
+            RippleButton { // Nav rail toggle, up here to keep the rail itself compact
+                id: railToggleButton
+                anchors {
+                    left: parent.left
+                    leftMargin: 8
+                    verticalCenter: parent.verticalCenter
+                }
+                implicitWidth: 35
+                implicitHeight: 35
+                buttonRadius: Appearance.rounding.full
+                focus: root.visible
+                downAction: () => {
+                    navRail.expanded = !navRail.expanded;
+                }
+                rotation: navRail.expanded ? 0 : -180
+                Behavior on rotation {
+                    animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
+                }
+                contentItem: MaterialSymbol {
+                    anchors.centerIn: parent
+                    horizontalAlignment: Text.AlignHCenter
+                    iconSize: 20
+                    color: Appearance.colors.colOnLayer1
+                    text: navRail.expanded ? "menu_open" : "menu"
+                }
+            }
             StyledText {
                 id: titleText
                 anchors {
-                    left: Config.options.windows.centerTitle ? undefined : parent.left
+                    left: Config.options.windows.centerTitle ? undefined : railToggleButton.right
                     horizontalCenter: Config.options.windows.centerTitle ? parent.horizontalCenter : undefined
                     verticalCenter: parent.verticalCenter
                     leftMargin: 12
@@ -222,10 +248,6 @@ ApplicationWindow {
                     }
                     spacing: 10
                     expanded: root.width > 900
-                    
-                    NavigationRailExpandButton {
-                        focus: root.visible
-                    }
 
                     FloatingActionButton {
                         id: fab
@@ -255,27 +277,35 @@ ApplicationWindow {
                         }
                     }
 
-                    NavigationRailTabArray {
-                        currentIndex: root.currentPage
-                        expanded: navRail.expanded
-                        Repeater {
-                            model: root.pages
-                            NavigationRailButton {
-                                required property var index
-                                required property var modelData
-                                toggled: root.currentPage === index
-                                onPressed: root.currentPage = index;
-                                expanded: navRail.expanded
-                                buttonIcon: modelData.icon
-                                buttonIconRotation: modelData.iconRotation || 0
-                                buttonText: modelData.name
-                                showToggledHighlight: false
+                    StyledFlickable { // The page list outgrows the window; let it scroll
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        clip: true
+                        contentWidth: navTabs.implicitWidth
+                        contentHeight: navTabs.implicitHeight + 25
+                        ScrollBar.vertical: null // KOOMPI design: scrollable surfaces stay clean, no scrollbar
+
+                        NavigationRailTabArray {
+                            id: navTabs
+                            y: 25
+                            currentIndex: root.currentPage
+                            expanded: navRail.expanded
+                            Repeater {
+                                model: root.pages
+                                NavigationRailButton {
+                                    required property var index
+                                    required property var modelData
+                                    toggled: root.currentPage === index
+                                    onPressed: root.currentPage = index;
+                                    expanded: navRail.expanded
+                                    buttonIcon: modelData.icon
+                                    buttonIconRotation: modelData.iconRotation || 0
+                                    buttonText: modelData.name
+                                    showToggledHighlight: false
+                                    showCollapsedLabel: false
+                                }
                             }
                         }
-                    }
-
-                    Item {
-                        Layout.fillHeight: true
                     }
                 }
             }
