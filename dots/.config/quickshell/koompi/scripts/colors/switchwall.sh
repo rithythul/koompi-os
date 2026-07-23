@@ -18,26 +18,53 @@ handle_qt_app_colors() {
         fi
     fi
 
-    # matugen already rendered the KoompiMaterial scheme (config.toml
-    # templates.kde_scheme); applying it merges the colors into kdeglobals and
-    # notifies running Qt apps. Replaces kde-material-you-colors (M7).
-    # ponytail: plasma-apply-colorscheme is the last KDE tool in this path; it
-    # leaves with the qt6ct migration.
-    command -v plasma-apply-colorscheme >/dev/null || return
-    # It refuses to reapply the currently-active scheme name, so alternate
-    # between two names to force every new palette through.
-    local schemes_dir="$HOME/.local/share/color-schemes"
-    local cur target
-    cur=$(grep -m1 '^ColorScheme=' "$XDG_CONFIG_HOME/kdeglobals" 2>/dev/null | cut -d= -f2)
-    if [ "$cur" = "KoompiMaterial" ]; then
-        target="KoompiMaterialAlt"
-        sed 's/^Name=KoompiMaterial$/Name=KoompiMaterialAlt/; s/^ColorScheme=KoompiMaterial$/ColorScheme=KoompiMaterialAlt/' \
-            "$schemes_dir/KoompiMaterial.colors" > "$schemes_dir/KoompiMaterialAlt.colors"
-    else
-        target="KoompiMaterial"
+    local mode_flag="$1"
+    if [[ "$mode_flag" != "dark" && "$mode_flag" != "light" ]]; then
+        [[ "$(gsettings get org.gnome.desktop.interface color-scheme 2>/dev/null)" == *dark* ]] \
+            && mode_flag="dark" || mode_flag="light"
     fi
-    plasma-apply-colorscheme "$target" >/dev/null 2>&1 \
-        || echo "switchwall: plasma-apply-colorscheme $target failed" >&2
+    local icon_theme="breeze-plus"
+    [[ "$mode_flag" == "dark" ]] && icon_theme="breeze-plus-dark"
+
+    # matugen rendered both Qt palettes (config.toml templates.kde_scheme and
+    # templates.qt6ct_scheme). Plain Qt apps read the qt6ct palette via
+    # QT_QPA_PLATFORMTHEME=qt6ct; KDE apps (dolphin, kdialog) read kdeglobals
+    # directly, so merge the scheme there ourselves. No KDE tool in the path.
+    # ponytail: neither side hot-reloads running apps, colors land on next
+    # launch. plasma-integration did live recolor; accepted trade of the unwind.
+    python3 "$SCRIPT_DIR/apply_kdeglobals.py" \
+        "$HOME/.local/share/color-schemes/KoompiMaterial.colors" \
+        --icon-theme "$icon_theme" \
+        || echo "switchwall: kdeglobals merge failed" >&2
+
+    # qt6ct.conf is KOOMPI-owned: theming is set in KOOMPI Settings, not qt6ct.
+    mkdir -p "$XDG_CONFIG_HOME/qt6ct"
+    cat > "$XDG_CONFIG_HOME/qt6ct/qt6ct.conf" <<EOF
+# Managed by KOOMPI (switchwall.sh). Edits here are overwritten on theme change.
+[Appearance]
+color_scheme_path=$XDG_CONFIG_HOME/qt6ct/colors/koompi-material.conf
+custom_palette=true
+icon_theme=$icon_theme
+standard_dialogs=default
+style=Darkly
+
+[Fonts]
+fixed="JetBrainsMono Nerd Font,11,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
+general="Google Sans Flex,11,-1,5,500,0,0,0,0,0,0,0,0,0,0,1,Medium"
+
+[Interface]
+activate_item_on_single_click=1
+buttonbox_layout=0
+cursor_flash_time=1000
+dialog_buttons_have_icons=1
+double_click_interval=400
+keyboard_scheme=2
+menus_have_icons=true
+show_shortcuts_in_context_menus=true
+toolbutton_style=4
+underline_shortcut=1
+wheel_scroll_lines=3
+EOF
 }
 
 pre_process() {
@@ -57,7 +84,7 @@ pre_process() {
 }
 
 post_process() {
-    handle_qt_app_colors &
+    handle_qt_app_colors "$1" &
     "$SCRIPT_DIR/code/material-code-set-color.sh" &
 }
 
@@ -306,7 +333,7 @@ switch() {
     deactivate
     "$SCRIPT_DIR"/applycolor.sh
 
-    post_process
+    post_process "$mode_flag"
 }
 
 main() {

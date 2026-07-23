@@ -33,6 +33,10 @@ output_path = '~/.local/state/quickshell/user/generated/color.txt'
 input_path = '~/.config/matugen/templates/kde/kdeglobals-scheme.colors'
 output_path = '~/.local/share/color-schemes/KoompiMaterial.colors'
 
+[templates.qt6ct_scheme]
+input_path = '~/.config/matugen/templates/qt6ct/koompi-material.conf'
+output_path = '~/.config/qt6ct/colors/koompi-material.conf'
+
 [templates.wallpaper]
 input_path = '~/.config/matugen/templates/wallpaper.txt'
 output_path = '~/.local/state/quickshell/user/generated/wallpaper/path.txt'
