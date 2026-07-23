@@ -149,6 +149,10 @@ hl.curve("stall", {
     type = "bezier",
     points = {{1, -0.1}, {0.7, 0.85}}
 })
+hl.curve("easeOutExpo", {
+    type = "bezier",
+    points = {{0.16, 1}, {0.3, 1}}
+})
 -- Configs
 -- windows
 hl.animation({
@@ -220,11 +224,14 @@ hl.animation({
     bezier = "stall"
 })
 -- workspaces
+-- menu_decel at 700ms moved almost everything in the first frames then crawled
+-- the rest of the way, which read as clunky. easeOutExpo at 350ms keeps the
+-- fast start but settles cleanly.
 hl.animation({
     leaf = "workspaces",
     enabled = true,
-    speed = 7,
-    bezier = "menu_decel",
+    speed = 3.5,
+    bezier = "easeOutExpo",
     style = "slide"
 })
 -- specialWorkspace
