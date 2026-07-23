@@ -15,6 +15,9 @@ Item {
 
     property real messagePadding: 10
     property real contentSpacing: 3
+    property real avatarSize: 28
+    property bool showAvatar: root.isUser || root.isAssistant
+    property real avatarSpace: showAvatar ? (avatarSize + 6) : 0
 
     property bool enableMouseSelection: false
     property bool renderMarkdown: true
@@ -24,11 +27,37 @@ Item {
     property bool isInterface: messageData?.role == 'interface'
     property bool isAssistant: messageData?.role == 'assistant'
 
-    property list<var> messageBlocks: StringUtils.splitMarkdownBlocks(root.messageData?.content)
+    property list<var> messageBlocks: []
 
     anchors.left: parent?.left
     anchors.right: parent?.right
     implicitHeight: outerColumn.implicitHeight
+
+    function recomputeBlocks() {
+        messageBlocks = StringUtils.splitMarkdownBlocks(root.messageData?.content)
+    }
+
+    onMessageDataChanged: recomputeBlocks()
+    Component.onCompleted: recomputeBlocks()
+
+    Timer {
+        id: throttleTimer
+        interval: 120
+        repeat: false
+        onTriggered: root.recomputeBlocks()
+    }
+
+    Connections {
+        target: root.messageData
+        function onContentChanged() {
+            if (root.messageData.done) root.recomputeBlocks();
+            else if (!throttleTimer.running) throttleTimer.start();
+        }
+        function onDoneChanged() {
+            throttleTimer.stop();
+            root.recomputeBlocks();
+        }
+    }
 
     function saveMessage() {
         if (!root.editing) return;
@@ -82,17 +111,46 @@ Item {
             Layout.fillWidth: true
             implicitHeight: bubble.implicitHeight
 
+            Rectangle { // Sender avatar
+                id: avatar
+                visible: root.showAvatar
+                y: 0
+                x: root.isUser ? (parent.width - width) : 0
+                implicitWidth: root.avatarSize
+                implicitHeight: root.avatarSize
+                radius: width / 2
+                color: root.isUser ? Appearance.colors.colLayer2 : Appearance.colors.colLayer1
+
+                MaterialSymbol { // User avatar
+                    visible: root.isUser
+                    anchors.centerIn: parent
+                    iconSize: root.avatarSize * 0.62
+                    color: Appearance.colors.colOnLayer2
+                    text: "person"
+                }
+
+                CustomIcon { // Assistant avatar: KOOMPI logo
+                    visible: root.isAssistant
+                    anchors.centerIn: parent
+                    width: root.avatarSize * 0.7
+                    height: root.avatarSize * 0.7
+                    source: "koompi-symbolic.svg"
+                    colorize: true
+                    color: Appearance.colors.colOnLayer1
+                }
+            }
+
             Rectangle {
                 id: bubble
                 y: 0
-                x: root.isUser ? (parent.width - width) : 0
+                x: root.isUser ? (parent.width - width - root.avatarSpace) : root.avatarSpace
                 radius: Appearance.rounding.normal
                 color: root.isUser ? Appearance.colors.colLayer2
                     : root.isInterface ? "transparent"
                     : Appearance.colors.colLayer1
                 implicitHeight: contentColumn.implicitHeight + root.messagePadding * 2
                 width: Math.min(contentColumn.implicitWidth + root.messagePadding * 2,
-                    parent.width * (root.isUser ? 0.82 : root.isInterface ? 1.0 : 0.92))
+                    (parent.width - root.avatarSpace) * (root.isUser ? 0.82 : root.isInterface ? 1.0 : 0.92))
 
                 ColumnLayout {
                     id: contentColumn
@@ -214,7 +272,7 @@ Item {
             Layout.fillWidth: true
             implicitHeight: controlsRow.implicitHeight
             opacity: messageHover.hovered ? 1 : 0
-            visible: opacity > 0
+            enabled: messageHover.hovered
 
             Behavior on opacity {
                 animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
@@ -225,20 +283,10 @@ Item {
                 x: root.isUser ? (parent.width - width) : 0
                 spacing: 2
 
-                MaterialSymbol { // Not visible to model
-                    visible: root.isInterface
-                    Layout.alignment: Qt.AlignVCenter
-                    Layout.rightMargin: 4
-                    iconSize: Appearance.font.pixelSize.small
-                    color: Appearance.colors.colSubtext
-                    text: "visibility_off"
-                    StyledToolTip {
-                        text: Translation.tr("Not visible to model")
-                    }
-                }
 
                 AiMessageControlButton {
                     id: regenButton
+                    accessibleName: Translation.tr("Regenerate response")
                     buttonIcon: "refresh"
                     visible: root.isAssistant
                     onClicked: Ai.regenerate(root.messageIndex)
@@ -249,6 +297,7 @@ Item {
 
                 AiMessageControlButton {
                     id: copyButton
+                    accessibleName: Translation.tr("Copy message")
                     buttonIcon: activated ? "inventory" : "content_copy"
                     onClicked: {
                         Quickshell.clipboardText = root.messageData?.content
@@ -268,6 +317,7 @@ Item {
 
                 AiMessageControlButton {
                     id: editButton
+                    accessibleName: root.editing ? Translation.tr("Save message") : Translation.tr("Edit message")
                     activated: root.editing
                     enabled: root.messageData?.done ?? false
                     buttonIcon: "edit"
@@ -284,6 +334,7 @@ Item {
 
                 AiMessageControlButton {
                     id: toggleMarkdownButton
+                    accessibleName: Translation.tr("View Markdown source")
                     activated: !root.renderMarkdown
                     buttonIcon: "code"
                     onClicked: root.renderMarkdown = !root.renderMarkdown
@@ -294,10 +345,26 @@ Item {
 
                 AiMessageControlButton {
                     id: deleteButton
+                    accessibleName: Translation.tr("Delete message")
                     buttonIcon: "close"
                     onClicked: Ai.removeMessage(root.messageIndex)
                     StyledToolTip {
                         text: Translation.tr("Delete")
+                    }
+                }
+
+                StyledText {
+                    visible: (root.messageData?.timestamp ?? 0) > 0
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.leftMargin: 4
+                    font.pixelSize: Appearance.font.pixelSize.smallie
+                    color: Appearance.colors.colSubtext
+                    text: {
+                        if (!((root.messageData?.timestamp ?? 0) > 0)) return "";
+                        const time = Qt.formatTime(new Date(root.messageData.timestamp), "hh:mm");
+                        const modelId = root.messageData?.model ?? "";
+                        const modelName = Ai.models[modelId]?.name ?? modelId;
+                        return (root.isAssistant && modelName.length > 0) ? time + " · " + modelName : time;
                     }
                 }
             }

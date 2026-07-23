@@ -7,6 +7,9 @@ GroupButton {
     id: button
     property string buttonIcon
     property bool activated: false
+    property string accessibleName: ""
+    Accessible.role: Accessible.Button
+    Accessible.name: accessibleName
     toggled: activated
     baseWidth: height
     colBackgroundHover: Appearance.colors.colSecondaryContainerHover

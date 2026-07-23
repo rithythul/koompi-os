@@ -26,6 +26,14 @@ Item {
 
     property var collapseAnimation: messageTextBlock.implicitHeight > 40 ? Appearance.animation.elementMoveEnter : Appearance.animation.elementMoveFast
     property bool collapsed: true /* should be root.completed but its kinda buggy rn so nope */
+    property int dotPhase: 0
+
+    Timer {
+        interval: 400
+        repeat: true
+        running: !root.completed
+        onTriggered: root.dotPhase = (root.dotPhase + 1) % 4
+    }
 
     Layout.fillWidth: true
     implicitHeight: collapsed ? header.implicitHeight : columnLayout.implicitHeight
@@ -91,7 +99,7 @@ Item {
                     id: thinkBlockLanguage
                     Layout.fillWidth: false
                     Layout.alignment: Qt.AlignLeft
-                    text: root.completed ? Translation.tr("Thought") : (Translation.tr("Thinking") + ".".repeat(Math.random() * 4))
+                    text: root.completed ? Translation.tr("Thought") : Translation.tr("Thinking") + ".".repeat(root.dotPhase)
                 }
                 Item { Layout.fillWidth: true }
                 RippleButton { // Expand button

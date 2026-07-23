@@ -59,8 +59,14 @@ Singleton {
             property string hyprlandInstanceSignature: ""
 
             property JsonObject ai: JsonObject {
-                property string model: "gemini-2.5-flash"
+                property string model: "remote"
                 property real temperature: 0.5
+                property string ownerName: ""
+                property string remoteModel: "gemini-2.5-flash"
+                property string remoteEndpoint: ""
+                property string remoteFormat: ""
+                property string localModel: ""
+                property string localEndpoint: "http://localhost:11434/v1/chat/completions"
             }
 
             property JsonObject cheatsheet: JsonObject {

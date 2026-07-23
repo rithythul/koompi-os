@@ -64,6 +64,7 @@ ColumnLayout {
             ButtonGroup {
                 AiMessageControlButton {
                     id: copyCodeButton
+                    accessibleName: Translation.tr("Copy code")
                     buttonIcon: activated ? "inventory" : "content_copy"
 
                     onClicked: {
@@ -86,16 +87,18 @@ ColumnLayout {
                 }
                 AiMessageControlButton {
                     id: saveCodeButton
+                    accessibleName: Translation.tr("Save code to Downloads")
                     buttonIcon: activated ? "check" : "save"
 
                     onClicked: {
                         const downloadPath = FileUtils.trimFileProtocol(Directories.downloads)
-                        Quickshell.execDetached(["bash", "-c", 
-                            `echo '${StringUtils.shellSingleQuoteEscape(segmentContent)}' > '${downloadPath}/code.${segmentLang || "txt"}'`
+                        const fname = "code-" + Qt.formatDateTime(new Date(), "yyyyMMdd-hhmmss") + "." + (segmentLang || "txt")
+                        Quickshell.execDetached(["bash", "-c",
+                            `printf '%s\\n' '${StringUtils.shellSingleQuoteEscape(segmentContent)}' > '${downloadPath}/${fname}'`
                         ])
-                        Quickshell.execDetached(["notify-send", 
-                            Translation.tr("Code saved to file"), 
-                            Translation.tr("Saved to %1").arg(`${downloadPath}/code.${segmentLang || "txt"}`),
+                        Quickshell.execDetached(["notify-send",
+                            Translation.tr("Code saved to file"),
+                            Translation.tr("Saved to %1").arg(`${downloadPath}/${fname}`),
                             "-a", "Shell"
                         ])
                         saveCodeButton.activated = true
@@ -143,18 +146,14 @@ ColumnLayout {
                 }
                 spacing: 0
                 
-                Repeater {
-                    model: codeTextArea.text.split("\n").length
-                    Text {
-                        required property int index
-                        Layout.fillWidth: true
-                        Layout.alignment: Qt.AlignRight
-                        font.family: Appearance.font.family.monospace
-                        font.pixelSize: Appearance.font.pixelSize.small
-                        color: Appearance.colors.colSubtext
-                        horizontalAlignment: Text.AlignRight
-                        text: index + 1
-                    }
+                Text {
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignRight
+                    font.family: Appearance.font.family.monospace
+                    font.pixelSize: Appearance.font.pixelSize.small
+                    color: Appearance.colors.colSubtext
+                    horizontalAlignment: Text.AlignRight
+                    text: Array.from({length: codeTextArea.text.split("\n").length}, (_, i) => i + 1).join("\n")
                 }
             }
         }

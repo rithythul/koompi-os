@@ -14,6 +14,8 @@ Singleton {
     property string distroId: "unknown"
     property string distroIcon: "linux-symbolic"
     property string username: "user"
+    property string hostname: ""
+    property string kernelVersion: ""
     property string homeUrl: ""
     property string documentationUrl: ""
     property string supportUrl: ""
@@ -96,6 +98,28 @@ Singleton {
         stdout: SplitParser {
             onRead: data => {
                 root.username = data.trim()
+            }
+        }
+    }
+
+    Process {
+        id: getHostname
+        running: true
+        command: ["uname", "-n"]
+        stdout: SplitParser {
+            onRead: data => {
+                root.hostname = data.trim()
+            }
+        }
+    }
+
+    Process {
+        id: getKernelVersion
+        running: true
+        command: ["uname", "-r"]
+        stdout: SplitParser {
+            onRead: data => {
+                root.kernelVersion = data.trim()
             }
         }
     }

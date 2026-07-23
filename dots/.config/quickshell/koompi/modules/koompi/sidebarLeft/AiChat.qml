@@ -28,6 +28,11 @@ Item {
 
     Keys.onPressed: event => {
         messageInputField.forceActiveFocus();
+        // Re-insert the keystroke that triggered focus (skip control chars like Esc/Enter)
+        if (event.text.length > 0 && (event.modifiers & ~Qt.ShiftModifier) === 0 && event.text.charCodeAt(0) >= 0x20) {
+            messageInputField.insert(messageInputField.cursorPosition, event.text);
+            event.accepted = true;
+        }
         if (event.modifiers === Qt.NoModifier) {
             if (event.key === Qt.Key_PageUp) {
                 messageListView.contentY = Math.max(0, messageListView.contentY - messageListView.height / 2);
@@ -96,6 +101,13 @@ Item {
             }
         },
         {
+            name: "endpoint",
+            description: Translation.tr("Set or view model endpoint. Usage: /endpoint [remote|local] URL | /endpoint reset"),
+            execute: args => {
+                Ai.setEndpoint(args.join(" ").trim());
+            }
+        },
+        {
             name: "save",
             description: Translation.tr("Save chat"),
             execute: args => {
@@ -140,6 +152,174 @@ Item {
             }
         },
         {
+            name: "owner",
+            description: Translation.tr("Set the name the assistant should call you by."),
+            execute: args => {
+                const name = args.join(" ").trim();
+                if (name.length === 0 || name === "get") {
+                    const current = Persistent.states.ai.ownerName;
+                    if (current.length > 0) {
+                        Ai.addMessage(Translation.tr("You're registered as **%1**. Change it with %2owner NEW_NAME").arg(current).arg(root.commandPrefix), Ai.interfaceRole);
+                    } else {
+                        Ai.addMessage(Translation.tr("No owner name set yet. Register with %1owner YOUR_NAME").arg(root.commandPrefix), Ai.interfaceRole);
+                    }
+                    return;
+                }
+                Ai.setOwnerName(name);
+                Ai.addMessage(Translation.tr("Got it — I'll call you **%1** from now on.").arg(name), Ai.interfaceRole);
+            }
+        },
+        {
+            name: "whoami",
+            description: Translation.tr("Show who the assistant thinks you are."),
+            execute: () => {
+                const current = Persistent.states.ai.ownerName;
+                const ownerLine = current.length > 0 ? current : Translation.tr("unknown (tell me your name or use %1owner)").arg(root.commandPrefix);
+                Ai.addMessage(Translation.tr("**Assistant**: %1\n**Owner**: %2\n**Login user**: %3").arg(Ai.aiName).arg(ownerLine).arg(SystemInfo.username), Ai.interfaceRole);
+            }
+        },
+        {
+            name: "remember",
+            description: Translation.tr("Manually store a fact in long-term memory."),
+            execute: args => {
+                const text = args.join(" ").trim();
+                if (text.length === 0) {
+                    Ai.addMessage(Translation.tr("Usage: %1remember SOMETHING TO REMEMBER").arg(root.commandPrefix), Ai.interfaceRole);
+                    return;
+                }
+                if (!MemoryService.ready) {
+                    Ai.addMessage(Translation.tr("Memory service is not ready."), Ai.interfaceRole);
+                    return;
+                }
+                MemoryService.remember(text, "fact", [], "user", resp => {
+                    Ai.addMessage(resp && resp.ok
+                        ? (resp.stored ? Translation.tr("Remembered: %1").arg(text) : Translation.tr("Already in memory."))
+                        : Translation.tr("Failed to store memory."), Ai.interfaceRole);
+                });
+            }
+        },
+        {
+            name: "memories",
+            description: Translation.tr("List stored long-term memories."),
+            execute: () => {
+                if (!MemoryService.ready) {
+                    Ai.addMessage(Translation.tr("Memory service is not ready."), Ai.interfaceRole);
+                    return;
+                }
+                MemoryService.list(50, resp => {
+                    const results = resp?.results ?? [];
+                    if (results.length === 0) {
+                        Ai.addMessage(Translation.tr("No memories stored yet."), Ai.interfaceRole);
+                        return;
+                    }
+                    const lines = results.map(r => `- \`#${r.id}\` [${r.mtype}] ${r.text}`).join("\n");
+                    Ai.addMessage(Translation.tr("**Stored memories** (forget with %1forget ID):\n%2").arg(root.commandPrefix).arg(lines), Ai.interfaceRole);
+                });
+            }
+        },
+        {
+            name: "forget",
+            description: Translation.tr("Forget a memory by id (see /memories)."),
+            execute: args => {
+                const id = parseInt(args[0]);
+                if (isNaN(id)) {
+                    Ai.addMessage(Translation.tr("Usage: %1forget MEMORY_ID").arg(root.commandPrefix), Ai.interfaceRole);
+                    return;
+                }
+                MemoryService.forget(id, resp => {
+                    Ai.addMessage(resp && resp.ok && resp.forgotten
+                        ? Translation.tr("Forgot memory #%1.").arg(id)
+                        : Translation.tr("No memory with id #%1.").arg(id), Ai.interfaceRole);
+                });
+            }
+        },
+        {
+            name: "compact",
+            description: Translation.tr("Compact conversation context into a summary to preserve model quality."),
+            execute: () => {
+                if (!Ai.currentModelHasApiKey) {
+                    Ai.addMessage(Translation.tr("No API key set — cannot compact."), Ai.interfaceRole);
+                    return;
+                }
+                if (Ai.compacting) {
+                    Ai.addMessage(Translation.tr("Already compacting."), Ai.interfaceRole);
+                    return;
+                }
+                Ai.compact(null);
+            }
+        },
+        {
+            name: "fork",
+            description: Translation.tr("Snapshot this session to memory. Resume later with /resume SESSION_ID."),
+            execute: () => {
+                if (!MemoryService.ready) {
+                    Ai.addMessage(Translation.tr("Memory service not ready."), Ai.interfaceRole);
+                    return;
+                }
+                const msgList = Ai.messageIDs.map(id => Ai.messageByID[id]).filter(m => m.role !== Ai.interfaceRole);
+                if (msgList.length < 2) {
+                    Ai.addMessage(Translation.tr("Not enough messages to fork."), Ai.interfaceRole);
+                    return;
+                }
+                const summary = msgList.map(m => m.role.toUpperCase() + ": " + (m.rawContent ?? "")).join("\n\n---\n\n").substring(0, 4000);
+                const forkText = "[Session fork " + Ai.sessionId + "]\n\n" + summary;
+                MemoryService.remember(forkText, "compaction", ["session_fork", Ai.sessionId], "user", resp => {
+                    Ai.addMessage(resp && resp.ok && resp.stored
+                        ? Translation.tr("Session forked as **%1**. Resume with `/resume %1`").arg(Ai.sessionId)
+                        : Translation.tr("Fork failed."), Ai.interfaceRole);
+                });
+            }
+        },
+        {
+            name: "resume",
+            description: Translation.tr("Restore a forked session. Usage: /resume SESSION_ID"),
+            execute: args => {
+                const forkId = (args[0] ?? "").trim();
+                if (!forkId) {
+                    Ai.addMessage(Translation.tr("Usage: %1resume SESSION_ID").arg(root.commandPrefix), Ai.interfaceRole);
+                    return;
+                }
+                if (!MemoryService.ready) {
+                    Ai.addMessage(Translation.tr("Memory service not ready."), Ai.interfaceRole);
+                    return;
+                }
+                MemoryService.recall("Session fork " + forkId, 5, results => {
+                    const match = (results ?? []).find(r => (r.text ?? "").includes("[Session fork " + forkId + "]"));
+                    if (!match) {
+                        Ai.addMessage(Translation.tr("No session found with id **%1**.").arg(forkId), Ai.interfaceRole);
+                        return;
+                    }
+                    Ai.clearMessages();
+                    Ai.injectContext(match.text);
+                    Ai.addMessage(Translation.tr("Session **%1** restored.").arg(forkId), Ai.interfaceRole);
+                });
+            }
+        },
+        {
+            name: "research",
+            description: Translation.tr("Deep research loop — Think, Search, Synthesize (max 5 iterations). Usage: /research QUERY"),
+            execute: args => {
+                const query = args.join(" ").trim();
+                if (!query) {
+                    Ai.addMessage(Translation.tr("Usage: %1research QUERY").arg(root.commandPrefix), Ai.interfaceRole);
+                    return;
+                }
+                ResearchService.start(query);
+            }
+        },
+        {
+            name: "task",
+            description: Translation.tr("Run a subtask in a fresh context; result posted back here. Usage: /task DESCRIPTION"),
+            execute: args => {
+                const desc = args.join(" ").trim();
+                if (!desc) {
+                    Ai.addMessage(Translation.tr("Usage: %1task DESCRIPTION").arg(root.commandPrefix), Ai.interfaceRole);
+                    return;
+                }
+                Ai.spawnSubtask(desc);
+            }
+        },
+        ...(Config.options?.ai?.debugCommands ?? false ? [{
             name: "test",
             description: Translation.tr("Markdown test"),
             execute: () => {
@@ -194,10 +374,57 @@ Inline w/ backslash and square brackets \\[\\int_0^\\infty \\frac{1}{x^2} dx = \
 Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
 `, Ai.interfaceRole);
             }
-        },
+        }] : []),
     ]
 
+    property bool stallDetected: false
+    property var recallTypingResults: []
+    property bool recallStripVisible: false
+    property bool recallDismissed: false
+
+    function prefillCommand(cmd) {
+        messageInputField.text = cmd;
+        messageInputField.cursorPosition = messageInputField.text.length;
+        messageInputField.forceActiveFocus();
+    }
+
+    Timer {
+        id: stallWatchdog
+        interval: 60000
+        repeat: false
+        onTriggered: { if (Ai.requestActive) root.stallDetected = true }
+    }
+
+    Connections {
+        target: Ai
+        function onTokenStreamed() { stallWatchdog.restart(); root.stallDetected = false }
+        function onResponseFinished() { stallWatchdog.stop(); root.stallDetected = false }
+        function onRequestActiveChanged() {
+            if (Ai.requestActive) { stallWatchdog.restart() }
+            else { stallWatchdog.stop(); root.stallDetected = false }
+        }
+    }
+
+    Timer {
+        id: recallDebounceTimer
+        interval: 600
+        repeat: false
+        onTriggered: {
+            const text = messageInputField.text;
+            if (text.length < 3 || text.startsWith(root.commandPrefix) || !MemoryService.ready) {
+                root.recallTypingResults = [];
+                root.recallStripVisible = false;
+                return;
+            }
+            MemoryService.recall(text, 3, results => {
+                root.recallTypingResults = results ?? [];
+                root.recallStripVisible = !root.recallDismissed && root.recallTypingResults.length > 0;
+            });
+        }
+    }
+
     function handleInput(inputText) {
+        root.recallDismissed = false;
         if (inputText.startsWith(root.commandPrefix)) {
             // Handle special commands
             const command = inputText.split(" ")[0].substring(1);
@@ -213,7 +440,7 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
         }
 
         // Always scroll to bottom when user sends a message
-        messageListView.positionViewAtEnd();
+        Qt.callLater(messageListView.positionViewAtEnd);
     }
 
     Process {
@@ -239,7 +466,10 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
         property string icon
         property string statusText
         property string description
+        property var clickAction: null
         hoverEnabled: true
+        cursorShape: clickAction ? Qt.PointingHandCursor : Qt.ArrowCursor
+        onClicked: if (clickAction) clickAction()
         implicitHeight: statusItemRowLayout.implicitHeight
         implicitWidth: statusItemRowLayout.implicitWidth
 
@@ -327,12 +557,14 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
                         icon: Ai.currentModelHasApiKey ? "key" : "key_off"
                         statusText: ""
                         description: Ai.currentModelHasApiKey ? Translation.tr("API key is set\nChange with /key YOUR_API_KEY") : Translation.tr("No API key\nSet it with /key YOUR_API_KEY")
+                        clickAction: () => root.prefillCommand(root.commandPrefix + "key ")
                     }
                     StatusSeparator {}
                     StatusItem {
                         icon: "device_thermostat"
                         statusText: Ai.temperature.toFixed(1)
                         description: Translation.tr("Temperature\nChange with /temp VALUE")
+                        clickAction: () => root.prefillCommand(root.commandPrefix + "temp ")
                     }
                     StatusSeparator {
                         visible: Ai.tokenCount.total > 0
@@ -359,20 +591,21 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
                 spacing: 10
                 popin: false
                 topMargin: statusBg.implicitHeight + statusBg.anchors.topMargin * 2
+                scrollAnimation: false
 
                 touchpadScrollFactor: Config.options.interactions.scrolling.touchpadScrollFactor * 1.4
                 mouseScrollFactor: Config.options.interactions.scrolling.mouseScrollFactor * 1.4
 
                 property int lastResponseLength: 0
-                // onContentHeightChanged: {
-                //     if (atYEnd)
-                //         Qt.callLater(positionViewAtEnd);
-                // }
-                // onCountChanged: {
-                //     // Auto-scroll when new messages are added
-                //     if (atYEnd)
-                //         Qt.callLater(positionViewAtEnd);
-                // }
+                // A new message (user or AI) always jumps the view to the newest one,
+                // so the user never has to scroll down to see the latest chat.
+                onCountChanged: Qt.callLater(positionViewAtEnd)
+                // While a response streams in, keep the bottom pinned — but only if the
+                // user is already at the bottom, so scrolling up to read isn't yanked back.
+                onContentHeightChanged: {
+                    if (atYEnd)
+                        Qt.callLater(positionViewAtEnd);
+                }
 
                 add: null // Prevent function calls from being janky
 
@@ -386,9 +619,7 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
                     required property var modelData
                     required property int index
                     messageIndex: index
-                    messageData: {
-                        Ai.messageByID[modelData];
-                    }
+                    messageData: Ai.messageByID[modelData]
                     messageInputField: root.inputField
                 }
             }
@@ -402,15 +633,116 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
                 shape: MaterialShape.Shape.PixelCircle
             }
 
+            RowLayout { // Empty-state starter chips
+                z: 2
+                visible: Ai.messageIDs.length === 0
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
+                    bottom: parent.bottom
+                    bottomMargin: 20
+                }
+                spacing: 5
+
+                ApiCommandButton {
+                    visible: !Ai.currentModelHasApiKey
+                    buttonText: Translation.tr("Set API key")
+                    onClicked: root.prefillCommand(root.commandPrefix + "key ")
+                }
+                ApiCommandButton {
+                    buttonText: Translation.tr("Pick model")
+                    onClicked: root.prefillCommand(root.commandPrefix + "model ")
+                }
+                ApiCommandButton {
+                    visible: Ai.savedChats.length > 0
+                    buttonText: Translation.tr("Load chat")
+                    onClicked: root.prefillCommand(root.commandPrefix + "load ")
+                }
+            }
+
             ScrollToBottomButton {
                 z: 3
                 target: messageListView
             }
         }
 
+        // Token HUD — thin context fill bar (#14)
+        Rectangle {
+            visible: Ai.tokenCount.total > 0
+            Layout.fillWidth: true
+            height: 3
+            radius: 1
+            color: Appearance.colors.colLayer1
+            Rectangle {
+                readonly property real fill: Ai.tokenCount.total / Math.max(1, Config.options?.ai?.memory?.contextWindow ?? 128000)
+                width: parent.width * Math.min(1.0, fill)
+                height: parent.height
+                radius: parent.radius
+                color: fill >= 0.85 ? Appearance.colors.colError
+                     : fill >= 0.60 ? Appearance.m3colors.m3tertiary
+                     : Appearance.colors.colPrimary
+                Behavior on width {
+                    animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
+                }
+                Behavior on color {
+                    animation: Appearance.animation.elementMoveFast.colorAnimation.createObject(this)
+                }
+            }
+            MouseArea {
+                id: contextBarMouseArea
+                anchors.fill: parent
+                anchors.topMargin: -4
+                anchors.bottomMargin: -4
+                hoverEnabled: true
+                acceptedButtons: Qt.NoButton
+
+                StyledToolTip {
+                    extraVisibleCondition: false
+                    alternativeVisibleCondition: contextBarMouseArea.containsMouse
+                    text: Translation.tr("Context: %1 / %2 tokens\nInput: %3 — Output: %4").arg(Ai.tokenCount.total).arg(Config.options?.ai?.memory?.contextWindow ?? 128000).arg(Ai.tokenCount.input).arg(Ai.tokenCount.output)
+                }
+            }
+        }
+        StyledText {
+            visible: Ai.tokenCount.total > 0
+                && Ai.tokenCount.total >= (Config.options?.ai?.memory?.contextWindow ?? 128000) * 0.90
+            Layout.fillWidth: true
+            horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: Appearance.font.pixelSize.small
+            font.italic: true
+            color: Appearance.colors.colError
+            text: Translation.tr("Context nearly full — will compact soon")
+        }
+
         DescriptionBox {
             text: root.suggestionList[suggestions.selectedIndex]?.description ?? ""
             showArrows: root.suggestionList.length > 1
+        }
+
+        RowLayout {
+            visible: root.stallDetected
+            Layout.alignment: Qt.AlignHCenter
+            spacing: 5
+
+            StyledText {
+                font.pixelSize: Appearance.font.pixelSize.small
+                font.italic: true
+                color: Appearance.colors.colSubtext
+                text: Translation.tr("Still thinking…")
+            }
+            ApiCommandButton {
+                buttonText: Translation.tr("Retry")
+                onClicked: {
+                    Ai.retryRequest();
+                    root.stallDetected = false;
+                }
+            }
+            ApiCommandButton {
+                buttonText: Translation.tr("Stop")
+                onClicked: {
+                    Ai.cancelRequest();
+                    root.stallDetected = false;
+                }
+            }
         }
 
         FlowButtonGroup { // Suggestions
@@ -466,6 +798,63 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
                     const word = root.suggestionList[suggestions.selectedIndex].name;
                     suggestions.acceptSuggestion(word);
                 }
+            }
+        }
+
+        // Recall-while-typing strip (#13)
+        ColumnLayout {
+            visible: root.recallStripVisible
+            Layout.fillWidth: true
+            spacing: 2
+
+            RowLayout {
+                Layout.fillWidth: true
+                StyledText {
+                    font.pixelSize: Appearance.font.pixelSize.small
+                    color: Appearance.colors.colSubtext
+                    text: Translation.tr("Recalled:")
+                }
+                Item { Layout.fillWidth: true }
+                ApiCommandButton {
+                    contentItem: StyledText {
+                        font.pixelSize: Appearance.font.pixelSize.small
+                        color: Appearance.m3colors.m3onSurface
+                        text: "×"
+                    }
+                    onClicked: {
+                        root.recallStripVisible = false;
+                        root.recallDismissed = true;
+                    }
+                }
+            }
+            Repeater {
+                model: root.recallTypingResults.slice(0, 3)
+                delegate: StyledText {
+                    required property var modelData
+                    Layout.fillWidth: true
+                    font.pixelSize: Appearance.font.pixelSize.small
+                    color: Appearance.colors.colSubtext
+                    text: "• " + (modelData.text ?? "")
+                    wrapMode: Text.WordWrap
+                    elide: Text.ElideRight
+                    maximumLineCount: 2
+                }
+            }
+        }
+
+        RowLayout { // Undo-clear bar
+            visible: Ai.canUndoClear
+            Layout.alignment: Qt.AlignHCenter
+            spacing: 5
+
+            StyledText {
+                font.pixelSize: Appearance.font.pixelSize.small
+                color: Appearance.colors.colSubtext
+                text: Translation.tr("Chat cleared")
+            }
+            ApiCommandButton {
+                buttonText: Translation.tr("Undo")
+                onClicked: Ai.undoClear()
             }
         }
 
@@ -526,6 +915,7 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
                             if (messageInputField.text.length === 0) {
                                 root.suggestionQuery = "";
                                 root.suggestionList = [];
+                                root.recallDismissed = false;
                                 return;
                             } else if (messageInputField.text.startsWith(`${root.commandPrefix}model`)) {
                                 root.suggestionQuery = messageInputField.text.split(" ")[1] ?? "";
@@ -629,6 +1019,14 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
                                     };
                                 });
                             }
+                            // Recall while typing — debounced (#13)
+                            if (messageInputField.text.length >= 3 && !messageInputField.text.startsWith(root.commandPrefix)) {
+                                recallDebounceTimer.restart();
+                            } else {
+                                recallDebounceTimer.stop();
+                                root.recallTypingResults = [];
+                                root.recallStripVisible = false;
+                            }
                         }
 
                         function accept() {
@@ -637,8 +1035,15 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
                         }
 
                         Keys.onPressed: event => {
-                            if (event.key === Qt.Key_Tab) {
+                            if (event.key === Qt.Key_Tab && suggestions.visible) {
                                 suggestions.acceptSelectedWord();
+                                event.accepted = true;
+                            } else if ((event.key === Qt.Key_PageUp || event.key === Qt.Key_PageDown) && event.modifiers === Qt.NoModifier) {
+                                if (event.key === Qt.Key_PageUp) {
+                                    messageListView.contentY = Math.max(0, messageListView.contentY - messageListView.height / 2);
+                                } else {
+                                    messageListView.contentY = Math.min(messageListView.contentHeight - messageListView.height / 2, messageListView.contentY + messageListView.height / 2);
+                                }
                                 event.accepted = true;
                             } else if (event.key === Qt.Key_Up && suggestions.visible) {
                                 suggestions.selectedIndex = Math.max(0, suggestions.selectedIndex - 1);
@@ -683,8 +1088,11 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
                                 }
                                 event.accepted = false; // No image, let text pasting proceed
                             } else if (event.key === Qt.Key_Escape) {
-                                // Esc to detach file
-                                if (Ai.pendingFilePath.length > 0) {
+                                // Esc: cancel request > detach file > propagate (close sidebar)
+                                if (Ai.requestActive) {
+                                    Ai.cancelRequest();
+                                    event.accepted = true;
+                                } else if (Ai.pendingFilePath.length > 0) {
                                     Ai.attachFile("");
                                     event.accepted = true;
                                 } else {
@@ -701,13 +1109,18 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
                     implicitWidth: 40
                     implicitHeight: 40
                     buttonRadius: Appearance.rounding.small
-                    enabled: messageInputField.text.length > 0
+                    enabled: Ai.requestActive || messageInputField.text.length > 0
                     toggled: enabled
+                    Accessible.name: Ai.requestActive ? Translation.tr("Stop response") : Translation.tr("Send message")
 
                     MouseArea {
                         anchors.fill: parent
                         cursorShape: sendButton.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
                         onClicked: {
+                            if (Ai.requestActive) {
+                                Ai.cancelRequest();
+                                return;
+                            }
                             const inputText = messageInputField.text;
                             root.handleInput(inputText);
                             messageInputField.clear();
@@ -719,7 +1132,7 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
                         horizontalAlignment: Text.AlignHCenter
                         iconSize: 22
                         color: sendButton.enabled ? Appearance.m3colors.m3onPrimary : Appearance.colors.colOnLayer2Disabled
-                        text: "arrow_upward"
+                        text: Ai.requestActive ? "stop" : "arrow_upward"
                     }
                 }
             }
@@ -751,6 +1164,7 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
                     icon: "api"
                     text: Ai.getModel().name
                     tooltipText: Translation.tr("Current model: %1\nSet it with %2model MODEL").arg(Ai.getModel().name).arg(root.commandPrefix)
+                    onClickedAction: () => root.prefillCommand(root.commandPrefix + "model ")
                 }
 
                 ApiInputBoxIndicator {
@@ -758,6 +1172,23 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
                     icon: "service_toolbox"
                     text: Ai.currentTool.charAt(0).toUpperCase() + Ai.currentTool.slice(1)
                     tooltipText: Translation.tr("Current tool: %1\nSet it with %2tool TOOL").arg(Ai.currentTool).arg(root.commandPrefix)
+                    onClickedAction: () => root.prefillCommand(root.commandPrefix + "tool ")
+                }
+
+                ApiCommandButton {
+                    // Attach button
+                    contentItem: MaterialSymbol {
+                        horizontalAlignment: Text.AlignHCenter
+                        iconSize: Appearance.font.pixelSize.larger
+                        color: Appearance.m3colors.m3onSurface
+                        text: "attach_file"
+                    }
+                    onClicked: root.prefillCommand(root.commandPrefix + "attach ")
+                    Accessible.name: Translation.tr("Attach a file")
+
+                    StyledToolTip {
+                        text: Translation.tr("Attach a file — paste an image or type a path")
+                    }
                 }
 
                 Item {
