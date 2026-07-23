@@ -33,6 +33,8 @@ fi
 
 mkfifo "$FIFO"
 
+# Invoked indirectly via `trap cleanup EXIT` below.
+# shellcheck disable=SC2329
 cleanup() {
     kill "$SONGREC_PID" 2>/dev/null || true
     wait "$SONGREC_PID" 2>/dev/null

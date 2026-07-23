@@ -25,7 +25,7 @@ for CODE_SETTINGS_PATH in "${settings_paths[@]}"; do
                 "s/(\"material-code.primaryColor\"\s*:\s*\")[^\"]*(\")/\1${new_color}\2/" \
                 "$CODE_SETTINGS_PATH"
         else # If the key is not already there, add it
-            sed -i '$ s/}/,\n  "material-code.primaryColor": "'${new_color}'"\n}/' "$CODE_SETTINGS_PATH"
+            sed -i '$ s/}/,\n  "material-code.primaryColor": "'"${new_color}"'"\n}/' "$CODE_SETTINGS_PATH"
             sed -i '$ s/,\n,/,/' "$CODE_SETTINGS_PATH"
         fi
     fi

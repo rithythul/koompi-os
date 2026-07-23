@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # This script is meant to be sourced.
 # It's not for directly running.
 
@@ -8,12 +9,12 @@ install-yay(){
   x makepkg -o
   x makepkg -se
   x makepkg -i --noconfirm
-  x cd ${REPO_ROOT}
+  x cd "${REPO_ROOT}"
   rm -rf /tmp/buildyay
 }
 
 remove_deprecated_dependencies(){
-  printf "${STY_CYAN}[$0]: Removing deprecated dependencies:${STY_RST}\n"
+  printf "%b[%s]: Removing deprecated dependencies:%b\n" "$STY_CYAN" "$0" "$STY_RST"
   local list=()
   list+=(illogical-impulse-{microtex,pymyc-aur,oneui4-icons-git})
   # Old local metapackages, renamed to koompi-*: drop the illogical-impulse-* group so it doesn't linger as orphans.
@@ -21,7 +22,7 @@ remove_deprecated_dependencies(){
   list+=(hyprland-qtutils)
   list+=({quickshell,hyprutils,hyprpicker,hyprlang,hypridle,hyprland-qt-support,hyprland-qtutils,hyprlock,xdg-desktop-portal-hyprland,hyprcursor,hyprwayland-scanner,hyprland}-git)
   list+=(matugen-bin)
-  for i in ${list[@]};do try sudo pacman --noconfirm -Rdd $i;done
+  for i in "${list[@]}";do try sudo pacman --noconfirm -Rdd "$i";done
 }
 # NOTE: `implicitize_old_dependencies()` was for the old days when we just switch from dependencies.conf to local PKGBUILDs.
 # However, let's just keep it as references for other distros writing their `sdata/dist-<OS_GROUP_ID>/install-deps.sh`, if they need it.
@@ -42,7 +43,7 @@ implicitize_old_dependencies(){
 
 #####################################################################################
 if ! command -v pacman >/dev/null 2>&1; then
-  printf "${STY_RED}[$0]: pacman not found, it seems that the system is not ArchLinux or Arch-based distros. Aborting...${STY_RST}\n"
+  printf "%b[%s]: pacman not found, it seems that the system is not ArchLinux or Arch-based distros. Aborting...%b\n" "$STY_RED" "$0" "$STY_RST"
   exit 1
 fi
 
@@ -77,9 +78,13 @@ install-local-pkgbuild() {
   local location=$1
   local installflags=$2
 
-  x pushd $location
+  x pushd "$location"
 
+  # shellcheck source=/dev/null  # PKGBUILD path is only known at runtime
   source ./PKGBUILD
+  # SC2086: $installflags is a flag list ("--needed --noconfirm") that must word-split.
+  # SC2154: depends[] comes from the PKGBUILD sourced just above.
+  # shellcheck disable=SC2086,SC2154
   x yay -S --sudoloop $installflags --asdeps "${depends[@]}"
   # man makepkg:
   # -A, --ignorearch: Ignore a missing or incomplete arch field in the build script.
@@ -115,6 +120,7 @@ metapkgs+=(./sdata/dist-arch/koompi-desktop)
 
 for i in "${metapkgs[@]}"; do
   metainstallflags="--needed"
+  # shellcheck disable=SC2154  # $ask is set by the installer that sources this file
   $ask && showfun install-local-pkgbuild || metainstallflags="$metainstallflags --noconfirm"
   v install-local-pkgbuild "$i" "$metainstallflags"
 done
@@ -128,7 +134,7 @@ case $SKIP_PLASMAINTG in
       echo -e "${STY_YELLOW}[$0]: NOTE: The size of \"plasma-browser-integration\" is ~600 KiB, but if you don't yet have KDE on your system it'll pull an extra ~600MiB of packages.${STY_RST}"
       echo -e "${STY_YELLOW}It is needed if you want playtime of media in Firefox to be shown on the music controls widget.${STY_RST}"
       echo -e "${STY_YELLOW}Install it? [y/N]${STY_RST}"
-      read -p "====> " p
+      read -r -p "====> " p
     else
       p=y
     fi

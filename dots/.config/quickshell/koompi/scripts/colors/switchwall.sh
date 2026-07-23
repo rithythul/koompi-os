@@ -1,15 +1,12 @@
 #!/usr/bin/env bash
 
-QUICKSHELL_CONFIG_NAME="koompi"
 XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
-CONFIG_DIR="$XDG_CONFIG_HOME/quickshell/$QUICKSHELL_CONFIG_NAME"
 CACHE_DIR="$XDG_CACHE_HOME/quickshell"
 STATE_DIR="$XDG_STATE_HOME/quickshell"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SHELL_CONFIG_FILE="$XDG_CONFIG_HOME/koompi/config.json"
-MATUGEN_DIR="$XDG_CONFIG_HOME/matugen"
 terminalscheme="$SCRIPT_DIR/terminal/scheme-base.json"
 
 handle_kde_material_you_colors() {
@@ -51,10 +48,6 @@ pre_process() {
 }
 
 post_process() {
-    local screen_width="$1"
-    local screen_height="$2"
-    local wallpaper_path="$3"
-
     handle_kde_material_you_colors &
     "$SCRIPT_DIR/code/material-code-set-color.sh" &
 }
@@ -173,13 +166,6 @@ switch() {
     if [[ "$aiStylingEnabled" == "true" ]]; then
         categorize_wallpaper "$imgpath" &
     fi
-
-    read scale screenx screeny screensizey < <(hyprctl monitors -j | jq '.[] | select(.focused) | .scale, .x, .y, .height' | xargs)
-    cursorposx=$(hyprctl cursorpos -j | jq '.x' 2>/dev/null) || cursorposx=960
-    cursorposx=$(bc <<< "scale=0; ($cursorposx - $screenx) * $scale / 1")
-    cursorposy=$(hyprctl cursorpos -j | jq '.y' 2>/dev/null) || cursorposy=540
-    cursorposy=$(bc <<< "scale=0; ($cursorposy - $screeny) * $scale / 1")
-    cursorposy_inverted=$((screensizey - cursorposy))
 
     matugen_args=(--source-color-index 0)
 
@@ -304,16 +290,14 @@ switch() {
     fi
 
     matugen "${matugen_args[@]}"
-    source "$(eval echo $ILLOGICAL_IMPULSE_VIRTUAL_ENV)/bin/activate"
+    # shellcheck source=/dev/null # venv activate script lives outside the repo
+    source "$(eval echo "$ILLOGICAL_IMPULSE_VIRTUAL_ENV")/bin/activate"
     python3 "$SCRIPT_DIR/generate_colors_material.py" "${generate_colors_material_args[@]}" \
         > "$STATE_DIR"/user/generated/material_colors.scss
     deactivate
     "$SCRIPT_DIR"/applycolor.sh
 
-    # Pass screen width, height, and wallpaper path to post_process
-    max_width_desired="$(hyprctl monitors -j | jq '([.[].width] | min)' | xargs)"
-    max_height_desired="$(hyprctl monitors -j | jq '([.[].height] | min)' | xargs)"
-    post_process "$max_width_desired" "$max_height_desired" "$imgpath"
+    post_process
 }
 
 main() {
@@ -337,7 +321,8 @@ main() {
 
     detect_scheme_type_from_image() {
         local img="$1"
-        source "$(eval echo $ILLOGICAL_IMPULSE_VIRTUAL_ENV)/bin/activate"
+        # shellcheck source=/dev/null # venv activate script lives outside the repo
+        source "$(eval echo "$ILLOGICAL_IMPULSE_VIRTUAL_ENV")/bin/activate"
         "$SCRIPT_DIR"/scheme_for_image.py "$img" 2>/dev/null | tr -d '\n'
         deactivate
     }
@@ -360,7 +345,7 @@ main() {
                     set_accent_color ""
                     shift 2
                 else
-                    set_accent_color $(hyprpicker --no-fancy)
+                    set_accent_color "$(hyprpicker --no-fancy)"
                     shift
                 fi
                 ;;
@@ -447,8 +432,9 @@ main() {
     # If mode_flag is dark or light, try to find a variant with that mode suffix
     if [[ "$mode_flag" == "dark" || "$mode_flag" == "light" ]]; then
         # Get directory, filename without extension, and extension
-        local imgdir="$(dirname "$imgpath")"
-        local imgbase="$(basename "$imgpath")"
+        local imgdir imgbase
+        imgdir="$(dirname "$imgpath")"
+        imgbase="$(basename "$imgpath")"
         local imgname="${imgbase%.*}"
         local imgext="${imgbase##*.}"
 

@@ -64,7 +64,7 @@ show_status() {
 # Parse command line arguments
 LANG_CODE=""
 COMMAND=""
-YES_FLAG=""
+YES_FLAG=()
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -81,7 +81,7 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         -y|--yes)
-            YES_FLAG="-y"
+            YES_FLAG=(-y)
             shift
             ;;
         -h|--help)
@@ -121,28 +121,28 @@ if [ "$COMMAND" = "status" ] && ! command -v jq >/dev/null 2>&1; then
 fi
 
 # Build base arguments
-BASE_ARGS="--translations-dir $TRANSLATIONS_DIR --source-dir $SOURCE_DIR"
+BASE_ARGS=(--translations-dir "$TRANSLATIONS_DIR" --source-dir "$SOURCE_DIR")
 
 case $COMMAND in
     extract)
         echo "Extracting translatable texts..."
-        python3 "$SCRIPT_DIR/translation-manager.py" $BASE_ARGS $YES_FLAG --extract-only --show-temp
+        python3 "$SCRIPT_DIR/translation-manager.py" "${BASE_ARGS[@]}" "${YES_FLAG[@]}" --extract-only --show-temp
         ;;
     update)
         echo "Updating translation files..."
         if [ -n "$LANG_CODE" ]; then
-            python3 "$SCRIPT_DIR/translation-manager.py" $BASE_ARGS $YES_FLAG --language "$LANG_CODE"
+            python3 "$SCRIPT_DIR/translation-manager.py" "${BASE_ARGS[@]}" "${YES_FLAG[@]}" --language "$LANG_CODE"
         else
-            python3 "$SCRIPT_DIR/translation-manager.py" $BASE_ARGS $YES_FLAG
+            python3 "$SCRIPT_DIR/translation-manager.py" "${BASE_ARGS[@]}" "${YES_FLAG[@]}"
         fi
         ;;
     clean)
         echo "Cleaning unused translation keys..."
-        python3 "$SCRIPT_DIR/translation-cleaner.py" $BASE_ARGS $YES_FLAG --clean
+        python3 "$SCRIPT_DIR/translation-cleaner.py" "${BASE_ARGS[@]}" "${YES_FLAG[@]}" --clean
         ;;
     sync)
         echo "Syncing translation keys..."
-        python3 "$SCRIPT_DIR/translation-cleaner.py" $BASE_ARGS $YES_FLAG --sync
+        python3 "$SCRIPT_DIR/translation-cleaner.py" "${BASE_ARGS[@]}" "${YES_FLAG[@]}" --sync
         ;;
     status)
         show_status

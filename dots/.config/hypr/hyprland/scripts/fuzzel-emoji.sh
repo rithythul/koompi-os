@@ -1,4 +1,7 @@
 #!/bin/bash
+# Everything after '### DATA ###' is emoji data read back out of $0 by sed, never
+# executed. shellcheck parses it as code and chokes on faces like ":)".
+# shellcheck disable=SC2317,SC1089
 set -euo pipefail
 
 MODE="${1:-type}"
