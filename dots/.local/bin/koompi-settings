@@ -17,4 +17,10 @@ if [[ ! -f "$SETTINGS_QML" ]]; then
     exit 1
 fi
 
+# Optional page name, e.g. `koompi-settings bluetooth`, matched against the
+# settings page component filenames.
+if [[ $# -ge 1 ]]; then
+    export KOOMPI_SETTINGS_PAGE="$1"
+fi
+
 exec qs -p "$SETTINGS_QML"

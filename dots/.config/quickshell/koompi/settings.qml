@@ -50,6 +50,16 @@ ApplicationWindow {
             component: "modules/settings/InterfaceConfig.qml"
         },
         {
+            name: Translation.tr("Bluetooth"),
+            icon: "bluetooth",
+            component: "modules/settings/BluetoothConfig.qml"
+        },
+        {
+            name: Translation.tr("Account"),
+            icon: "person",
+            component: "modules/settings/AccountConfig.qml"
+        },
+        {
             name: Translation.tr("Services"),
             icon: "settings",
             component: "modules/settings/ServicesConfig.qml"
@@ -65,7 +75,14 @@ ApplicationWindow {
             component: "modules/settings/About.qml"
         }
     ]
-    property int currentPage: 0
+    // koompi-settings <page> exports KOOMPI_SETTINGS_PAGE; match it against the
+    // component filename so page names need no separate registry.
+    property int currentPage: {
+        const requested = (Quickshell.env("KOOMPI_SETTINGS_PAGE") ?? "").toLowerCase();
+        if (requested.length === 0) return 0;
+        const idx = root.pages.findIndex(p => p.component.toLowerCase().includes(requested));
+        return idx >= 0 ? idx : 0;
+    }
 
     visible: true
     onClosing: Qt.quit()
@@ -240,7 +257,7 @@ ApplicationWindow {
 
                     active: Config.ready
                     Component.onCompleted: {
-                        source = root.pages[0].component
+                        source = root.pages[root.currentPage].component
                     }
 
                     Connections {
