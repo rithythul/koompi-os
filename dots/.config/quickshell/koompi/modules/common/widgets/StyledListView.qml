@@ -21,6 +21,8 @@ ListView {
     property real touchpadScrollFactor: Config?.options.interactions.scrolling.touchpadScrollFactor ?? 100
     property real mouseScrollFactor: Config?.options.interactions.scrolling.mouseScrollFactor ?? 50
     property real mouseScrollDeltaThreshold: Config?.options.interactions.scrolling.mouseScrollDeltaThreshold ?? 120
+    // Set false to snap contentY instantly (avoids animation pileup during rapid updates)
+    property bool scrollAnimation: true
 
     function resetDrag() {
         root.dragIndex = -1
@@ -52,6 +54,7 @@ ListView {
     }
 
     Behavior on contentY {
+        enabled: root.scrollAnimation
         NumberAnimation {
             id: scrollAnim
             alwaysRunToEnd: true

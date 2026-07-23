@@ -63,6 +63,7 @@ MouseArea {
             root._dragDiffX = mouse.x - startX
             root._dragDiffY = mouse.y - startY
             const dist = Math.sqrt(root._dragDiffX * root._dragDiffX + root._dragDiffY * root._dragDiffY);
+            if (dist < 8) return; // ignore tiny movements (touchpad tap jitter)
             root.dragPressed(_dragDiffX, _dragDiffY);
             root.dragging = true;
         }

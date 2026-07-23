@@ -78,6 +78,13 @@ MouseArea { // Notification group area
         root.expanded = !root.expanded;
     }
 
+    TapHandler { // Touchpad tap and left-click expand/collapse
+        acceptedButtons: Qt.LeftButton
+        onSingleTapped: (eventPoint, button) => {
+            root.toggleExpanded();
+        }
+    }
+
     DragManager { // Drag manager
         id: dragManager
         anchors.fill: parent

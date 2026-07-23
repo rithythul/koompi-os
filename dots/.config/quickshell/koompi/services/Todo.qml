@@ -57,6 +57,16 @@ Singleton {
         }
     }
 
+    function moveItem(fromIndex, toIndex) {
+        if (fromIndex < 0 || fromIndex >= list.length) return;
+        if (toIndex < 0 || toIndex >= list.length) return;
+        if (fromIndex === toIndex) return;
+        const item = list.splice(fromIndex, 1)[0];
+        list.splice(toIndex, 0, item);
+        root.list = list.slice(0);
+        todoFileView.setText(JSON.stringify(root.list));
+    }
+
     function refresh() {
         todoFileView.reload()
     }
