@@ -20,7 +20,6 @@ hl.env("QT_QPA_PLATFORM", "wayland;xcb")
 -- loading plasma-integration (M5/M7 Qt unwind). KDE apps still read kdeglobals,
 -- which switchwall.sh merges the same colors into.
 hl.env("QT_QPA_PLATFORMTHEME", "qt6ct")
-hl.env("XDG_MENU_PREFIX", "plasma-")
 
 -- Virtual environment
 hl.env("ILLOGICAL_IMPULSE_VIRTUAL_ENV", home_dir .. "/.local/state/quickshell/.venv")
