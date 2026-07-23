@@ -609,7 +609,9 @@ Singleton {
             }
 
             property JsonObject screenSnip: JsonObject {
-                property string savePath: "" // only copy to clipboard when empty
+                // A screenshot key that leaves no file is surprising, so KOOMPI
+                // saves as well as copies. Set to "" for clipboard only.
+                property string savePath: `${Directories.pictures}/Screenshots`.replace("file://", "")
             }
 
             property JsonObject sounds: JsonObject {

@@ -121,13 +121,13 @@ MouseArea {
 
     Process {
         id: lockWallpaperProc
+        running: true
         property string path: ""
         command: [FileUtils.trimFileProtocol(`${Directories.scriptPath}/colors/random/random_library_wall.sh`), "--print"]
         stdout: StdioCollector {
             onStreamFinished: lockWallpaperProc.path = text.trim()
         }
     }
-    Component.onCompleted: lockWallpaperProc.running = true
 
     // Main toolbar: password box
     Toolbar {

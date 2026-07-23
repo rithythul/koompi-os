@@ -22,6 +22,18 @@ Toolbar {
     property var selectionMode
     // Signals
     signal dismiss()
+    signal fullScreenRequested()
+
+    // Capture the whole screen without dragging a selection. The selector is the
+    // only screenshot UI, so it has to offer the case where you want all of it.
+    IconAndTextToolbarButton {
+        iconText: "fullscreen"
+        buttonText: Translation.tr("Full screen")
+        onClicked: root.fullScreenRequested()
+        StyledToolTip {
+            text: Translation.tr("Capture this entire screen")
+        }
+    }
 
     ToolbarTabBar {
         id: tabBar

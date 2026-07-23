@@ -257,6 +257,16 @@ PanelWindow {
         }
     }
 
+    // Whole screen, no dragging. Same path as a manual selection, so the chosen
+    // action, save location and post-snip behaviour all stay identical.
+    function snipFullScreen() {
+        root.regionX = 0;
+        root.regionY = 0;
+        root.regionWidth = root.screen.width;
+        root.regionHeight = root.screen.height;
+        root.snip();
+    }
+
     // Execution after selection
     function snip() {
         // Validity check
@@ -527,6 +537,7 @@ PanelWindow {
                     property alias source: root.selectionMode
                 }
                 onDismiss: root.dismiss();
+                onFullScreenRequested: root.snipFullScreen();
             }
             ToolbarPairedFab {
                 anchors.verticalCenter: parent.verticalCenter

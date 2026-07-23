@@ -99,13 +99,22 @@ hl.bind("SUPER + ALT + R", hl.dsp.exec_cmd(qsIsAlive .. " || " .. qsScripts .. "
 hl.bind("CTRL + ALT + R", hl.dsp.exec_cmd(qsScripts .. "/videos/record.sh --fullscreen"), { locked = true })
 hl.bind("SUPER + SHIFT + ALT + R", hl.dsp.exec_cmd(qsScripts .. "/videos/record.sh --fullscreen --sound"),
     { locked = true, description = "Utilities: Record screen (with sound)" })
---# Fullscreen screenshot
+--# Screenshot
 local grimhyprctl = "grim -o \"$(hyprctl activeworkspace -j | jq -r '.monitor')\""
-hl.bind("Print", hl.dsp.exec_cmd(
+-- Print opens the snip UI so you can drag a region or hit "Full screen", rather
+-- than silently grabbing everything. SHIFT + Print keeps the old one-shot grab.
+hl.bind("Print", hl.dsp.global("quickshell:regionScreenshot"),
+    { locked = true, description = "Utilities: Screenshot (region or full screen)" })
+hl.bind("Print", hl.dsp.exec_cmd(qsIsAlive .. " || (" ..
+    "mkdir -p $(xdg-user-dir PICTURES)/Screenshots && " ..
+    "f=$(xdg-user-dir PICTURES)/Screenshots/Screenshot_\"$(date '+%Y-%m-%d_%H.%M.%S')\".png && " ..
+    grimhyprctl .. " \"$f\" && wl-copy < \"$f\" && notify-send 'Screenshot saved' \"$f\" -i \"$f\")"
+), { locked = true })
+hl.bind("SHIFT + Print", hl.dsp.exec_cmd(
     "mkdir -p $(xdg-user-dir PICTURES)/Screenshots && " ..
     "f=$(xdg-user-dir PICTURES)/Screenshots/Screenshot_\"$(date '+%Y-%m-%d_%H.%M.%S')\".png && " ..
     grimhyprctl .. " \"$f\" && wl-copy < \"$f\" && notify-send 'Screenshot saved' \"$f\" -i \"$f\""
-), { locked = true, description = "Utilities: Screenshot >> file + clipboard" })
+), { locked = true, description = "Utilities: Screenshot whole screen >> file + clipboard" })
 hl.bind("CTRL + Print", hl.dsp.exec_cmd(
     "mkdir -p $(xdg-user-dir PICTURES)/Screenshots && " ..
     grimhyprctl .. " $(xdg-user-dir PICTURES)/Screenshots/Screenshot_\"$(date '+%Y-%m-%d_%H.%M.%S')\".png"
