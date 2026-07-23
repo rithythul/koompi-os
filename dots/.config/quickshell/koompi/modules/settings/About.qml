@@ -20,7 +20,8 @@ ContentPage {
             Layout.bottomMargin: 10
             IconImage {
                 implicitSize: 80
-                source: Quickshell.iconPath(SystemInfo.logo)
+                // KOOMPI logo is theme-adaptive: white on dark, navy on light
+                source: Quickshell.iconPath(Appearance.m3colors.darkmode ? "koompi" : "koompi-light")
             }
             ColumnLayout {
                 Layout.alignment: Qt.AlignVCenter
@@ -80,33 +81,34 @@ ContentPage {
     }
     ContentSection {
         icon: "folder_managed"
-        title: Translation.tr("Dotfiles")
+        title: Translation.tr("Desktop")
 
-        RowLayout {
-            Layout.alignment: Qt.AlignHCenter
-            spacing: 20
+        ColumnLayout {
+            Layout.fillWidth: true
             Layout.topMargin: 10
             Layout.bottomMargin: 10
-            IconImage {
-                implicitSize: 80
-                source: Quickshell.iconPath("illogical-impulse")
+            spacing: 4
+            StyledText {
+                text: Translation.tr("Hyprland desktop, part of KOOMPI OS")
+                font.pixelSize: Appearance.font.pixelSize.normal
             }
-            ColumnLayout {
-                Layout.alignment: Qt.AlignVCenter
-                // spacing: 10
-                StyledText {
-                    text: Translation.tr("Built on illogical-impulse")
-                    font.pixelSize: Appearance.font.pixelSize.title
+            StyledText {
+                text: "https://github.com/rithythul/koompi-hyprland"
+                font.pixelSize: Appearance.font.pixelSize.normal
+                textFormat: Text.MarkdownText
+                onLinkActivated: (link) => {
+                    Qt.openUrlExternally(link)
                 }
-                StyledText {
-                    text: "https://github.com/end-4/dots-hyprland"
-                    font.pixelSize: Appearance.font.pixelSize.normal
-                    textFormat: Text.MarkdownText
-                    onLinkActivated: (link) => {
-                        Qt.openUrlExternally(link)
-                    }
-                    PointingHandLinkHover {}
+                PointingHandLinkHover {}
+            }
+            StyledText {
+                text: "Based on [illogical-impulse](https://github.com/end-4/dots-hyprland) by end-4"
+                font.pixelSize: Appearance.font.pixelSize.smaller
+                textFormat: Text.MarkdownText
+                onLinkActivated: (link) => {
+                    Qt.openUrlExternally(link)
                 }
+                PointingHandLinkHover {}
             }
         }
 
@@ -118,7 +120,7 @@ ContentPage {
                 materialIcon: "auto_stories"
                 mainText: Translation.tr("Documentation")
                 onClicked: {
-                    Qt.openUrlExternally("https://end-4.github.io/dots-hyprland-wiki/en/ii-qs/02usage/")
+                    Qt.openUrlExternally("https://github.com/rithythul/koompi-hyprland")
                 }
             }
             RippleButtonWithIcon {
@@ -126,14 +128,14 @@ ContentPage {
                 materialIconFill: false
                 mainText: Translation.tr("Issues")
                 onClicked: {
-                    Qt.openUrlExternally("https://github.com/end-4/dots-hyprland/issues")
+                    Qt.openUrlExternally("https://github.com/rithythul/koompi-hyprland/issues")
                 }
             }
             RippleButtonWithIcon {
                 materialIcon: "forum"
                 mainText: Translation.tr("Discussions")
                 onClicked: {
-                    Qt.openUrlExternally("https://github.com/end-4/dots-hyprland/discussions")
+                    Qt.openUrlExternally("https://github.com/rithythul/koompi-hyprland/discussions")
                 }
             }
             RippleButtonWithIcon {
