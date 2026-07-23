@@ -21,13 +21,20 @@ ApiStrategy {
             const geminiApiRoleName = (message.role === "assistant") ? "model" : message.role;
             const usingSearch = tools[0]?.google_search !== undefined
             if (!usingSearch && message.functionCall != undefined && message.functionName.length > 0) {
+                const args = (message.functionCall && typeof message.functionCall === "object")
+                    ? (message.functionCall.args ?? {}) : {};
+                const fcPart = {
+                    functionCall: {
+                        "name": message.functionName,
+                        "args": args,
+                    }
+                };
+                // Replay the thought signature Gemini gave us, or it rejects the turn (Error 400).
+                if (message.thoughtSignature && message.thoughtSignature.length > 0)
+                    fcPart.thoughtSignature = message.thoughtSignature;
                 return {
                     "role": geminiApiRoleName,
-                    "parts": [{
-                        functionCall: {
-                            "name": message.functionName,
-                        }
-                    }]
+                    "parts": [fcPart]
                 }
             }
             if (!usingSearch && message.functionResponse != undefined && message.functionName.length > 0) {
@@ -128,10 +135,13 @@ ApiStrategy {
             }
             
             // Function call handling
-            if (dataJson.candidates[0]?.content?.parts[0]?.functionCall) {
-                const functionCall = dataJson.candidates[0]?.content?.parts[0]?.functionCall;
+            const fcPart = dataJson.candidates[0]?.content?.parts?.[0];
+            if (fcPart?.functionCall) {
+                const functionCall = fcPart.functionCall;
                 message.functionName = functionCall.name;
                 message.functionCall = functionCall.name;
+                // Preserve the thought signature so it can be replayed on the follow-up turn.
+                message.thoughtSignature = fcPart.thoughtSignature ?? "";
                 const newContent = `\n\n[[ Function: ${functionCall.name}(${JSON.stringify(functionCall.args, null, 2)}) ]]\n`
                 message.rawContent += newContent;
                 message.content += newContent;

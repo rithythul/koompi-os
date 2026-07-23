@@ -18,7 +18,11 @@ QtObject {
     property list<string> searchQueries: []
     property string functionName
     property var functionCall
+    // Gemini 2.5 attaches an opaque thoughtSignature to the functionCall part; it
+    // must be echoed back verbatim on the next request or the API rejects the turn.
+    property string thoughtSignature: ""
     property string functionResponse
     property bool functionPending: false
     property bool visibleToUser: true
+    property double timestamp: 0
 }
