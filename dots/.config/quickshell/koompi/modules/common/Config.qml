@@ -161,7 +161,8 @@ Singleton {
 
             property JsonObject apps: JsonObject {
                 property string bluetooth: "~/.local/bin/koompi-settings bluetooth"
-                property string changePassword: "kitty -1 --hold=yes fish -i -c 'passwd'"
+                property string changePassword: `~/.config/hypr/hyprland/scripts/launch_first_available.sh "kitty -1 --hold=yes fish -i -c passwd" "foot fish -i -c passwd" "alacritty -e fish -i -c passwd" "wezterm start -- fish -i -c passwd"`
+                property string addUser: `~/.config/hypr/hyprland/scripts/launch_first_available.sh "kitty -1 --hold=yes koompi-useradd" "foot koompi-useradd" "alacritty -e koompi-useradd" "wezterm start -- koompi-useradd"`
                 // nm-connection-editor is NetworkManager's own editor, so advanced
                 // network settings no longer route through a Plasma control module.
                 property string network: "nm-connection-editor"

@@ -62,15 +62,28 @@ ContentPage {
         icon: "key"
         title: Translation.tr("Security")
 
-        RippleButtonWithIcon {
-            materialIcon: "password"
-            mainText: Translation.tr("Change password")
-            buttonRadius: Appearance.rounding.small
-            onClicked: {
-                Quickshell.execDetached(["bash", "-c", Config.options.apps.changePassword]);
+        ConfigRow {
+            RippleButtonWithIcon {
+                materialIcon: "password"
+                mainText: Translation.tr("Change password")
+                buttonRadius: Appearance.rounding.small
+                onClicked: {
+                    Quickshell.execDetached(["bash", "-c", Config.options.apps.changePassword]);
+                }
+                StyledToolTip {
+                    text: Translation.tr("Opens a terminal running passwd")
+                }
             }
-            StyledToolTip {
-                text: Translation.tr("Opens a terminal running passwd")
+            RippleButtonWithIcon {
+                materialIcon: "person_add"
+                mainText: Translation.tr("Add user")
+                buttonRadius: Appearance.rounding.small
+                onClicked: {
+                    Quickshell.execDetached(["bash", "-c", Config.options.apps.addUser]);
+                }
+                StyledToolTip {
+                    text: Translation.tr("Create a new user account (asks for admin rights)")
+                }
             }
         }
     }
