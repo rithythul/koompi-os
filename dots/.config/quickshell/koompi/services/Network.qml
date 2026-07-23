@@ -34,6 +34,7 @@ Singleton {
 
     property string networkName: ""
     property int networkStrength
+    readonly property bool connected: root.ethernet || (root.wifiEnabled && root.wifiStatus === "connected")
     property string materialSymbol: root.ethernet
         ? "lan"
         : (root.wifiEnabled && root.wifiStatus === "connected")
@@ -48,9 +49,9 @@ Singleton {
             : (root.wifiStatus === "connecting")
                 ? "signal_wifi_statusbar_not_connected"
                 : (root.wifiStatus === "disconnected")
-                    ? "wifi_find"
+                    ? "signal_wifi_off"
                     : (root.wifiStatus === "disabled")
-                        ? "signal_wifi_off"
+                        ? "wifi_off"
                         : "signal_wifi_bad"
 
     // Control
@@ -172,7 +173,7 @@ Singleton {
     Process {
         id: updateConnectionType
         property string buffer
-        command: ["sh", "-c", "nmcli -t -f TYPE,STATE d status && nmcli -t -f CONNECTIVITY g"]
+        command: ["sh", "-c", "nmcli -c no -t -f TYPE,STATE d status && nmcli -c no -t -f CONNECTIVITY g"]
         running: true
         function startCheck() {
             buffer = "";
@@ -221,7 +222,7 @@ Singleton {
 
     Process {
         id: updateNetworkName
-        command: ["sh", "-c", "nmcli -t -f NAME c show --active | head -1"]
+        command: ["sh", "-c", "nmcli -c no -t -f NAME c show --active | head -1"]
         running: true
         stdout: SplitParser {
             onRead: data => {
@@ -233,7 +234,7 @@ Singleton {
     Process {
         id: updateNetworkStrength
         running: true
-        command: ["sh", "-c", "nmcli -f IN-USE,SIGNAL,SSID device wifi | awk '/^\\*/{if (NR!=1) {print $2}}'"]
+        command: ["sh", "-c", "nmcli -c no -f IN-USE,SIGNAL,SSID device wifi | awk '/^\\*/{if (NR!=1) {print $2}}'"]
         stdout: SplitParser {
             onRead: data => {
                 root.networkStrength = parseInt(data);
@@ -243,7 +244,7 @@ Singleton {
 
     Process {
         id: wifiStatusProcess
-        command: ["nmcli", "radio", "wifi"]
+        command: ["nmcli", "-c", "no", "radio", "wifi"]
         Component.onCompleted: running = true
         environment: ({
             LANG: "C",
@@ -259,7 +260,7 @@ Singleton {
     Process {
         id: getNetworks
         running: true
-        command: ["nmcli", "-g", "ACTIVE,SIGNAL,FREQ,SSID,BSSID,SECURITY", "d", "w"]
+        command: ["nmcli", "-c", "no", "-g", "ACTIVE,SIGNAL,FREQ,SSID,BSSID,SECURITY", "d", "w"]
         environment: ({
             LANG: "C",
             LC_ALL: "C"
