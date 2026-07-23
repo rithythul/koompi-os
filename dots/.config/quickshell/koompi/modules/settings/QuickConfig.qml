@@ -14,7 +14,7 @@ ContentPage {
     Process {
         id: randomWallProc
         property string status: ""
-        property string scriptPath: `${Directories.scriptPath}/colors/random/random_konachan_wall.sh`
+        property string scriptPath: `${Directories.scriptPath}/colors/random/random_library_wall.sh`
         command: ["bash", "-c", FileUtils.trimFileProtocol(randomWallProc.scriptPath)]
         stdout: SplitParser {
             onRead: data => {
@@ -86,6 +86,20 @@ ContentPage {
             }
 
             ColumnLayout {
+                RippleButtonWithIcon {
+                    enabled: !randomWallProc.running
+                    Layout.fillWidth: true
+                    buttonRadius: Appearance.rounding.small
+                    materialIcon: "ifl"
+                    mainText: randomWallProc.running ? Translation.tr("Be patient...") : Translation.tr("Random: KOOMPI library")
+                    onClicked: {
+                        randomWallProc.scriptPath = `${Directories.scriptPath}/colors/random/random_library_wall.sh`;
+                        randomWallProc.running = true;
+                    }
+                    StyledToolTip {
+                        text: Translation.tr("Random wallpaper from the KOOMPI library\nWorks offline, no download")
+                    }
+                }
                 RippleButtonWithIcon {
                     enabled: !randomWallProc.running
                     visible: Config.options.policies.weeb === 1

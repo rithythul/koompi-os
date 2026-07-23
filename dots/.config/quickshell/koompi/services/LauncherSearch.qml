@@ -87,6 +87,12 @@ Singleton {
             }
         },
         {
+            action: "randomwallpaper",
+            execute: () => {
+                Quickshell.execDetached([Quickshell.shellPath("scripts/colors/random/random_library_wall.sh")]);
+            }
+        },
+        {
             action: "superpaste",
             execute: args => {
                 if (!/^(\d+)/.test(args.trim())) {

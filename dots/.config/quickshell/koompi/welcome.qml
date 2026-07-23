@@ -42,13 +42,14 @@ ApplicationWindow {
     color: Appearance.m3colors.m3background
 
     Process {
-        id: konachanWallProc
+        id: randomWallProc
         property string status: ""
-        command: ["bash", "-c", Quickshell.shellPath("scripts/colors/random/random_konachan_wall.sh")]
+        property string scriptPath: Quickshell.shellPath("scripts/colors/random/random_library_wall.sh")
+        command: ["bash", "-c", randomWallProc.scriptPath]
         stdout: SplitParser {
             onRead: data => {
-                console.log(`Konachan wall proc output: ${data}`);
-                konachanWallProc.status = data.trim();
+                console.log(`Random wall proc output: ${data}`);
+                randomWallProc.status = data.trim();
             }
         }
     }
@@ -282,14 +283,30 @@ ApplicationWindow {
                         Layout.alignment: Qt.AlignHCenter
                         RippleButtonWithIcon {
                             id: rndWallBtn
+                            enabled: !randomWallProc.running
+                            Layout.alignment: Qt.AlignHCenter
+                            buttonRadius: Appearance.rounding.small
+                            materialIcon: "ifl"
+                            mainText: randomWallProc.running ? Translation.tr("Be patient...") : Translation.tr("Random: KOOMPI library")
+                            onClicked: {
+                                randomWallProc.scriptPath = Quickshell.shellPath("scripts/colors/random/random_library_wall.sh");
+                                randomWallProc.running = true;
+                            }
+                            StyledToolTip {
+                                text: Translation.tr("Random wallpaper from the KOOMPI library\nWorks offline, no download")
+                            }
+                        }
+                        RippleButtonWithIcon {
+                            id: rndKonachanBtn
+                            enabled: !randomWallProc.running
                             visible: Config.options.policies.weeb === 1
                             Layout.alignment: Qt.AlignHCenter
                             buttonRadius: Appearance.rounding.small
                             materialIcon: "ifl"
-                            mainText: konachanWallProc.running ? Translation.tr("Be patient...") : Translation.tr("Random: Konachan")
+                            mainText: randomWallProc.running ? Translation.tr("Be patient...") : Translation.tr("Random: Konachan")
                             onClicked: {
-                                console.log(konachanWallProc.command.join(" "));
-                                konachanWallProc.running = true;
+                                randomWallProc.scriptPath = Quickshell.shellPath("scripts/colors/random/random_konachan_wall.sh");
+                                randomWallProc.running = true;
                             }
                             StyledToolTip {
                                 text: Translation.tr("Random SFW Anime wallpaper from Konachan\nImage is saved to ~/Pictures/Wallpapers")
@@ -445,14 +462,14 @@ ApplicationWindow {
                             materialIcon: "help"
                             mainText: Translation.tr("Usage")
                             onClicked: {
-                                Qt.openUrlExternally("https://end-4.github.io/dots-hyprland-wiki/en/ii-qs/02usage/");
+                                Qt.openUrlExternally("https://github.com/rithythul/koompi-hyprland");
                             }
                         }
                         RippleButtonWithIcon {
                             materialIcon: "construction"
                             mainText: Translation.tr("Configuration")
                             onClicked: {
-                                Qt.openUrlExternally("https://end-4.github.io/dots-hyprland-wiki/en/ii-qs/03config/");
+                                Qt.openUrlExternally("https://github.com/rithythul/koompi-hyprland#configuration");
                             }
                         }
                     }
