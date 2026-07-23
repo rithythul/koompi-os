@@ -45,7 +45,14 @@ if [ -z "$link" ] || [ "$link" = "null" ]; then
 fi
 
 ext=$(echo "$link" | awk -F. '{print $NF}')
-downloadPath="$PICTURES_DIR/Wallpapers/random_wallpaper.$ext"
+# With a target workspace, each workspace gets its own file: sharing one
+# mutable filename meant a later download silently changed every workspace
+# that pointed at it.
+if [ -n "${KOOMPI_TARGET_WORKSPACE:-}" ]; then
+    downloadPath="$PICTURES_DIR/Wallpapers/random_wallpaper-ws${KOOMPI_TARGET_WORKSPACE}.$ext"
+else
+    downloadPath="$PICTURES_DIR/Wallpapers/random_wallpaper.$ext"
+fi
 currentWallpaperPath=$(jq -r '.background.wallpaperPath' "$illogicalImpulseConfigPath")
 if [ "$downloadPath" == "$currentWallpaperPath" ]; then
     downloadPath="$PICTURES_DIR/Wallpapers/random_wallpaper-1.$ext"

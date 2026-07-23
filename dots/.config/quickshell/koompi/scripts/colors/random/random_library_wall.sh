@@ -47,13 +47,27 @@ if [ "${#images[@]}" -eq 0 ]; then
     exit 1
 fi
 
-pick="${images[RANDOM % ${#images[@]}]}"
-
-# Picking the wallpaper already on screen reads as a dead button, so try again.
-current=$(jq -r '.background.wallpaperPath // empty' "$CONFIG_FILE" 2>/dev/null)
-if [ "$pick" = "$current" ] && [ "${#images[@]}" -gt 1 ]; then
-    pick="${images[RANDOM % ${#images[@]}]}"
+# Keep every workspace's wallpaper distinct: exclude images already used by
+# any workspace or as the global wallpaper. When the pool is smaller than the
+# number of workspaces the filter empties out; fall back to the full pool then,
+# since a repeat beats a dead keypress.
+mapfile -t used < <(jq -r '
+    [.background.wallpaperPath // empty]
+    + [.background.workspaceWallpapers.workspaces[]?.path // empty]
+    | .[] | select(length > 0)' "$CONFIG_FILE" 2>/dev/null)
+if [ "${#used[@]}" -gt 0 ]; then
+    fresh=()
+    for img in "${images[@]}"; do
+        keep=1
+        for u in "${used[@]}"; do
+            [ "$img" = "$u" ] && { keep=0; break; }
+        done
+        [ "$keep" = 1 ] && fresh+=("$img")
+    done
+    [ "${#fresh[@]}" -gt 0 ] && images=("${fresh[@]}")
 fi
+
+pick="${images[RANDOM % ${#images[@]}]}"
 
 # --print just names a wallpaper without touching anything. The lock screen uses
 # it to show a different image each time it locks.

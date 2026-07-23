@@ -24,6 +24,9 @@ Commands:
   set <1-10> /path/to/image
       Set one workspace static path and mode=static. Does not enable the feature globally.
 
+  seed
+      Give every workspace (1-10) its own distinct random wallpaper.
+
   set-active /path/to/image
       Same as set, but targets whichever workspace is active right now. This is
       what the random wallpaper keybind uses, so a re-roll only ever touches the
@@ -168,6 +171,45 @@ cmd_set() {
     printf 'Set %s static wallpaper to %s.\n' "$key" "$path"
 }
 
+# Deal a distinct wallpaper to every workspace. With a pool smaller than ten
+# the deal cycles, repeating as little as possible.
+cmd_seed() {
+    ensure_config_file
+    ensure_workspace_config
+    need_cmd shuf
+    local library
+    library="$(json_get '.background.workspaceWallpapers.libraryPath // "'"$DEFAULT_LIBRARY"'"')"
+    local -a dirs=()
+    [[ -d "$library" ]] && dirs+=("$library")
+    [[ -d /usr/share/backgrounds/koompi ]] && dirs+=(/usr/share/backgrounds/koompi)
+    local pictures_wallpapers="$HOME/Pictures/Wallpapers"
+    [[ -d "$pictures_wallpapers" ]] && dirs+=("$pictures_wallpapers")
+    [[ "${#dirs[@]}" -gt 0 ]] || fail "No wallpaper directory found to seed from"
+
+    local -a images=()
+    while IFS= read -r -d '' f; do
+        case "$(file -b --mime-type "$f")" in
+            image/*) images+=("$f") ;;
+        esac
+    done < <(find "${dirs[@]}" -type f -not -path '*/not-desktop-grade/*' -print0)
+    [[ "${#images[@]}" -gt 0 ]] || fail "No images found in: ${dirs[*]}"
+
+    mapfile -t shuffled < <(printf '%s
+' "${images[@]}" | shuf)
+    local i path
+    for i in {1..10}; do
+        path="${shuffled[$(( (i - 1) % ${#shuffled[@]} ))]}"
+        jq --arg key "ws$i" --arg path "$path" '
+          .background.workspaceWallpapers.workspaces[$key].mode = "static" |
+          .background.workspaceWallpapers.workspaces[$key].path = $path
+        ' "$CONFIG_FILE" > "$CONFIG_FILE.tmp"
+        mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
+        log "seed ws$i -> $path"
+    done
+    printf 'Seeded 10 workspaces from %s image(s).
+' "${#shuffled[@]}"
+}
+
 cmd_set_active() {
     local path="${1:-}"
     local workspace
@@ -201,6 +243,11 @@ main() {
         set-active)
             shift
             cmd_set_active "$@"
+            ;;
+        seed)
+            shift
+            [[ $# -eq 0 ]] || fail "seed takes no arguments"
+            cmd_seed
             ;;
         -h|--help|help|"")
             usage
