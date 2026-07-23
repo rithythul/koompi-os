@@ -9,8 +9,9 @@ Singleton {
     id: root
 
     property bool smartTray: Config.options.tray.filterPassive
-    property list<var> itemsInUserList: SystemTray.items.values.filter(i => (Config.options.tray.pinnedItems.includes(i.id) && (!smartTray || i.status !== Status.Passive)))
-    property list<var> itemsNotInUserList: SystemTray.items.values.filter(i => (!Config.options.tray.pinnedItems.includes(i.id) && (!smartTray || i.status !== Status.Passive)))
+    property list<var> shownItems: SystemTray.items.values.filter(i => (!Config.options.tray.ignoredItems.includes(i.id) && (!smartTray || i.status !== Status.Passive)))
+    property list<var> itemsInUserList: shownItems.filter(i => Config.options.tray.pinnedItems.includes(i.id))
+    property list<var> itemsNotInUserList: shownItems.filter(i => !Config.options.tray.pinnedItems.includes(i.id))
 
     property bool invertPins: Config.options.tray.invertPinnedItems
     property list<var> pinnedItems: invertPins ? itemsNotInUserList : itemsInUserList
