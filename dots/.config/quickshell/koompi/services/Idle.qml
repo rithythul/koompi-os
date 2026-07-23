@@ -14,6 +14,15 @@ Singleton {
     property alias inhibit: idleInhibitor.enabled
     inhibit: false
 
+    // The [q] keeps the regex from matching the literal pattern text inside the
+    // bash wrapper's own cmdline below. Keeps exactly zero or one inhibitor
+    // alive across toggle-offs and shell reloads, which used to leak them.
+    readonly property string inhibitorPattern: "who=[q]uickshell --why=Keep system awake"
+
+    onInhibitChanged: {
+        if (!root.inhibit) Quickshell.execDetached(["pkill", "-f", root.inhibitorPattern]);
+    }
+
     Connections {
         target: Persistent
         function onReadyChanged() {
@@ -22,6 +31,7 @@ Singleton {
             } else {
                 Persistent.states.idle.inhibit = root.inhibit;
             }
+            if (!root.inhibit) Quickshell.execDetached(["pkill", "-f", root.inhibitorPattern]);
         }
     }
 
@@ -39,8 +49,9 @@ Singleton {
     // systemd idle inhibitor, which hypridle honors directly.
     Process {
         running: root.inhibit
-        command: ["systemd-inhibit", "--what=idle:sleep", "--mode=block",
-                  "--who=quickshell", "--why=Keep system awake", "sleep", "infinity"]
+        command: ["bash", "-c",
+            "pkill -f 'who=[q]uickshell --why=Keep system awake'; " +
+            "exec systemd-inhibit --what=idle:sleep --mode=block --who=quickshell --why='Keep system awake' sleep infinity"]
     }
 
     IdleInhibitor {
