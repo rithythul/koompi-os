@@ -17,6 +17,13 @@ if [[ ! -f "$SETTINGS_QML" ]]; then
     exit 1
 fi
 
+# Toggle like the sidebars (Super + I opens, Super + I closes): a bare
+# invocation closes the running instance; a page argument switches to it.
+if pgrep -f "qs -p $SETTINGS_QML" >/dev/null 2>&1; then
+    qs kill -p "$SETTINGS_QML" 2>/dev/null || pkill -f "qs -p $SETTINGS_QML" || true
+    [[ $# -ge 1 ]] || exit 0
+fi
+
 # Optional page name, e.g. `koompi-settings bluetooth`, matched against the
 # settings page component filenames.
 if [[ $# -ge 1 ]]; then
