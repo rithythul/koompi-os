@@ -55,4 +55,11 @@ if [ "$pick" = "$current" ] && [ "${#images[@]}" -gt 1 ]; then
     pick="${images[RANDOM % ${#images[@]}]}"
 fi
 
+# --print just names a wallpaper without touching anything. The lock screen uses
+# it to show a different image each time it locks.
+if [ "${1:-}" = "--print" ]; then
+    printf '%s\n' "$pick"
+    exit 0
+fi
+
 "$SCRIPT_DIR/../apply_wall.sh" "$pick"

@@ -11,6 +11,7 @@ import qs.modules.common.panels.lock
 import qs.modules.koompi.bar as Bar
 import Quickshell
 import Quickshell.Services.SystemTray
+import Quickshell.Io
 
 MouseArea {
     id: root
@@ -96,38 +97,37 @@ MouseArea {
     //     }
     // }
 
-    // KOOMPI doodle: purely decorative, gently breathing/bobbing logo in the
-    // empty upper area. Non-interactive (clicks fall through to the MouseArea).
-    // Disable with config.json -> lock.doodle.enable = false.
+    // The lock surface covers everything, so without this it is a black void.
+    // A different wallpaper each time it locks, drawn from the same pool the
+    // random keybind uses. Dimmed so the password field stays readable on a
+    // bright image.
     Image {
-        id: koompiDoodle
-        visible: Config.options.lock?.doodle?.enable ?? true
-        property real bob: 0
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: parent.top
-        anchors.topMargin: Math.round(parent.height * 0.16) + bob
-        source: Quickshell.iconPath(Appearance.m3colors.darkmode ? "koompi" : "koompi-light")
-        sourceSize: Qt.size(80, 80)
-        width: 72
-        height: 72
-        fillMode: Image.PreserveAspectFit
+        id: lockWallpaper
+        anchors.fill: parent
+        fillMode: Image.PreserveAspectCrop
+        asynchronous: true
+        cache: false
         smooth: true
-        antialiasing: true
-        opacity: 0.5
+        source: lockWallpaperProc.path.length > 0 ? `file://${lockWallpaperProc.path}` : ""
+        z: -1
+    }
+    Rectangle {
+        anchors.fill: parent
+        visible: lockWallpaper.status === Image.Ready
+        color: Appearance.m3colors.darkmode ? "#000000" : "#FFFFFF"
+        opacity: 0.35
+        z: -1
+    }
 
-        SequentialAnimation on bob {
-            running: koompiDoodle.visible
-            loops: Animation.Infinite
-            NumberAnimation { from: 0; to: -14; duration: 2600; easing.type: Easing.InOutSine }
-            NumberAnimation { from: -14; to: 0; duration: 2600; easing.type: Easing.InOutSine }
-        }
-        SequentialAnimation on scale {
-            running: koompiDoodle.visible
-            loops: Animation.Infinite
-            NumberAnimation { from: 1.0; to: 1.06; duration: 2600; easing.type: Easing.InOutSine }
-            NumberAnimation { from: 1.06; to: 1.0; duration: 2600; easing.type: Easing.InOutSine }
+    Process {
+        id: lockWallpaperProc
+        property string path: ""
+        command: [FileUtils.trimFileProtocol(`${Directories.scriptPath}/colors/random/random_library_wall.sh`), "--print"]
+        stdout: StdioCollector {
+            onStreamFinished: lockWallpaperProc.path = text.trim()
         }
     }
+    Component.onCompleted: lockWallpaperProc.running = true
 
     // Main toolbar: password box
     Toolbar {
