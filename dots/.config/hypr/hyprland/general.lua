@@ -37,6 +37,12 @@ hl.gesture({
 })
 
 hl.config({
+    -- The 4-finger swipe walks numeric neighbours (r+1/r-1) instead of cycling
+    -- only the open workspaces, so every workspace is reachable by swiping,
+    -- the same way the bar's scroll wheel already behaves.
+    gestures = {
+        workspace_swipe_use_r = true
+    },
     general = {
         -- Gaps and border
         gaps_in = 4,
