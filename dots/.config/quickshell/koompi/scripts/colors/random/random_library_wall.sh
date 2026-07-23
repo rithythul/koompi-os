@@ -6,11 +6,29 @@
 
 XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LIBRARY_DIR="$XDG_CONFIG_HOME/koompi/wallpapers/library"
 CONFIG_FILE="$XDG_CONFIG_HOME/koompi/config.json"
 
-if [ ! -d "$LIBRARY_DIR" ]; then
-    echo "random_library_wall: no wallpaper library at $LIBRARY_DIR" >&2
+get_pictures_dir() {
+    if command -v xdg-user-dir >/dev/null 2>&1; then
+        xdg-user-dir PICTURES
+        return
+    fi
+    echo "$HOME/Pictures"
+}
+
+# Two homes, on purpose. The shipped set is installed read-only by the
+# koompi-branding package so it survives, upgrades, and costs one copy for the
+# whole machine. The user's own folder is where anything they add lives, and
+# where the online sources save what they download.
+dirs=()
+configured=$(jq -r '.background.workspaceWallpapers.libraryPath // empty' "$CONFIG_FILE" 2>/dev/null)
+[ -n "$configured" ] && [ -d "$configured" ] && dirs+=("$configured")
+[ -d "/usr/share/backgrounds/koompi" ] && dirs+=("/usr/share/backgrounds/koompi")
+user_dir="$(get_pictures_dir)/Wallpapers"
+[ -d "$user_dir" ] && dirs+=("$user_dir")
+
+if [ "${#dirs[@]}" -eq 0 ]; then
+    echo "random_library_wall: no wallpaper directory found" >&2
     exit 1
 fi
 
@@ -22,10 +40,10 @@ while IFS= read -r -d '' f; do
     case "$(file -b --mime-type "$f")" in
         image/*) images+=("$f") ;;
     esac
-done < <(find "$LIBRARY_DIR" -type f -not -path '*/not-desktop-grade/*' -print0)
+done < <(find "${dirs[@]}" -type f -not -path '*/not-desktop-grade/*' -print0)
 
 if [ "${#images[@]}" -eq 0 ]; then
-    echo "random_library_wall: no images in $LIBRARY_DIR" >&2
+    echo "random_library_wall: no images in ${dirs[*]}" >&2
     exit 1
 fi
 
