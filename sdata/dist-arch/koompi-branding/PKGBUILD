@@ -27,7 +27,15 @@ package() {
   _repo_root="$(cd "$startdir/../../.." && pwd)"
   _src="$startdir/files"
 
-  # Wallpapers (already in the repo) -> /usr/share/backgrounds/koompi
+  # Wallpapers -> /usr/share/backgrounds/koompi. Two tiers (M0 decision
+  # 2026-07-23): the brand wallpapers stay in git and install from the repo;
+  # the curated library ships as a release tarball built by
+  # wallpapers/build-tarball.sh. When the first tarball is published to a
+  # wallpapers-v<N> release on github.com/rithythul/koompi-os, add it to this
+  # PKGBUILD as:
+  #   source=("https://github.com/rithythul/koompi-os/releases/download/wallpapers-v<N>/koompi-wallpapers-<N>.tar.zst")
+  #   sha256sums=('<from build-tarball.sh output>')
+  # and install "$srcdir/koompi-wallpapers/"*/ into the same target below.
   install -dm755 "$pkgdir/usr/share/backgrounds/koompi"
   install -m644 "$_repo_root/wallpapers/"*.jpg "$pkgdir/usr/share/backgrounds/koompi/" 2>/dev/null || \
     echo "koompi-branding: no wallpapers/*.jpg at repo root — skipping (clean-chroot build?)" >&2
