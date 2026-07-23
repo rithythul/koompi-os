@@ -17,7 +17,7 @@ QuickToggleModel {
     available: BluetoothStatus.available
     toggled: BluetoothStatus.enabled
     mainAction: () => {
-        Bluetooth.defaultAdapter.enabled = !Bluetooth.defaultAdapter?.enabled
+        BluetoothStatus.setEnabled(!Bluetooth.defaultAdapter?.enabled)
     }
     hasMenu: true
 }
