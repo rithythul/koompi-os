@@ -46,9 +46,7 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 
-compare_running_models_and_modelfiles() { 
-    json_match=()
-    json_output=()
+compare_running_models_and_modelfiles() {
     local matching_models=()
     OLDIFS=$IFS
     for ((i=0; i<${#model_name_paths[@]}; i++)); do  # Iterate over the array of modelname,blob-path
@@ -61,18 +59,18 @@ compare_running_models_and_modelfiles() {
     done
     
     if [ -z "$json_out" ]; then
-        echo -e "\nModel Found: \n $(echo ${matching_models[*]} | jq '.' | sed s/[{}]//g) \n"        
+        echo -e "\nModel Found: \n $(echo "${matching_models[*]}" | jq '.' | sed s/[{}]//g) \n"
     else
         local json_match="${matching_models[*]}"
-        json_output=$(echo $json_match | jq -c -s .)
+        json_output=$(echo "$json_match" | jq -c -s .)
         echo "$json_output"
     fi
     IFS=$OLDIFS
 }
 
 get_running_model_paths() {
-    blobs=$(ps aux | grep -- '--model' | grep -v grep | grep -Po '(?<=--model\s).*' | cut -d ' ' -f1)
-    if [ -z "$blobs" ]; then
+    mapfile -t blobs < <(ps aux | grep -- '--model' | grep -v grep | grep -Po '(?<=--model\s).*' | cut -d ' ' -f1)
+    if [ "${#blobs[@]}" -eq 0 ]; then
         echo -e "\n\n Warning: No running Ollama models detected!\n"
         exit 0
     fi
@@ -81,16 +79,18 @@ get_running_model_paths() {
 parse_modelfiles() {
     if [ -z "$json_out" ]; then
         echo -e "\nConnecting to $ollama_url:$port\n"
-        if [ -z "$(curl -s $ollama_url:$port)" ]; then
+        if [ -z "$(curl -s "$ollama_url:$port")" ]; then
            echo -e "Could not connect to Ollama. Check the ollama_url parameter and that the server is running\n"
            exit 1
         fi
         curl -s "$ollama_url:$port"
     fi
-    local models=( $(curl -s "$ollama_url:$port/api/tags" | jq -r '.models[].name') )
+    local models=()
+    mapfile -t models < <(curl -s "$ollama_url:$port/api/tags" | jq -r '.models[].name')
     for model in "${models[@]}"; do
-        local modelfile=$(curl -s "$ollama_url:$port/api/show" -d '{ "name": "'"$model"'", "modelfile": true }' | jq   -r '.modelfile')
-        model_name_paths+=($model,$(echo "$modelfile" | awk '/^FROM/{print $2}'))
+        local modelfile
+        modelfile=$(curl -s "$ollama_url:$port/api/show" -d '{ "name": "'"$model"'", "modelfile": true }' | jq   -r '.modelfile')
+        model_name_paths+=("$model,$(echo "$modelfile" | awk '/^FROM/{print $2}')")
     done
 }
 
