@@ -64,4 +64,4 @@ if ! curl -fsA "$userAgent" "$link" -o "$downloadPath" || [ ! -s "$downloadPath"
     rm -f "$downloadPath"
     exit 1
 fi
-"$SCRIPT_DIR/../switchwall.sh" --image "$downloadPath"
+"$SCRIPT_DIR/../apply_wall.sh" "$downloadPath"

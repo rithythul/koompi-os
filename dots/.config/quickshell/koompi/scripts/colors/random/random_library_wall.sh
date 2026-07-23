@@ -37,4 +37,4 @@ if [ "$pick" = "$current" ] && [ "${#images[@]}" -gt 1 ]; then
     pick="${images[RANDOM % ${#images[@]}]}"
 fi
 
-"$SCRIPT_DIR/../switchwall.sh" --image "$pick"
+"$SCRIPT_DIR/../apply_wall.sh" "$pick"

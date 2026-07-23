@@ -287,7 +287,7 @@ ApplicationWindow {
                             Layout.alignment: Qt.AlignHCenter
                             buttonRadius: Appearance.rounding.small
                             materialIcon: "ifl"
-                            mainText: randomWallProc.running ? Translation.tr("Be patient...") : Translation.tr("Random: KOOMPI library")
+                            mainText: randomWallProc.running ? Translation.tr("Be patient...") : Translation.tr("Random: KOOMPI")
                             onClicked: {
                                 randomWallProc.scriptPath = Quickshell.shellPath("scripts/colors/random/random_library_wall.sh");
                                 randomWallProc.running = true;

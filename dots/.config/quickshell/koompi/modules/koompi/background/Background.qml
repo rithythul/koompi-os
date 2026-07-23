@@ -40,8 +40,42 @@ Variants {
         property int workspaceChunkSize: Config?.options.bar.workspaces.shown ?? 10
         property int totalWorkspaces: Math.ceil(lastWorkspaceId / workspaceChunkSize) * workspaceChunkSize
         // Wallpaper
-        property bool wallpaperIsVideo: Config.options.background.wallpaperPath.endsWith(".mp4") || Config.options.background.wallpaperPath.endsWith(".webm") || Config.options.background.wallpaperPath.endsWith(".mkv") || Config.options.background.wallpaperPath.endsWith(".avi") || Config.options.background.wallpaperPath.endsWith(".mov")
-        property string wallpaperPath: wallpaperIsVideo ? Config.options.background.thumbnailPath : Config.options.background.wallpaperPath
+        property int activeWorkspaceId: bgRoot.monitor?.activeWorkspace?.id ?? 1
+        function workspaceWallpaperKey() {
+            const id = bgRoot.activeWorkspaceId;
+            if (id < 1 || id > 10) {
+                return "";
+            }
+            return `ws${id}`;
+        }
+        function workspaceWallpaperConfig() {
+            const workspaceWallpapers = Config.options.background.workspaceWallpapers;
+            if (!workspaceWallpapers?.enabled) {
+                return null;
+            }
+            const key = bgRoot.workspaceWallpaperKey();
+            if (key.length === 0) {
+                return null;
+            }
+            return workspaceWallpapers.workspaces[key];
+        }
+        function resolvedWallpaperPath() {
+            const fallbackPath = Config.options.background.wallpaperPath;
+            const workspaceConfig = bgRoot.workspaceWallpaperConfig();
+            if (!workspaceConfig) {
+                return fallbackPath;
+            }
+
+            const mode = workspaceConfig.mode || Config.options.background.workspaceWallpapers.defaultMode || "inherit";
+            const path = workspaceConfig.path || "";
+            if (mode === "static" && path.length > 0) {
+                return path;
+            }
+            return fallbackPath;
+        }
+        property string wallpaperRawPath: resolvedWallpaperPath()
+        property bool wallpaperIsVideo: wallpaperRawPath.endsWith(".mp4") || wallpaperRawPath.endsWith(".webm") || wallpaperRawPath.endsWith(".mkv") || wallpaperRawPath.endsWith(".avi") || wallpaperRawPath.endsWith(".mov")
+        property string wallpaperPath: wallpaperIsVideo ? Config.options.background.thumbnailPath : wallpaperRawPath
         property bool wallpaperSafetyTriggered: {
             const enabled = Config.options.workSafety.enable.wallpaper;
             const sensitiveWallpaper = (CF.StringUtils.stringListContainsSubstring(wallpaperPath.toLowerCase(), Config.options.workSafety.triggerCondition.fileKeywords));

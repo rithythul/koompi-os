@@ -212,6 +212,53 @@ Singleton {
                 }
                 property string wallpaperPath: ""
                 property string thumbnailPath: ""
+                property JsonObject workspaceWallpapers: JsonObject {
+                    property bool enabled: false
+                    property string libraryPath: `${Directories.config}/koompi/wallpapers/library`.replace("file://", "")
+                    property string defaultMode: "inherit"
+                    property JsonObject workspaces: JsonObject {
+                        property JsonObject ws1: JsonObject {
+                            property string mode: "inherit"
+                            property string path: ""
+                        }
+                        property JsonObject ws2: JsonObject {
+                            property string mode: "inherit"
+                            property string path: ""
+                        }
+                        property JsonObject ws3: JsonObject {
+                            property string mode: "inherit"
+                            property string path: ""
+                        }
+                        property JsonObject ws4: JsonObject {
+                            property string mode: "inherit"
+                            property string path: ""
+                        }
+                        property JsonObject ws5: JsonObject {
+                            property string mode: "inherit"
+                            property string path: ""
+                        }
+                        property JsonObject ws6: JsonObject {
+                            property string mode: "inherit"
+                            property string path: ""
+                        }
+                        property JsonObject ws7: JsonObject {
+                            property string mode: "inherit"
+                            property string path: ""
+                        }
+                        property JsonObject ws8: JsonObject {
+                            property string mode: "inherit"
+                            property string path: ""
+                        }
+                        property JsonObject ws9: JsonObject {
+                            property string mode: "inherit"
+                            property string path: ""
+                        }
+                        property JsonObject ws10: JsonObject {
+                            property string mode: "inherit"
+                            property string path: ""
+                        }
+                    }
+                }
                 property bool hideWhenFullscreen: true
                 property JsonObject parallax: JsonObject {
                     property bool vertical: false

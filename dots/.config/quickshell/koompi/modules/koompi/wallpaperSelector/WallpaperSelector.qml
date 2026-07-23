@@ -92,9 +92,14 @@ Scope {
 
     GlobalShortcut {
         name: "wallpaperSelectorRandom"
-        description: "Select random wallpaper in current folder"
+        description: "Select random wallpaper from all enabled random sources"
         onPressed: {
-            Wallpapers.randomFromCurrentFolder();
+            // Resolve the target workspace here rather than in the script: an
+            // online source can download for seconds, and by then the focus may
+            // have moved. Passing 0 means "no workspace", so the script falls
+            // back to whatever is active when it applies.
+            const workspaceId = Hyprland.focusedMonitor?.activeWorkspace?.id ?? 0;
+            Quickshell.execDetached([Quickshell.shellPath("scripts/colors/random/random_wall.sh"), String(workspaceId)]);
         }
     }
 }
