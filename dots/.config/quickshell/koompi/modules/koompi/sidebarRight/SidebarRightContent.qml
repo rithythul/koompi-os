@@ -280,7 +280,7 @@ Item {
                 buttonIcon: "settings"
                 onClicked: {
                     GlobalStates.sidebarRightOpen = false;
-                    Quickshell.execDetached(["qs", "-p", root.settingsQmlPath]);
+                    Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/koompi-settings"]);
                 }
                 StyledToolTip {
                     text: Translation.tr("Settings")
