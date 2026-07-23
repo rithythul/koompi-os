@@ -23,11 +23,36 @@ PICTURES_DIR=$(get_pictures_dir)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 mkdir -p "$PICTURES_DIR/Wallpapers"
-page=$((1 + RANDOM % 1000));
 illogicalImpulseConfigPath="$HOME/.config/koompi/config.json"
 userAgent=$(jq -r '.networking.userAgent // empty' "$illogicalImpulseConfigPath" 2>/dev/null)
-response=$(curl -A "$userAgent" "https://konachan.net/post.json?tags=rating%3Asafe&limit=1&page=$page")
-link=$(echo "$response" | jq '.[0].file_url' -r);
+
+# Content filter for online anime wallpapers. Konachan's own "rating:safe"
+# still allows suggestive art, so KOOMPI defaults to safe, character-free
+# images (no_humans -> scenery/objects, nothing sexy). Override in config.json:
+#   .background.randomWallpaper.konachanTags   e.g. "rating:safe -bikini -swimsuit"
+tags=$(jq -r '.background.randomWallpaper.konachanTags // empty' "$illogicalImpulseConfigPath" 2>/dev/null)
+[ -z "$tags" ] && tags="rating:safe no_humans"
+encodedTags=$(jq -rn --arg t "$tags" '$t|@uri')
+
+# Fetch a page of matches and pick one at random. Retry across pages so a
+# stricter filter (fewer posts) does not land on an empty page and fail.
+link="null"
+for _ in 1 2 3 4 5; do
+    page=$((1 + RANDOM % 50))
+    response=$(curl -sA "$userAgent" "https://konachan.net/post.json?tags=${encodedTags}&limit=40&page=$page")
+    count=$(echo "$response" | jq 'length' 2>/dev/null || echo 0)
+    if [ "${count:-0}" -gt 0 ]; then
+        idx=$((RANDOM % count))
+        link=$(echo "$response" | jq -r ".[$idx].file_url")
+        [ "$link" != "null" ] && [ -n "$link" ] && break
+    fi
+done
+
+if [ "$link" = "null" ] || [ -z "$link" ]; then
+    echo "random_konachan_wall: no image found for tags '$tags'" >&2
+    exit 1
+fi
+
 ext=$(echo "$link" | awk -F. '{print $NF}')
 downloadPath="$PICTURES_DIR/Wallpapers/random_wallpaper.$ext"
 currentWallpaperPath=$(jq -r '.background.wallpaperPath' "$illogicalImpulseConfigPath")
