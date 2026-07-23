@@ -51,7 +51,7 @@ hl.window_rule({match = {class = "^(Zotero)$" },                             siz
 -- app is pinned to its own special workspace by class and floated. Telegram and
 -- WhatsApp are LEFT-DOCKED tall side panels (mirror of the SUPER+grave terminal,
 -- which is right-docked): 0.5w wide (wider than the terminal's 0.42w) x FULL
--- height — they fill exactly the vertical band a maximized/tiled window gets, so a
+-- height - they fill exactly the vertical band a maximized/tiled window gets, so a
 -- floating widget reads as "same window, just half width". Anchored to the left
 -- edge (x=16). See the terminal math for the full-height derivation. Discord is
 -- still wide + centered. See keybinds App: *.
@@ -73,20 +73,20 @@ hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               mov
 -- Quick-fire scratchpads sharing the chat-widget pattern. Same launch-or-toggle
 -- script, same float/center/size convention; each uses a UNIQUE --class so it
 -- never collides with the normal SUPER + Return terminal.
--- Terminal: SUPER + grave — RIGHT-docked panel (NOT centered like Discord),
+-- Terminal: SUPER + grave - RIGHT-docked panel (NOT centered like Discord),
 -- since SUPER + T already opens a terminal in the workspace. Tall + narrow so it
 -- reads as a side panel coming from the right. Telegram/WhatsApp above mirror it
 -- on the LEFT (x=16) with the same size + vertical math.
 hl.window_rule({match = {class = "^(term-scratch)$" },                       workspace = "special:term silent"})
 hl.window_rule({match = {class = "^(term-scratch)$" },                       float = true})
--- FULL height — the panel fills exactly the band a maximized/tiled window gets, so
+-- FULL height - the panel fills exactly the band a maximized/tiled window gets, so
 -- it lines up edge-for-edge with a normal window (just narrower). Measured on
 -- eDP-1: reserved = [L,T,R,B] = [0,40,0,0] (the bar reserves 40px at the TOP, not
 -- the bottom), gaps_out = 5, border = 1. A tiled window therefore sits at top
 -- inset 46 (40 reserved + 5 gap + 1 border) and bottom inset 6 (5 gap + 1 border),
 -- giving y = 46 and height = monitor_h-52 (40 + 6 + 6). x = monitor_w*0.58-16
 -- right-docks the 0.42w panel (16px right gap). Fixed monitor_w/h math, NOT
--- window_w/window_h — those evaluate before the size rule and fall back to centered.
+-- window_w/window_h - those evaluate before the size rule and fall back to centered.
 hl.window_rule({match = {class = "^(term-scratch)$" },                       size = {"(monitor_w*0.42)", "(monitor_h-52)"} })
 hl.window_rule({match = {class = "^(term-scratch)$" },                       move = {"(monitor_w*0.58-16)", "(46)"} })
 -- System monitor: SUPER + SHIFT + Escape (btop, falling back to htop/top)
@@ -97,16 +97,16 @@ hl.window_rule({match = {class = "^(sysmon-scratch)$" },                     cen
 
 -- Browser home workspace. A link clicked inside a chat widget spawns a real
 -- browser window; with a special workspace focused, that window would be born on
--- the special workspace — tiled, hidden behind the floating widget. Pinning the
--- browser to ws 9 (non-silent, so it switches there) sends those link windows —
--- and every browser window — to your real browser instead. Matches the NORMAL
+-- the special workspace - tiled, hidden behind the floating widget. Pinning the
+-- browser to ws 9 (non-silent, so it switches there) sends those link windows -
+-- and every browser window - to your real browser instead. Matches the NORMAL
 -- browser classes only, never the chrome --app widget class
 -- (chrome-web.whatsapp.com__-Default), so the WhatsApp/Telegram/Discord widgets
 -- stay on their special workspaces. See keybinds "App: * widget".
 hl.window_rule({match = {class = "^(google-chrome|google-chrome-stable|chromium|brave-browser|firefox|zen|zen-browser|microsoft-edge|opera|librewolf)$" }, workspace = "9"})
 
 -- Dolphin file manager: float-in-place for a quick file peek. Unlike the chat
--- widgets above it is NOT sent to a special workspace — it floats + centers +
+-- widgets above it is NOT sent to a special workspace - it floats + centers +
 -- sizes on the CURRENT workspace so SUPER + E still opens it normally (just
 -- floating), and SUPER + Q dismisses it. Dolphin has no per-window class
 -- override, so this applies to every Dolphin window. To make it a hide/restore

@@ -35,7 +35,7 @@ Item { // Faux global menu: app icon + bold app name + window title
             return "";
         // Strip leading whitespace + symbol/icon code points (Braille, arrows, BMP PUA,
         // variation selectors) and astral-plane glyphs (emoji / supplementary-PUA Nerd Font
-        // icons, which arrive as UTF-16 surrogate pairs). \u escapes only — Qt's QML JS
+        // icons, which arrive as UTF-16 surrogate pairs). \u escapes only - Qt's QML JS
         // engine has no \p{L} unicode-property support.
         return String(s).replace(/^[\s\u2000-\u2BFF\u2E00-\u2E7F\uE000-\uF8FF\uFE00-\uFE0F\uD800-\uDFFF]+/, "").trim();
     }
