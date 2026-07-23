@@ -22,7 +22,7 @@ ToolTip {
 
     delay: 0
     visible: internalVisibleCondition
-    
+
     contentItem: StyledToolTipContent {
         id: contentItem
         font: root.font

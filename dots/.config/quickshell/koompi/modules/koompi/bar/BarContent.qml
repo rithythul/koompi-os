@@ -264,8 +264,20 @@ Item { // Bar content region
                     }
                     MaterialSymbol {
                         text: Network.materialSymbol
+                        fill: Network.connected ? 1 : 0
                         iconSize: Appearance.font.pixelSize.larger
                         color: rightSidebarButton.colText
+                        MouseArea {
+                            id: networkHover
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            acceptedButtons: Qt.NoButton
+                        }
+                        PopupToolTip {
+                            extraVisibleCondition: networkHover.containsMouse
+                            anchorEdges: (!Config.options.bar.bottom && !Config.options.bar.vertical) ? Edges.Bottom : Edges.Top
+                            text: Network.networkName !== "" ? Network.networkName : Translation.tr("Network")
+                        }
                     }
                     MaterialSymbol {
                         Layout.leftMargin: indicatorsRowLayout.realSpacing
@@ -273,6 +285,19 @@ Item { // Bar content region
                         text: BluetoothStatus.connected ? "bluetooth_connected" : BluetoothStatus.enabled ? "bluetooth" : "bluetooth_disabled"
                         iconSize: Appearance.font.pixelSize.larger
                         color: rightSidebarButton.colText
+                        MouseArea {
+                            id: bluetoothHover
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            acceptedButtons: Qt.NoButton
+                        }
+                        PopupToolTip {
+                            extraVisibleCondition: bluetoothHover.containsMouse
+                            anchorEdges: (!Config.options.bar.bottom && !Config.options.bar.vertical) ? Edges.Bottom : Edges.Top
+                            text: BluetoothStatus.connected
+                                ? (BluetoothStatus.firstActiveDevice?.name ?? Translation.tr("Bluetooth connected"))
+                                : BluetoothStatus.enabled ? Translation.tr("Bluetooth on") : Translation.tr("Bluetooth off")
+                        }
                     }
                 }
             }

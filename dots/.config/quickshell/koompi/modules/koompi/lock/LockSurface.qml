@@ -96,6 +96,39 @@ MouseArea {
     //     }
     // }
 
+    // KOOMPI doodle: purely decorative, gently breathing/bobbing logo in the
+    // empty upper area. Non-interactive (clicks fall through to the MouseArea).
+    // Disable with config.json -> lock.doodle.enable = false.
+    Image {
+        id: koompiDoodle
+        visible: Config.options.lock?.doodle?.enable ?? true
+        property real bob: 0
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: parent.top
+        anchors.topMargin: Math.round(parent.height * 0.16) + bob
+        source: Quickshell.iconPath(Appearance.m3colors.darkmode ? "koompi" : "koompi-light")
+        sourceSize: Qt.size(80, 80)
+        width: 72
+        height: 72
+        fillMode: Image.PreserveAspectFit
+        smooth: true
+        antialiasing: true
+        opacity: 0.5
+
+        SequentialAnimation on bob {
+            running: koompiDoodle.visible
+            loops: Animation.Infinite
+            NumberAnimation { from: 0; to: -14; duration: 2600; easing.type: Easing.InOutSine }
+            NumberAnimation { from: -14; to: 0; duration: 2600; easing.type: Easing.InOutSine }
+        }
+        SequentialAnimation on scale {
+            running: koompiDoodle.visible
+            loops: Animation.Infinite
+            NumberAnimation { from: 1.0; to: 1.06; duration: 2600; easing.type: Easing.InOutSine }
+            NumberAnimation { from: 1.06; to: 1.0; duration: 2600; easing.type: Easing.InOutSine }
+        }
+    }
+
     // Main toolbar: password box
     Toolbar {
         id: mainIsland
@@ -282,8 +315,8 @@ MouseArea {
             Layout.rightMargin: 10
             Layout.alignment: Qt.AlignVCenter
             showSeparator: false
-            showOverflowMenu: false
             pinnedItems: SystemTray.items.values.filter(i => i.id == "Fcitx")
+            unpinnedItems: []
             visible: pinnedItems.length > 0
         }
     }

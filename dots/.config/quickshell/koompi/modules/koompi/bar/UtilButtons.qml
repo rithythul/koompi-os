@@ -1,4 +1,5 @@
 import qs
+import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
 import QtQuick
@@ -25,6 +26,7 @@ Item {
             visible: Config.options.bar.utilButtons.showScreenSnip
             sourceComponent: CircleUtilButton {
                 Layout.alignment: Qt.AlignVCenter
+                tooltipText: Translation.tr("Screenshot region")
                 onClicked: Quickshell.execDetached(["qs", "-p", Quickshell.shellPath(""), "ipc", "call", "region", "screenshot"]);
                 MaterialSymbol {
                     horizontalAlignment: Qt.AlignHCenter
@@ -41,6 +43,7 @@ Item {
             visible: Config.options.bar.utilButtons.showScreenRecord
             sourceComponent: CircleUtilButton {
                 Layout.alignment: Qt.AlignVCenter
+                tooltipText: Translation.tr("Screen record")
                 onClicked: Quickshell.execDetached([Directories.recordScriptPath])
                 MaterialSymbol {
                     horizontalAlignment: Qt.AlignHCenter
@@ -57,6 +60,7 @@ Item {
             visible: Config.options.bar.utilButtons.showColorPicker
             sourceComponent: CircleUtilButton {
                 Layout.alignment: Qt.AlignVCenter
+                tooltipText: Translation.tr("Color picker")
                 onClicked: Quickshell.execDetached(["hyprpicker", "-a"])
                 MaterialSymbol {
                     horizontalAlignment: Qt.AlignHCenter
@@ -73,6 +77,7 @@ Item {
             visible: Config.options.bar.utilButtons.showKeyboardToggle
             sourceComponent: CircleUtilButton {
                 Layout.alignment: Qt.AlignVCenter
+                tooltipText: Translation.tr("On-screen keyboard")
                 onClicked: GlobalStates.oskOpen = !GlobalStates.oskOpen
                 MaterialSymbol {
                     horizontalAlignment: Qt.AlignHCenter
@@ -89,6 +94,7 @@ Item {
             visible: Config.options.bar.utilButtons.showMicToggle
             sourceComponent: CircleUtilButton {
                 Layout.alignment: Qt.AlignVCenter
+                tooltipText: Pipewire.defaultAudioSource?.audio?.muted ? Translation.tr("Unmute microphone") : Translation.tr("Mute microphone")
                 onClicked: Quickshell.execDetached(["wpctl", "set-mute", "@DEFAULT_SOURCE@", "toggle"])
                 MaterialSymbol {
                     horizontalAlignment: Qt.AlignHCenter
@@ -105,6 +111,7 @@ Item {
             visible: Config.options.bar.utilButtons.showDarkModeToggle
             sourceComponent: CircleUtilButton {
                 Layout.alignment: Qt.AlignVCenter
+                tooltipText: Appearance.m3colors.darkmode ? Translation.tr("Switch to light mode") : Translation.tr("Switch to dark mode")
                 onClicked: event => {
                     if (Appearance.m3colors.darkmode) {
                         Quickshell.execDetached(["bash", "-c", `${Directories.wallpaperSwitchScriptPath} --mode light --noswitch`])
@@ -127,6 +134,11 @@ Item {
             visible: Config.options.bar.utilButtons.showPerformanceProfileToggle
             sourceComponent: CircleUtilButton {
                 Layout.alignment: Qt.AlignVCenter
+                tooltipText: switch(PowerProfiles.profile) {
+                    case PowerProfile.PowerSaver: return Translation.tr("Power profile: power saver")
+                    case PowerProfile.Balanced: return Translation.tr("Power profile: balanced")
+                    case PowerProfile.Performance: return Translation.tr("Power profile: performance")
+                }
                 onClicked: event => {
                     if (PowerProfiles.hasPerformanceProfile) {
                         switch(PowerProfiles.profile) {
