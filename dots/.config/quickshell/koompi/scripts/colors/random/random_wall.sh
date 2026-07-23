@@ -35,9 +35,20 @@ if [ -n "${1:-}" ] && [ "$1" != "0" ]; then
     export KOOMPI_TARGET_WORKSPACE
 fi
 
-pick="${sources[RANDOM % ${#sources[@]}]}"
-"$SCRIPT_DIR/random_${pick}_wall.sh" && exit 0
+# Walk the sources in random order rather than betting the keypress on one of
+# them. Any source can be unavailable: no library installed yet, an API behind
+# Cloudflare, no network. Giving up after the first pick makes the keybind
+# silently do nothing, which reads as a broken key.
+while [ "${#sources[@]}" -gt 0 ]; do
+    idx=$((RANDOM % ${#sources[@]}))
+    pick="${sources[idx]}"
+    if "$SCRIPT_DIR/random_${pick}_wall.sh"; then
+        exit 0
+    fi
+    echo "random_wall: source '$pick' produced nothing, trying another" >&2
+    unset 'sources[idx]'
+    sources=("${sources[@]}")
+done
 
-[ "$pick" = "library" ] && exit 1
-echo "random_wall: '$pick' failed, falling back to the KOOMPI library" >&2
-exec "$SCRIPT_DIR/random_library_wall.sh"
+echo "random_wall: no source could provide a wallpaper" >&2
+exit 1
