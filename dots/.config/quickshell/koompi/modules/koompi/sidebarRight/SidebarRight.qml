@@ -9,7 +9,7 @@ import Quickshell.Hyprland
 
 Scope {
     id: root
-    property int sidebarWidth: Appearance.sizes.sidebarWidth
+    property int sidebarWidth: Appearance.sizes.sidebarWidthRight
 
     PanelWindow {
         id: panelWindow

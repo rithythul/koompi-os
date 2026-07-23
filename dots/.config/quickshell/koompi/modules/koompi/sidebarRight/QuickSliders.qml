@@ -88,6 +88,7 @@ Rectangle {
             active: Config.options.sidebar.quickSliders.showMic
             sourceComponent: QuickSlider {
                 materialSymbol: "mic"
+                symbolSize: 17
                 value: Audio.source.audio.volume
                 onMoved: {
                     Audio.source.audio.volume = value
@@ -96,11 +97,12 @@ Rectangle {
         }
     }
 
-    component QuickSlider: StyledSlider { 
+    component QuickSlider: StyledSlider {
         id: quickSlider
         required property string materialSymbol
         property string secondaryMaterialSymbol
-        configuration: StyledSlider.Configuration.M
+        property int symbolSize: 20
+        configuration: StyledSlider.Configuration.S
         stopIndicatorValues: []
         dividerValues: secondaryMaterialSymbol.length > 0 ? [secondaryIcon.iconLocation] : []
         
@@ -112,7 +114,7 @@ Rectangle {
                 right: nearFull ? quickSlider.handle.right : quickSlider.right
                 rightMargin: nearFull ? 14 : 8
             }
-            iconSize: 20
+            iconSize: quickSlider.symbolSize
             color: nearFull ? Appearance.colors.colOnPrimary : Appearance.colors.colOnSecondaryContainer
             text: quickSlider.materialSymbol
 

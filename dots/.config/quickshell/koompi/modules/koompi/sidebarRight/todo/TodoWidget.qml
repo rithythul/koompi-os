@@ -10,7 +10,7 @@ Item {
     property var tabButtonList: [{"icon": "checklist", "name": Translation.tr("Unfinished")}, {"name": Translation.tr("Done"), "icon": "check_circle"}]
     property bool showAddDialog: false
     property int dialogMargins: 20
-    property int fabSize: 48
+    property int fabSize: 36
     property int fabMargins: 14
 
     Keys.onPressed: (event) => {

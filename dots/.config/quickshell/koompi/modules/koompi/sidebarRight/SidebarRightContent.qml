@@ -19,7 +19,7 @@ import qs.modules.koompi.sidebarRight.wifiNetworks
 
 Item {
     id: root
-    property int sidebarWidth: Appearance.sizes.sidebarWidth
+    property int sidebarWidth: Appearance.sizes.sidebarWidthRight
     property int sidebarPadding: 10
     property string settingsQmlPath: Quickshell.shellPath("settings.qml")
     property bool showAudioOutputDialog: false
