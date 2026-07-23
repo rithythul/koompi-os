@@ -29,6 +29,10 @@ output_path = '~/.config/gtk-4.0/gtk.css'
 input_path = '~/.config/matugen/templates/kde/color.txt'
 output_path = '~/.local/state/quickshell/user/generated/color.txt'
 
+[templates.kde_scheme]
+input_path = '~/.config/matugen/templates/kde/kdeglobals-scheme.colors'
+output_path = '~/.local/share/color-schemes/KoompiMaterial.colors'
+
 [templates.wallpaper]
 input_path = '~/.config/matugen/templates/wallpaper.txt'
 output_path = '~/.local/state/quickshell/user/generated/wallpaper/path.txt'

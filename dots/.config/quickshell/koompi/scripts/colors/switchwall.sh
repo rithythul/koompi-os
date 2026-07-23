@@ -9,7 +9,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SHELL_CONFIG_FILE="$XDG_CONFIG_HOME/koompi/config.json"
 terminalscheme="$SCRIPT_DIR/terminal/scheme-base.json"
 
-handle_kde_material_you_colors() {
+handle_qt_app_colors() {
     # Check if Qt app theming is enabled in config
     if [ -f "$SHELL_CONFIG_FILE" ]; then
         enable_qt_apps=$(jq -r '.appearance.wallpaperTheming.enableQtApps' "$SHELL_CONFIG_FILE")
@@ -18,17 +18,26 @@ handle_kde_material_you_colors() {
         fi
     fi
 
-    # Map $type_flag to allowed scheme variants for kde-material-you-colors-wrapper.sh
-    local kde_scheme_variant=""
-    case "$type_flag" in
-        scheme-content|scheme-expressive|scheme-fidelity|scheme-fruit-salad|scheme-monochrome|scheme-neutral|scheme-rainbow|scheme-tonal-spot)
-            kde_scheme_variant="$type_flag"
-            ;;
-        *)
-            kde_scheme_variant="scheme-tonal-spot" # default
-            ;;
-    esac
-    "$XDG_CONFIG_HOME"/matugen/templates/kde/kde-material-you-colors-wrapper.sh --scheme-variant "$kde_scheme_variant"
+    # matugen already rendered the KoompiMaterial scheme (config.toml
+    # templates.kde_scheme); applying it merges the colors into kdeglobals and
+    # notifies running Qt apps. Replaces kde-material-you-colors (M7).
+    # ponytail: plasma-apply-colorscheme is the last KDE tool in this path; it
+    # leaves with the qt6ct migration.
+    command -v plasma-apply-colorscheme >/dev/null || return
+    # It refuses to reapply the currently-active scheme name, so alternate
+    # between two names to force every new palette through.
+    local schemes_dir="$HOME/.local/share/color-schemes"
+    local cur target
+    cur=$(grep -m1 '^ColorScheme=' "$XDG_CONFIG_HOME/kdeglobals" 2>/dev/null | cut -d= -f2)
+    if [ "$cur" = "KoompiMaterial" ]; then
+        target="KoompiMaterialAlt"
+        sed 's/^Name=KoompiMaterial$/Name=KoompiMaterialAlt/; s/^ColorScheme=KoompiMaterial$/ColorScheme=KoompiMaterialAlt/' \
+            "$schemes_dir/KoompiMaterial.colors" > "$schemes_dir/KoompiMaterialAlt.colors"
+    else
+        target="KoompiMaterial"
+    fi
+    plasma-apply-colorscheme "$target" >/dev/null 2>&1 \
+        || echo "switchwall: plasma-apply-colorscheme $target failed" >&2
 }
 
 pre_process() {
@@ -48,7 +57,7 @@ pre_process() {
 }
 
 post_process() {
-    handle_kde_material_you_colors &
+    handle_qt_app_colors &
     "$SCRIPT_DIR/code/material-code-set-color.sh" &
 }
 
