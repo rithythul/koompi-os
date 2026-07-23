@@ -589,12 +589,12 @@ Singleton {
                 property JsonObject quickToggles: JsonObject {
                     property string style: "android" // Options: classic, android
                     property JsonObject android: JsonObject {
-                        property int columns: 5
+                        property int columns: 6
                         property list<var> toggles: [
                             { "size": 2, "type": "network" },
                             { "size": 2, "type": "bluetooth"  },
                             { "size": 1, "type": "idleInhibitor" },
-                            { "size": 1, "type": "mic" },
+                            { "size": 2, "type": "mic" },
                             { "size": 2, "type": "audio" },
                             { "size": 2, "type": "nightLight" }
                         ]
