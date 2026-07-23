@@ -108,16 +108,6 @@ Item { // Bar content region
         }
         spacing: 4
 
-        BarGroup { // Pomodoro, immediately left of workspaces
-            id: pomodoroGroup
-            anchors.verticalCenter: parent.verticalCenter
-            visible: root.useShortenedForm === 0
-
-            Pomodoro {
-                Layout.fillHeight: true
-            }
-        }
-
         BarGroup {
             id: middleCenterGroup
             anchors.verticalCenter: parent.verticalCenter
@@ -183,6 +173,18 @@ Item { // Bar content region
                 showDate: false
                 Layout.alignment: Qt.AlignVCenter
                 Layout.rightMargin: Appearance.rounding.screenRounding
+            }
+
+            BarGroup { // Pomodoro, between the clock and the status indicators.
+                // Living in the centered middle group pushed the workspaces
+                // off true center whenever the timer was visible.
+                id: pomodoroGroup
+                Layout.alignment: Qt.AlignVCenter
+                visible: root.useShortenedForm === 0
+
+                Pomodoro {
+                    Layout.fillHeight: true
+                }
             }
 
             RippleButton { // Right sidebar button

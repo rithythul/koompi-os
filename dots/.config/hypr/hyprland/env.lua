@@ -10,6 +10,10 @@ hl.env("XDG_DATA_DIRS", home_dir .. "/.local/share/flatpak/exports/share:/var/li
 -- Global menu: GTK apps export their menubar over DBus instead of drawing it
 hl.env("GTK_MODULES", "appmenu-gtk-module")
 
+-- KDE's crash handler assumes a Plasma session; outside one it can only park
+-- a dead "closed unexpectedly" icon in the tray. Let crashes just exit.
+hl.env("KDE_DEBUG", "1")
+
 -- Themes
 hl.env("QT_QPA_PLATFORM", "wayland;xcb")
 hl.env("QT_QPA_PLATFORMTHEME", "kde")
