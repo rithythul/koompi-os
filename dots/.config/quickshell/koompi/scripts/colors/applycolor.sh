@@ -5,7 +5,6 @@ XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 CONFIG_DIR="$XDG_CONFIG_HOME/quickshell/$QUICKSHELL_CONFIG_NAME"
-CACHE_DIR="$XDG_CACHE_HOME/quickshell"
 STATE_DIR="$XDG_STATE_HOME/quickshell"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -21,10 +20,13 @@ colorstrings=''
 colorlist=()
 colorvalues=()
 
-colornames=$(cat $STATE_DIR/user/generated/material_colors.scss | cut -d: -f1)
-colorstrings=$(cat $STATE_DIR/user/generated/material_colors.scss | cut -d: -f2 | cut -d ' ' -f2 | cut -d ";" -f1)
+colornames=$(cut -d: -f1 "$STATE_DIR/user/generated/material_colors.scss")
+colorstrings=$(cut -d: -f2 "$STATE_DIR/user/generated/material_colors.scss" | cut -d ' ' -f2 | cut -d ";" -f1)
 IFS=$'\n'
+# shellcheck disable=SC2206 # deliberate split on IFS=$'\n'; word splitting also drops
+# blank lines, which mapfile would keep as empty entries and turn into a `sed s/ #/`
 colorlist=($colornames)     # Array of color names
+# shellcheck disable=SC2206 # same as above, must stay index-aligned with colorlist
 colorvalues=($colorstrings) # Array of color values
 
 apply_kitty() {  
@@ -41,11 +43,9 @@ apply_kitty() {
     sed -i "s/${colorlist[$i]} #/${colorvalues[$i]#\#}/g" "$STATE_DIR"/user/generated/terminal/kitty-theme.conf
   done
 
-  # Reload
-  if ! pgrep -f kitty >/dev/null; then
-    return
-  fi
-  kill -SIGUSR1 $(pidof kitty)
+  # Reload. -x so we only match the kitty binary: `pgrep -f kitty` used to match any
+  # command line merely mentioning kitty, then `pidof kitty` found nothing and kill errored.
+  pkill -USR1 -x kitty || true
 }
 
 apply_anyterm() {
