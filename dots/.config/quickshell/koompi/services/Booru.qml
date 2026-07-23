@@ -358,6 +358,9 @@ Singleton {
     }
 
     function makeRequest(tags, nsfw=false, limit=20, page=1) {
+        // KOOMPI policy: the in-shell browser is safe-rating only, same stance
+        // as the konachan wallpaper filter. NSFW browsing belongs in a browser.
+        nsfw = false;
         var url = constructRequestUrl(tags, nsfw, limit, page)
         console.log("[Booru] Making request to " + url)
 
