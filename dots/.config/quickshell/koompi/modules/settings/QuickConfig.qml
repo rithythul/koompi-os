@@ -116,21 +116,6 @@ ContentPage {
                     }
                 }
                 RippleButtonWithIcon {
-                    enabled: !randomWallProc.running
-                    visible: Config.options.policies.weeb === 1
-                    Layout.fillWidth: true
-                    buttonRadius: Appearance.rounding.small
-                    materialIcon: "ifl"
-                    mainText: randomWallProc.running ? Translation.tr("Be patient...") : Translation.tr("Random: osu! seasonal")
-                    onClicked: {
-                        randomWallProc.scriptPath = `${Directories.scriptPath}/colors/random/random_osu_wall.sh`;
-                        randomWallProc.running = true;
-                    }
-                    StyledToolTip {
-                        text: Translation.tr("Random osu! seasonal background\nImage is saved to ~/Pictures/Wallpapers")
-                    }
-                }
-                RippleButtonWithIcon {
                     Layout.fillWidth: true
                     materialIcon: "wallpaper"
                     StyledToolTip {
