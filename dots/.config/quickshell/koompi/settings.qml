@@ -50,9 +50,44 @@ ApplicationWindow {
             component: "modules/settings/InterfaceConfig.qml"
         },
         {
+            name: Translation.tr("Displays"),
+            icon: "monitor",
+            component: "modules/settings/DisplaysConfig.qml"
+        },
+        {
+            name: Translation.tr("Input"),
+            icon: "keyboard",
+            component: "modules/settings/InputConfig.qml"
+        },
+        {
+            name: Translation.tr("Shortcuts"),
+            icon: "keyboard_command_key",
+            component: "modules/settings/ShortcutsConfig.qml"
+        },
+        {
+            name: Translation.tr("Network"),
+            icon: "wifi",
+            component: "modules/settings/NetworkConfig.qml"
+        },
+        {
             name: Translation.tr("Bluetooth"),
             icon: "bluetooth",
             component: "modules/settings/BluetoothConfig.qml"
+        },
+        {
+            name: Translation.tr("Sound"),
+            icon: "volume_up",
+            component: "modules/settings/SoundConfig.qml"
+        },
+        {
+            name: Translation.tr("Power"),
+            icon: "battery_full",
+            component: "modules/settings/PowerConfig.qml"
+        },
+        {
+            name: Translation.tr("Privacy"),
+            icon: "shield_person",
+            component: "modules/settings/PrivacyConfig.qml"
         },
         {
             name: Translation.tr("Account"),
