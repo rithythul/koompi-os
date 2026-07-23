@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# koompi-settings - open the KOOMPI settings (control center).
+#
+# KOOMPI-native: launches the Quickshell settings page directly. No KDE
+# systemsettings / GNOME control-center fallback and no forced GNOME identity.
+set -euo pipefail
+
+XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+SETTINGS_QML="${KOOMPI_SETTINGS_QML:-$XDG_CONFIG_HOME/quickshell/koompi/settings.qml}"
+
+if ! command -v qs >/dev/null 2>&1; then
+    echo "koompi-settings: quickshell (qs) not found" >&2
+    exit 1
+fi
+if [[ ! -f "$SETTINGS_QML" ]]; then
+    echo "koompi-settings: settings UI not found: $SETTINGS_QML" >&2
+    exit 1
+fi
+
+exec qs -p "$SETTINGS_QML"

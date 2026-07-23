@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+# koompi-theme - apply/regenerate the KOOMPI desktop theme.
+#
+# Thin, KOOMPI-owned front end over the shell's existing color pipeline
+# (switchwall.sh -> matugen + compatibility outputs). This is theme only; use
+# koompi-wallpaper to change the wallpaper image.
+set -euo pipefail
+
+XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+SWITCHWALL="${KOOMPI_SWITCHWALL:-$XDG_CONFIG_HOME/quickshell/koompi/scripts/colors/switchwall.sh}"
+
+usage() {
+    cat <<'USAGE'
+Usage: koompi-theme [command]
+
+Commands:
+  regenerate            Re-apply the theme from the current wallpaper (default).
+  mode <dark|light>     Switch light/dark mode, keeping the current wallpaper.
+  scheme <name>         Switch Material scheme (e.g. scheme-tonal-spot, auto).
+  color <hex|clear>     Set the accent color (e.g. 00A859) or clear it.
+
+All commands regenerate colors for the shell, GTK, Qt, and terminal via the
+existing pipeline. They do not change the wallpaper image.
+USAGE
+}
+
+if [[ ! -x "$SWITCHWALL" ]]; then
+    echo "koompi-theme: theme engine not found or not executable: $SWITCHWALL" >&2
+    exit 1
+fi
+
+cmd="${1:-regenerate}"
+case "$cmd" in
+    regenerate|apply)
+        exec "$SWITCHWALL" --noswitch
+        ;;
+    mode)
+        m="${2:-}"
+        [[ "$m" == dark || "$m" == light ]] || { echo "koompi-theme: mode must be 'dark' or 'light'" >&2; exit 1; }
+        exec "$SWITCHWALL" --noswitch --mode "$m"
+        ;;
+    scheme)
+        s="${2:-}"
+        [[ -n "$s" ]] || { echo "koompi-theme: scheme name required" >&2; exit 1; }
+        exec "$SWITCHWALL" --noswitch --type "$s"
+        ;;
+    color)
+        c="${2:-}"
+        [[ -n "$c" ]] || { echo "koompi-theme: color hex or 'clear' required" >&2; exit 1; }
+        exec "$SWITCHWALL" --color "$c"
+        ;;
+    -h|--help|help)
+        usage
+        ;;
+    *)
+        echo "koompi-theme: unknown command '$cmd'" >&2
+        usage >&2
+        exit 1
+        ;;
+esac
