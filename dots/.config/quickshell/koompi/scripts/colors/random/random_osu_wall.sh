@@ -24,16 +24,35 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 mkdir -p "$PICTURES_DIR/Wallpapers"
 
-response=$(curl "https://osu.ppy.sh/api/v2/seasonal-backgrounds")
-images=$(echo "$response" | jq '.backgrounds | length' -r);
+illogicalImpulseConfigPath="$HOME/.config/koompi/config.json"
+userAgent=$(jq -r '.networking.userAgent // empty' "$illogicalImpulseConfigPath" 2>/dev/null)
+
+# osu! now puts this endpoint behind Cloudflare, so the response is often an
+# HTML challenge rather than JSON. Bail out instead of handing switchwall.sh a
+# path that was never downloaded - that leaves the desktop on a missing image.
+response=$(curl -sA "$userAgent" "https://osu.ppy.sh/api/v2/seasonal-backgrounds")
+images=$(echo "$response" | jq '.backgrounds | length' -r 2>/dev/null)
+if ! [ "${images:-0}" -gt 0 ] 2>/dev/null; then
+    echo "random_osu_wall: seasonal backgrounds unavailable (osu! API returned no JSON)" >&2
+    exit 1
+fi
+
 randomIndex=$((RANDOM % images));
 link=$(echo "$response" | jq ".backgrounds[$randomIndex].url" -r)
+if [ -z "$link" ] || [ "$link" = "null" ]; then
+    echo "random_osu_wall: no background url in response" >&2
+    exit 1
+fi
+
 ext=$(echo "$link" | awk -F. '{print $NF}')
 downloadPath="$PICTURES_DIR/Wallpapers/random_wallpaper.$ext"
-illogicalImpulseConfigPath="$HOME/.config/koompi/config.json"
 currentWallpaperPath=$(jq -r '.background.wallpaperPath' "$illogicalImpulseConfigPath")
 if [ "$downloadPath" == "$currentWallpaperPath" ]; then
     downloadPath="$PICTURES_DIR/Wallpapers/random_wallpaper-1.$ext"
 fi
-curl "$link" -o "$downloadPath"
+if ! curl -fsA "$userAgent" "$link" -o "$downloadPath" || [ ! -s "$downloadPath" ]; then
+    echo "random_osu_wall: download failed for $link" >&2
+    rm -f "$downloadPath"
+    exit 1
+fi
 "$SCRIPT_DIR/../switchwall.sh" --image "$downloadPath"

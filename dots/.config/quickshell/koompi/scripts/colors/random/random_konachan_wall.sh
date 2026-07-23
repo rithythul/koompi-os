@@ -59,5 +59,9 @@ currentWallpaperPath=$(jq -r '.background.wallpaperPath' "$illogicalImpulseConfi
 if [ "$downloadPath" == "$currentWallpaperPath" ]; then
     downloadPath="$PICTURES_DIR/Wallpapers/random_wallpaper-1.$ext"
 fi
-curl -A "$userAgent" "$link" -o "$downloadPath"
+if ! curl -fsA "$userAgent" "$link" -o "$downloadPath" || [ ! -s "$downloadPath" ]; then
+    echo "random_konachan_wall: download failed for $link" >&2
+    rm -f "$downloadPath"
+    exit 1
+fi
 "$SCRIPT_DIR/../switchwall.sh" --image "$downloadPath"
