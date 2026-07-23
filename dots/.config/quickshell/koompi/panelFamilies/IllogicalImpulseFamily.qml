@@ -22,6 +22,7 @@ import qs.modules.koompi.sidebarRight
 import qs.modules.koompi.overlay
 import qs.modules.koompi.verticalBar
 import qs.modules.koompi.wallpaperSelector
+import qs.modules.koompi.scratchpadDismiss
 
 Scope {
     PanelLoader { extraCondition: !Config.options.bar.vertical; component: Bar {} }
@@ -44,4 +45,5 @@ Scope {
     PanelLoader { component: SidebarRight {} }
     PanelLoader { extraCondition: Config.options.bar.vertical; component: VerticalBar {} }
     PanelLoader { component: WallpaperSelector {} }
+    PanelLoader { component: ScratchpadDismiss {} }
 }
