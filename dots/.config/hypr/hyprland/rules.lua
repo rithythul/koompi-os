@@ -55,11 +55,11 @@ hl.window_rule({match = {class = "^(Zotero)$" },                             siz
 -- floating widget reads as "same window, just half width". Anchored to the left
 -- edge (x=16). See the terminal math for the full-height derivation. Discord is
 -- still wide + centered. See keybinds App: *.
--- Telegram: SUPER + B  (left)
+-- Telegram: SUPER + Y. Tiled, NOT floated: a floating half-width widget
+-- forces the call/video window into the same cramped panel, which breaks calls.
+-- Tiled on its special workspace it fills the workspace (full-size), so SUPER+Y
+-- still toggles it and calls open at a usable size.
 hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               workspace = "special:telegram silent"})
-hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               float = true})
-hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               size = {"(monitor_w*0.5)", "(monitor_h-52)"} })
-hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               move = {"(16)", "(46)"} })
 -- Discord: SUPER + SHIFT + D
 hl.window_rule({match = {class = "^(discord)$" },                            workspace = "special:discord silent"})
 hl.window_rule({match = {class = "^(discord)$" },                            float = true})
@@ -105,15 +105,6 @@ hl.window_rule({match = {class = "^(sysmon-scratch)$" },                     cen
 -- stay on their special workspaces. See keybinds "App: * widget".
 hl.window_rule({match = {class = "^(google-chrome|google-chrome-stable|chromium|brave-browser|firefox|zen|zen-browser|microsoft-edge|opera|librewolf)$" }, workspace = "9"})
 
--- Dolphin file manager: float-in-place for a quick file peek. Unlike the chat
--- widgets above it is NOT sent to a special workspace - it floats + centers +
--- sizes on the CURRENT workspace so SUPER + E still opens it normally (just
--- floating), and SUPER + Q dismisses it. Dolphin has no per-window class
--- override, so this applies to every Dolphin window. To make it a hide/restore
--- scratchpad instead, pin it to a special workspace like the chat widgets.
-hl.window_rule({match = {class = "^(org.kde.dolphin)$" },                    float = true})
-hl.window_rule({match = {class = "^(org.kde.dolphin)$" },                    size = {"(monitor_w*0.6)", "(min(monitor_w*0.4, monitor_h*0.75))"} })
-hl.window_rule({match = {class = "^(org.kde.dolphin)$" },                    center = true})
 
 -- Move
 -- kde-material-you-colors spawns a window when changing dark/light theme. This is to make sure it doesn't interfere at all.
