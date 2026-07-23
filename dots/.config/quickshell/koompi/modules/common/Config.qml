@@ -162,10 +162,14 @@ Singleton {
             property JsonObject apps: JsonObject {
                 property string bluetooth: "kcmshell6 kcm_bluetooth"
                 property string changePassword: "kitty -1 --hold=yes fish -i -c 'passwd'"
-                property string network: "kcmshell6 kcm_networkmanagement"
+                // nm-connection-editor is NetworkManager's own editor, so advanced
+                // network settings no longer route through a Plasma control module.
+                property string network: "nm-connection-editor"
                 property string manageUser: "kcmshell6 kcm_users"
-                property string networkEthernet: "kcmshell6 kcm_networkmanagement"
-                property string taskManager: "plasma-systemmonitor --page-name Processes"
+                property string networkEthernet: "nm-connection-editor"
+                // plasma-systemmonitor is not part of this desktop, so the old
+                // default silently launched nothing. btop in a terminal always works.
+                property string taskManager: `~/.config/hypr/hyprland/scripts/launch_first_available.sh "gnome-system-monitor" "plasma-systemmonitor --page-name Processes" "kitty -1 fish -c btop"`
                 property string terminal: "kitty -1" // This is only for shell actions
                 property string update: "kitty -1 --hold=yes fish -i -c 'pkexec pacman -Syu'"
                 property string volumeMixer: `~/.config/hypr/hyprland/scripts/launch_first_available.sh "pavucontrol-qt" "pavucontrol"`
