@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
@@ -611,6 +612,71 @@ ContentPage {
                         value: "mostBusy"
                     },
                 ]
+            }
+        }
+    }
+
+    ContentSection {
+        icon: "wallpaper"
+        title: Translation.tr("Wallpaper per workspace")
+
+        ConfigSwitch {
+            buttonIcon: "dashboard"
+            text: Translation.tr("Give each workspace its own wallpaper")
+            checked: Config.options.background.workspaceWallpapers.enabled
+            onCheckedChanged: {
+                Config.options.background.workspaceWallpapers.enabled = checked;
+            }
+            StyledToolTip {
+                text: Translation.tr("Workspaces keep whatever you set until you change it.\nCtrl+Super+Alt+T re-rolls only the workspace you are on.\nTheme colours stay tied to the global wallpaper, since they apply to every workspace at once.")
+            }
+        }
+
+        Repeater {
+            model: 10
+            ConfigRow {
+                id: workspaceRow
+                readonly property int workspaceNumber: index + 1
+                readonly property var workspaceConfig: Config.options.background.workspaceWallpapers.workspaces[`ws${workspaceRow.workspaceNumber}`]
+                readonly property bool hasOwn: workspaceRow.workspaceConfig?.mode === "static" && (workspaceRow.workspaceConfig?.path ?? "").length > 0
+
+                enabled: Config.options.background.workspaceWallpapers.enabled
+                opacity: workspaceRow.enabled ? 1 : 0.5
+
+                StyledText {
+                    Layout.preferredWidth: 96
+                    text: Translation.tr("Workspace %1").arg(workspaceRow.workspaceNumber)
+                }
+                StyledText {
+                    Layout.fillWidth: true
+                    elide: Text.ElideMiddle
+                    color: workspaceRow.hasOwn ? Appearance.colors.colOnLayer1 : Appearance.colors.colSubtext
+                    text: workspaceRow.hasOwn ? workspaceRow.workspaceConfig.path.split("/").pop() : Translation.tr("Follows the global wallpaper")
+                }
+                RippleButtonWithIcon {
+                    materialIcon: "ifl"
+                    mainText: Translation.tr("Shuffle")
+                    buttonRadius: Appearance.rounding.small
+                    onClicked: {
+                        Quickshell.execDetached([`${Directories.scriptPath}/colors/random/random_wall.sh`.replace("file://", ""), String(workspaceRow.workspaceNumber)]);
+                    }
+                    StyledToolTip {
+                        text: Translation.tr("Pick a random wallpaper for this workspace")
+                    }
+                }
+                RippleButtonWithIcon {
+                    materialIcon: "backspace"
+                    mainText: Translation.tr("Use global")
+                    buttonRadius: Appearance.rounding.small
+                    enabled: workspaceRow.hasOwn
+                    onClicked: {
+                        workspaceRow.workspaceConfig.mode = "inherit";
+                        workspaceRow.workspaceConfig.path = "";
+                    }
+                    StyledToolTip {
+                        text: Translation.tr("Drop this workspace's own wallpaper and follow the global one again")
+                    }
+                }
             }
         }
     }

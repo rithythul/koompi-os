@@ -41,7 +41,11 @@ Singleton {
 
     function apply(path, darkMode = Appearance.m3colors.darkmode) {
         if (!path || path.length === 0) return;
-        Quickshell.execDetached([Directories.wallpaperSwitchScriptPath, "--mode", darkMode ? "dark" : "light", "--image", path]);
+        // Go through apply_wall.sh, not switchwall.sh directly: with workspace
+        // wallpapers on, a pick has to land on the workspace you are looking at,
+        // the same way the random keybind does. Otherwise picking a wallpaper on
+        // a workspace that has its own does nothing visible.
+        Quickshell.execDetached([Directories.wallpaperApplyScriptPath, path, "--mode", darkMode ? "dark" : "light"]);
         root.changed()
     }
 
