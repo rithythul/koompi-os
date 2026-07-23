@@ -16,3 +16,7 @@ __pycache__/
 # Emacs auto backup file
 *~
 .nimmit/
+
+# global-menu zig build artifacts
+/dots/.config/quickshell/koompi/scripts/global-menu/.zig-cache/
+/dots/.config/quickshell/koompi/scripts/global-menu/zig-out/

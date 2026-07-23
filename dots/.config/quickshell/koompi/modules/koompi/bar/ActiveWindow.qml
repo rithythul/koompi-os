@@ -17,7 +17,7 @@ Item { // Faux global menu: app icon + bold app name + window title
     property bool focusingThisMonitor: HyprlandData.activeWorkspace?.monitor == monitor?.name
     property var biggestWindow: HyprlandData.biggestWindowForWorkspace(HyprlandData.monitors[root.monitor?.id]?.activeWorkspace.id)
 
-    readonly property bool hasWindow: root.focusingThisMonitor && root.activeWindow?.activated && root.biggestWindow
+    readonly property bool hasWindow: root.focusingThisMonitor && (root.activeWindow?.activated ?? false) && root.biggestWindow !== undefined && root.biggestWindow !== null
     readonly property string appClass: root.hasWindow ? (root.activeWindow?.appId ?? "") : ((root.biggestWindow?.class) ?? "")
     readonly property string windowTitle: root.hasWindow ? (root.activeWindow?.title ?? "") : ((root.biggestWindow?.title) ?? `${Translation.tr("Workspace")} ${monitor?.activeWorkspace?.id ?? 1}`)
 
@@ -37,7 +37,23 @@ Item { // Faux global menu: app icon + bold app name + window title
         // variation selectors) and astral-plane glyphs (emoji / supplementary-PUA Nerd Font
         // icons, which arrive as UTF-16 surrogate pairs). \u escapes only - Qt's QML JS
         // engine has no \p{L} unicode-property support.
-        return String(s).replace(/^[\s\u2000-\u2BFF\u2E00-\u2E7F\uE000-\uF8FF\uFE00-\uFE0F\uD800-\uDFFF]+/, "").trim();
+        var t = String(s).replace(/^[\s -⯿⸀-⹿-︀-️\uD800-\uDFFF]+/, "").trim();
+        // Strip " - AppName" suffix (e.g. "Page - Google Chrome") case-insensitively.
+        var name = root.prettyName(root.appClass).toLowerCase();
+        if (name.length > 0 && name !== Translation.tr("Desktop").toLowerCase()) {
+            var lower = t.toLowerCase();
+            var seps = [" - ", " — ", " – "];
+            for (var i = 0; i < seps.length; i++) {
+                if (lower.endsWith(seps[i] + name)) {
+                    t = t.slice(0, t.length - (seps[i] + name).length).trim();
+                    break;
+                }
+            }
+            // Hide row entirely if what remains is just the app name.
+            if (t.toLowerCase() === name)
+                return "";
+        }
+        return t;
     }
 
     implicitWidth: rowLayout.implicitWidth
@@ -58,17 +74,27 @@ Item { // Faux global menu: app icon + bold app name + window title
             source: Quickshell.iconPath(AppSearch.guessIcon(root.appClass), "")
         }
 
-        ColumnLayout { // Two stacked rows: app name over window title
+        ColumnLayout { // Two stacked rows: app name + menu over window title
             Layout.fillWidth: true
             spacing: -4
 
-            StyledText { // App name, menubar-style
+            RowLayout { // App name followed by inline global menu items
                 Layout.fillWidth: true
-                font.pixelSize: Appearance.font.pixelSize.smaller
-                font.weight: Font.DemiBold
-                color: Appearance.colors.colOnLayer0
-                elide: Text.ElideRight
-                text: root.prettyName(root.appClass)
+                spacing: 6
+
+                StyledText { // App name, menubar-style
+                    font.pixelSize: Appearance.font.pixelSize.smaller
+                    font.weight: Font.Bold
+                    color: Appearance.colors.colOnLayer0
+                    elide: Text.ElideRight
+                    text: root.prettyName(root.appClass)
+                }
+
+                GlobalMenu { // Inline File/Edit/View menu buttons
+                    id: globalMenu
+                    Layout.fillHeight: true
+                    visible: menuItems.length > 0
+                }
             }
 
             StyledText { // Window title, dimmed
