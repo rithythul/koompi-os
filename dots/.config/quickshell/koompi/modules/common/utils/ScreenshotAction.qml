@@ -50,9 +50,10 @@ Singleton {
                 }
                 return [
                     "bash", "-c",
-                    `mkdir -p '${StringUtils.shellSingleQuoteEscape(saveDir)}' && \
+                    `dayDir='${StringUtils.shellSingleQuoteEscape(saveDir)}'/"$(date '+%Y-%m-%d')" && \
+                    mkdir -p "$dayDir" && \
                     saveFileName="screenshot-$(date '+%Y-%m-%d_%H.%M.%S').png" && \
-                    savePath="${saveDir}/$saveFileName" && \
+                    savePath="$dayDir/$saveFileName" && \
                     ${cropToStdout} | tee >(wl-copy) > "$savePath" && \
                     ${cleanup} && \
                     notify-send 'Screenshot saved' "$savePath" -i "$savePath" -a KOOMPI`

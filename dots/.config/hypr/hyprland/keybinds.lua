@@ -106,18 +106,18 @@ local grimhyprctl = "grim -o \"$(hyprctl activeworkspace -j | jq -r '.monitor')\
 hl.bind("Print", hl.dsp.global("quickshell:regionScreenshot"),
     { locked = true, description = "Utilities: Screenshot (region or full screen)" })
 hl.bind("Print", hl.dsp.exec_cmd(qsIsAlive .. " || (" ..
-    "mkdir -p $(xdg-user-dir PICTURES)/Screenshots && " ..
-    "f=$(xdg-user-dir PICTURES)/Screenshots/Screenshot_\"$(date '+%Y-%m-%d_%H.%M.%S')\".png && " ..
+    "d=$(xdg-user-dir PICTURES)/Screenshots/\"$(date '+%Y-%m-%d')\" && mkdir -p \"$d\" && " ..
+    "f=\"$d\"/Screenshot_\"$(date '+%Y-%m-%d_%H.%M.%S')\".png && " ..
     grimhyprctl .. " \"$f\" && wl-copy < \"$f\" && notify-send 'Screenshot saved' \"$f\" -i \"$f\")"
 ), { locked = true })
 hl.bind("SHIFT + Print", hl.dsp.exec_cmd(
-    "mkdir -p $(xdg-user-dir PICTURES)/Screenshots && " ..
-    "f=$(xdg-user-dir PICTURES)/Screenshots/Screenshot_\"$(date '+%Y-%m-%d_%H.%M.%S')\".png && " ..
+    "d=$(xdg-user-dir PICTURES)/Screenshots/\"$(date '+%Y-%m-%d')\" && mkdir -p \"$d\" && " ..
+    "f=\"$d\"/Screenshot_\"$(date '+%Y-%m-%d_%H.%M.%S')\".png && " ..
     grimhyprctl .. " \"$f\" && wl-copy < \"$f\" && notify-send 'Screenshot saved' \"$f\" -i \"$f\""
 ), { locked = true, description = "Utilities: Screenshot whole screen >> file + clipboard" })
 hl.bind("CTRL + Print", hl.dsp.exec_cmd(
-    "mkdir -p $(xdg-user-dir PICTURES)/Screenshots && " ..
-    grimhyprctl .. " $(xdg-user-dir PICTURES)/Screenshots/Screenshot_\"$(date '+%Y-%m-%d_%H.%M.%S')\".png"
+    "d=$(xdg-user-dir PICTURES)/Screenshots/\"$(date '+%Y-%m-%d')\" && mkdir -p \"$d\" && " ..
+    grimhyprctl .. " \"$d\"/Screenshot_\"$(date '+%Y-%m-%d_%H.%M.%S')\".png"
 ), { locked = true, non_consuming = true, description = "Utilities: Screenshot >> clipboard & file" })
 hl.bind("CTRL + Print", hl.dsp.exec_cmd(grimhyprctl .. " - | wl-copy"), { locked = true, non_consuming = true })
 --# AI
