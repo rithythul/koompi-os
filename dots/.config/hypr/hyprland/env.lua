@@ -15,6 +15,10 @@ end
 -- Global menu: GTK apps export their menubar over DBus instead of drawing it
 hl.env("GTK_MODULES", "appmenu-gtk-module")
 
+-- File dialogs: route GTK3/GTK4/Electron native choosers through the portal so
+-- every app gets the same floating centered picker (portal class rules in rules.lua)
+hl.env("GTK_USE_PORTAL", "1")
+
 -- KDE's crash handler assumes a Plasma session; outside one it can only park
 -- a dead "closed unexpectedly" icon in the tray. Let crashes just exit.
 hl.env("KDE_DEBUG", "1")
