@@ -59,12 +59,18 @@ json_get() {
     jq -r "$filter" "$CONFIG_FILE"
 }
 
+commit_config() {
+    local tmp="$1"
+    jq -e 'type == "object"' "$tmp" >/dev/null 2>&1 || { rm -f "$tmp"; fail "Refusing to write invalid config: $CONFIG_FILE"; }
+    mv "$tmp" "$CONFIG_FILE"
+}
+
 json_update() {
     local filter="$1"
     local tmp
     tmp="$(mktemp)"
     jq "$filter" "$CONFIG_FILE" > "$tmp"
-    mv "$tmp" "$CONFIG_FILE"
+    commit_config "$tmp"
 }
 
 ensure_config_file() {
@@ -72,7 +78,7 @@ ensure_config_file() {
     if [[ ! -f "$CONFIG_FILE" ]]; then
         fail "Config file not found: $CONFIG_FILE"
     fi
-    jq empty "$CONFIG_FILE" >/dev/null || fail "Config file is not valid JSON: $CONFIG_FILE"
+    jq -e 'type == "object"' "$CONFIG_FILE" >/dev/null || fail "Config file is not valid JSON: $CONFIG_FILE"
 }
 
 ensure_dirs() {
@@ -138,7 +144,7 @@ cmd_mode() {
       .background.workspaceWallpapers.workspaces[$key].mode = $mode |
       if $mode == "inherit" then .background.workspaceWallpapers.workspaces[$key].path = "" else . end
     ' "$CONFIG_FILE" > "$CONFIG_FILE.tmp"
-    mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
+    commit_config "$CONFIG_FILE.tmp"
     log "mode $key -> $mode"
     printf 'Set %s mode to %s.\n' "$key" "$mode"
 }
@@ -166,7 +172,7 @@ cmd_set() {
       .background.workspaceWallpapers.workspaces[$key].mode = "static" |
       .background.workspaceWallpapers.workspaces[$key].path = $path
     ' "$CONFIG_FILE" > "$CONFIG_FILE.tmp"
-    mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
+    commit_config "$CONFIG_FILE.tmp"
     log "set $key static path -> $path"
     printf 'Set %s static wallpaper to %s.\n' "$key" "$path"
 }
@@ -203,7 +209,7 @@ cmd_seed() {
           .background.workspaceWallpapers.workspaces[$key].mode = "static" |
           .background.workspaceWallpapers.workspaces[$key].path = $path
         ' "$CONFIG_FILE" > "$CONFIG_FILE.tmp"
-        mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
+        commit_config "$CONFIG_FILE.tmp"
         log "seed ws$i -> $path"
     done
     printf 'Seeded 10 workspaces from %s image(s).
