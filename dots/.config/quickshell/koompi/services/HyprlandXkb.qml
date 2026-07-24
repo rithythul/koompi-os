@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland
 import qs.modules.common
+import "../modules/koompi/onScreenKeyboard/layouts.js" as Layouts
 
 /**
  * Exposes the active Hyprland Xkb keyboard layout name and code for indicators.
@@ -109,7 +110,9 @@ Singleton {
                 root.currentLayoutName = dataString.substring(dataString.indexOf(",") + 1);
 
                 // Update layout for on-screen keyboard (osk)
-                Config.options.osk.layout = root.currentLayoutName.split(" (")[0];
+                if (Layouts.byName.hasOwnProperty(root.currentLayoutName)) {
+                    Config.options.osk.layout = root.currentLayoutName;
+                }
             } else if (event.name == "configreloaded") {
                 // Mark layout code list to be updated when config is reloaded
                 root.needsLayoutRefresh = true;

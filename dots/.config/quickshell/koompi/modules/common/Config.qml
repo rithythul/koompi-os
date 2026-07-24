@@ -174,7 +174,7 @@ Singleton {
                 property string networkEthernet: "nm-connection-editor"
                 // plasma-systemmonitor is not part of this desktop, so the old
                 // default silently launched nothing. btop in a terminal always works.
-                property string taskManager: `~/.config/hypr/hyprland/scripts/launch_first_available.sh "gnome-system-monitor" "plasma-systemmonitor --page-name Processes" "kitty -1 fish -c btop"`
+                property string taskManager: `~/.config/hypr/hyprland/scripts/launch_first_available.sh "kitty -1 fish -c btop"`
                 property string terminal: "kitty -1" // This is only for shell actions
                 property string update: "kitty -1 --hold=yes fish -i -c 'pkexec pacman -Syu'"
                 property string volumeMixer: `~/.config/hypr/hyprland/scripts/launch_first_available.sh "pavucontrol-qt" "pavucontrol"`
@@ -476,7 +476,7 @@ Singleton {
             }
 
             property JsonObject osk: JsonObject {
-                property string layout: "qwerty_full"
+                property string layout: "English (US)"
                 property bool pinnedOnStartup: false
             }
 
