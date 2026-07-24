@@ -83,7 +83,7 @@ Singleton {
             return key;
         
         // Normal cases
-        var translation = root.translations[key] || root.generatedTranslations[key] || key;
+        var translation = root.translations[key] || root.generatedTranslations?.[key] || key;
         // print(key, "-> [", root.translations[key], root.generatedTranslations[key], key, "] ->", translation);
         if (translation.endsWith(root.translationKeepSuffix)) {
             translation = translation.substring(0, translation.length - root.translationKeepSuffix.length).trim();
@@ -133,7 +133,7 @@ Singleton {
             try {
                 textContent = text();
                 var jsonData = JSON.parse(textContent);
-                translationReader.contentLoaded(jsonData);
+                translationReader.contentLoaded(jsonData ?? {});
             } catch (e) {
                 console.log("[Translation] Failed to load translations:", e);
                 translationReader.contentLoaded({});

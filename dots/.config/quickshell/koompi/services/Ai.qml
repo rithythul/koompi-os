@@ -164,6 +164,8 @@ Singleton {
             "role": "assistant", "content": "", "rawContent": "",
             "thinking": false, "done": false
         });
+        if (compactorScriptFile.path === "")
+            compactorScriptFile.path = "/tmp/quickshell/ai/compact.sh";
         compactorScriptFile.setText(scriptContent);
         compactor.running = true;
     }
@@ -1457,7 +1459,7 @@ Singleton {
 
     FileView {
         id: compactorScriptFile
-        path: "/tmp/quickshell/ai/compact.sh"
+        path: ""
         blockLoading: true
         watchChanges: false
     }

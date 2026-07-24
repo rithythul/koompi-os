@@ -72,7 +72,7 @@ Rectangle {
             active: Config.options.sidebar.quickSliders.showVolume
             sourceComponent: QuickSlider {
                 materialSymbol: "volume_up"
-                value: Audio.sink.audio.volume
+                value: Audio.sink?.audio?.volume ?? 0
                 onMoved: {
                     Audio.sink.audio.volume = value
                 }
@@ -89,7 +89,7 @@ Rectangle {
             sourceComponent: QuickSlider {
                 materialSymbol: "mic"
                 symbolSize: 17
-                value: Audio.source.audio.volume
+                value: Audio.source?.audio?.volume ?? 0
                 onMoved: {
                     Audio.source.audio.volume = value
                 }
