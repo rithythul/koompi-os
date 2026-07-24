@@ -5,7 +5,12 @@ hl.env("ELECTRON_OZONE_PLATFORM_HINT", "auto")
 
 -- Applications
 local xdg_data_dirs_old = os.getenv("XDG_DATA_DIRS") or ""
-hl.env("XDG_DATA_DIRS", home_dir .. "/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share:" .. xdg_data_dirs_old)
+local flatpak_data_dirs = home_dir .. "/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share"
+-- Reloads re-run this file; without the guard the flatpak paths get prepended
+-- again every time and the value grows without bound.
+if not string.find(xdg_data_dirs_old, "/var/lib/flatpak/exports/share", 1, true) then
+    hl.env("XDG_DATA_DIRS", flatpak_data_dirs .. ":" .. xdg_data_dirs_old)
+end
 
 -- Global menu: GTK apps export their menubar over DBus instead of drawing it
 hl.env("GTK_MODULES", "appmenu-gtk-module")
@@ -20,6 +25,10 @@ hl.env("QT_QPA_PLATFORM", "wayland;xcb")
 -- loading plasma-integration (M5/M7 Qt unwind). KDE apps still read kdeglobals,
 -- which switchwall.sh merges the same colors into.
 hl.env("QT_QPA_PLATFORMTHEME", "qt6ct")
+
+-- Cursor
+hl.env("XCURSOR_THEME", "Bibata-Modern-Classic")
+hl.env("XCURSOR_SIZE", "24")
 
 -- Virtual environment
 hl.env("ILLOGICAL_IMPULSE_VIRTUAL_ENV", home_dir .. "/.local/state/quickshell/.venv")
