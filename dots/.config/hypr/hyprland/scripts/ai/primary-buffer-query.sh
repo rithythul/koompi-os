@@ -11,7 +11,7 @@ Only respond for the appropriate case and use as little text as possible.\
 The content:"
 
 first_loaded_model=$("$(dirname "$0")/show-loaded-ollama-models.sh" -j | jq -r '.[0].model' 2>/dev/null) || first_loaded_model=""
-model=${first_loaded_model:-"llama3.2"}
+model="${first_loaded_model:-$(curl -s http://localhost:11434/api/tags | jq -r '.models[0].name // empty' 2>/dev/null)}"
 
 # Parse command-line arguments
 while [[ "$#" -gt 0 ]]; do
@@ -21,6 +21,12 @@ while [[ "$#" -gt 0 ]]; do
     esac
     shift
 done
+
+if [[ -z "$model" ]]; then
+    notify-send --app-name="Text selection query" "No Ollama model available" \
+        "Pull a model first, e.g. 'ollama pull llama3.2'."
+    exit 1
+fi
 
 # Combine the system prompt with the clipboard content
 content=$(wl-paste -p | tr '\n' ' ' | head -c 2000)  # 2000 char limit to prevent overflow
