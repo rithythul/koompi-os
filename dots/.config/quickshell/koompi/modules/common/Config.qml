@@ -78,6 +78,10 @@ Singleton {
         JsonAdapter {
             id: configOptionsJsonAdapter
 
+            // Schema version for migration tooling (koompi-migrate); bump only
+            // on breaking config.json layout changes.
+            property int configVersion: 1
+
             property string panelFamily: "ii" // "ii", "waffle"
 
             property JsonObject policies: JsonObject {
