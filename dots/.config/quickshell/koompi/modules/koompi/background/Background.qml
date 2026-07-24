@@ -165,9 +165,15 @@ Variants {
             StyledImage {
                 id: wallpaper
                 visible: opacity > 0 && !blurLoader.active
-                opacity: (status === Image.Ready && !bgRoot.wallpaperIsVideo) ? 1 : 0
-                cache: false
-                smooth: false
+                // Workspace switches swap source mid-slide. retainWhileLoading
+                // keeps the old frame while the next decodes, so stay visible
+                // during Loading instead of fading through black; hide only
+                // when nothing was ever shown (first load, safety blank).
+                // Image cache and smooth sampling (both Qt defaults) keep
+                // repeat flips decode-free and the parallax pan artifact-free.
+                opacity: ((status === Image.Ready || (status === Image.Loading && everReady)) && !bgRoot.wallpaperIsVideo) ? 1 : 0
+                property bool everReady: false
+                onStatusChanged: if (status === Image.Ready) everReady = true
 
                 property int workspaceIndex: (bgRoot.monitor.activeWorkspace?.id ?? 1) - 1
                 property real middleFraction: 0.5
