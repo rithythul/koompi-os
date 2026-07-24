@@ -141,6 +141,13 @@ Singleton {
 		this.activePlayerStale = false;
 	}
 
+	property bool playerctlAvailable: false
+	Process {
+		running: true
+		command: ["which", "playerctl"]
+		onExited: (exitCode, exitStatus) => root.playerctlAvailable = (exitCode === 0)
+	}
+
 	Process {
 		id: realPositionProbe
 		property string busSuffix: ""
@@ -165,7 +172,7 @@ Singleton {
 	Timer {
 		interval: 3000
 		repeat: true
-		running: root.activeIsPlasma && (root.activePlayer?.isPlaying ?? false)
+		running: root.playerctlAvailable && root.activeIsPlasma && (root.activePlayer?.isPlaying ?? false)
 		onRunningChanged: if (!running) root.__resetStale();
 		onTriggered: {
 			realPositionProbe.busSuffix = root.activePlayer.dbusName.replace("org.mpris.MediaPlayer2.", "");
