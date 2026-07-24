@@ -9,3 +9,5 @@ freshly installed user inherits the whole desktop on first login.
 
 For the full OS build architecture — signed `[koompi]` repo → archiso profile →
 installer — see [`docs/os-build.md`](docs/os-build.md).
+For what the desktop depends on, required and optional, see
+[`docs/dependencies.md`](docs/dependencies.md).
