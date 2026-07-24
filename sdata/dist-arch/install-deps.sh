@@ -108,8 +108,14 @@ metapkgs+=(./sdata/dist-arch/koompi-branding)
 metapkgs+=(./sdata/dist-arch/koompi-base)
 # Hyprland dotfiles into /etc/skel (conflicts the Plasma edition's koompi-kde-config).
 metapkgs+=(./sdata/dist-arch/koompi-hyprland-config)
+# Package-owned shell tree (/etc/xdg/quickshell/koompi) + /usr/bin koompi-* tools.
+metapkgs+=(./sdata/dist-arch/koompi-shell)
+# Bootable KOOMPI session: launcher, wayland-session entry, portal config.
+metapkgs+=(./sdata/dist-arch/koompi-session)
 # Hyprland edition metapackage (the name the Hyprland ISO/installer pacstraps).
 metapkgs+=(./sdata/dist-arch/koompi-desktop-hyprland)
+# The complete desktop under its public name (edition + session + shell).
+metapkgs+=(./sdata/dist-arch/koompi-desktop-experience)
 # Transitional alias so existing `koompi-desktop` installs upgrade to the edition.
 metapkgs+=(./sdata/dist-arch/koompi-desktop)
 #
