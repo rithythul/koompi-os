@@ -8,6 +8,7 @@ LOG_DIR="${KOOMPI_LOG_DIR:-$HOME/.local/state/koompi/logs}"
 LOG_FILE="$LOG_DIR/health.log"
 CONFIG_FILE="${KOOMPI_CONFIG_FILE:-$HOME/.config/koompi/config.json}"
 SHELL_DIR="$HOME/.config/quickshell/koompi"
+[[ -d "$SHELL_DIR" ]] || SHELL_DIR="/etc/xdg/quickshell/koompi"
 
 if [[ -t 1 ]]; then
     C_OK=$'\e[32m'; C_WARN=$'\e[33m'; C_FAIL=$'\e[31m'; C_DIM=$'\e[2m'; C_RST=$'\e[0m'
@@ -107,9 +108,9 @@ else
     bad "config.json missing: $CONFIG_FILE"
 fi
 if [[ -d "$SHELL_DIR" ]]; then
-    ok "shell config dir present"
+    ok "shell config dir present: $SHELL_DIR"
 else
-    bad "shell config dir missing: $SHELL_DIR"
+    bad "shell config dir missing: ~/.config/quickshell/koompi and /etc/xdg/quickshell/koompi"
 fi
 if [[ -d "$HOME/.local/state/koompi" ]]; then
     ok "state dir present"

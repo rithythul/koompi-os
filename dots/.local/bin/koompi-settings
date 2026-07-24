@@ -6,7 +6,11 @@
 set -euo pipefail
 
 XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
-SETTINGS_QML="${KOOMPI_SETTINGS_QML:-$XDG_CONFIG_HOME/quickshell/koompi/settings.qml}"
+# User config wins; /etc/xdg/quickshell/koompi is the packaged default tree
+# (koompi-shell), the same search order quickshell itself uses for `qs -c`.
+SHELL_DIR="$XDG_CONFIG_HOME/quickshell/koompi"
+[[ -d "$SHELL_DIR" ]] || SHELL_DIR="/etc/xdg/quickshell/koompi"
+SETTINGS_QML="${KOOMPI_SETTINGS_QML:-$SHELL_DIR/settings.qml}"
 
 if ! command -v qs >/dev/null 2>&1; then
     echo "koompi-settings: quickshell (qs) not found" >&2

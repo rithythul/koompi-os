@@ -7,7 +7,11 @@
 set -euo pipefail
 
 XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
-SWITCHWALL="${KOOMPI_SWITCHWALL:-$XDG_CONFIG_HOME/quickshell/koompi/scripts/colors/switchwall.sh}"
+# User config wins; /etc/xdg/quickshell/koompi is the packaged default tree
+# (koompi-shell), the same search order quickshell itself uses for `qs -c`.
+SHELL_DIR="$XDG_CONFIG_HOME/quickshell/koompi"
+[[ -d "$SHELL_DIR" ]] || SHELL_DIR="/etc/xdg/quickshell/koompi"
+SWITCHWALL="${KOOMPI_SWITCHWALL:-$SHELL_DIR/scripts/colors/switchwall.sh}"
 
 usage() {
     cat <<'USAGE'
