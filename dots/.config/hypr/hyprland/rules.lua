@@ -213,6 +213,12 @@ hl.layer_rule({ match = { namespace = "quickshell:popup" }, xray = false}) -- No
 hl.layer_rule({ match = { namespace = "quickshell:popup" }, ignore_alpha = 1}) -- No weird color for bar tooltips (but somehow this is necessary)
 hl.layer_rule({ match = { namespace = "quickshell:mediaControls" }, ignore_alpha = 1}) -- Same as above
 hl.layer_rule({ match = { namespace = "quickshell:reloadPopup" }, animation = "slide"})
+-- Quick Look (koompi-quicklook). No layer animation at all: the card animates
+-- itself on open, and animating the full-screen layer OUT leaves its dim scrim
+-- on screen for the length of the animation after the preview is gone. The
+-- blur/ignore_alpha above still apply via quickshell:.*, which is why the card
+-- is translucent but the scrim is not.
+hl.layer_rule({ match = { namespace = "quickshell:quicklook" }, no_anim = true})
 hl.layer_rule({ match = { namespace = "quickshell:regionSelector" }, no_anim = true})
 hl.layer_rule({ match = { namespace = "quickshell:screenshot" }, no_anim = true})
 hl.layer_rule({ match = { namespace = "quickshell:session" }, blur = true})
