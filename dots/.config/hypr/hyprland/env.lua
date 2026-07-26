@@ -26,8 +26,7 @@ hl.env("KDE_DEBUG", "1")
 -- Themes
 hl.env("QT_QPA_PLATFORM", "wayland;xcb")
 -- qt6ct, not kde: Qt apps read the matugen-rendered qt6ct palette instead of
--- loading plasma-integration (M5/M7 Qt unwind). KDE apps still read kdeglobals,
--- which switchwall.sh merges the same colors into.
+-- loading plasma-integration (M5/M7 Qt unwind).
 hl.env("QT_QPA_PLATFORMTHEME", "qt6ct")
 
 -- Cursor
