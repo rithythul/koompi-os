@@ -6,6 +6,7 @@ import qs.modules.common
 import qs.modules.common.widgets
 import QtQuick
 import Quickshell
+import "paging.js" as Paging
 
 FocusScope {
     id: root
@@ -70,7 +71,7 @@ FocusScope {
         root.selectedIndex = 0;
         root.launchingId = "";
         launchCloseTimer.stop();
-        pager.positionViewAtBeginning();
+        pager.goTo(0, false);
         searchInput.text = "";
         // Claiming focus here alone is not enough: reset() runs the moment the
         // state flips, before the layer surface is mapped, so the grab lands on
@@ -121,12 +122,12 @@ FocusScope {
         if (root.apps.length === 0)
             return;
         root.selectedIndex = Math.max(0, Math.min(root.apps.length - 1, index));
-        pager.currentIndex = Math.floor(root.selectedIndex / root.pageSize);
+        pager.goTo(Math.floor(root.selectedIndex / root.pageSize), true);
     }
 
     onQueryChanged: {
         root.selectedIndex = 0;
-        pager.positionViewAtBeginning();
+        pager.goTo(0, false);
     }
 
     Rectangle {
@@ -139,36 +140,56 @@ FocusScope {
         }
     }
 
-    // A horizontal ListView drops vertical wheel events entirely, so a mouse
-    // wheel or two-finger scroll does nothing to it. This lives on the overlay
-    // rather than inside the pager on purpose: a handler declared inside a
-    // Flickable is parented to its moving contentItem and never hit-tests where
-    // you expect. Deltas accumulate to a threshold so a touchpad's stream of
-    // small steps is one page and not a dozen.
-    property real wheelAccum: 0
-
+    // A pointer handler is not an Item and has nowhere to put a child, so the
+    // wheel's idle timer lives out here beside it.
     Timer {
-        id: wheelCooldown
-        interval: 260
+        id: notchIdle
+        interval: 300
         repeat: false
-        onTriggered: root.wheelAccum = 0
+        // Left to itself a part-notch never expires, and the next nudge an hour
+        // later inherits it and turns the page on its own.
+        onTriggered: wheel.notchAccum = 0
     }
 
+    // A touchpad and a mouse wheel want opposite things from the same event, so
+    // they are told apart and handled separately. Only a touchpad sends a pixel
+    // delta; a wheel sends angle steps of 120 and nothing else. Treating both as
+    // one stream is what made this feel bad - a touchpad's deltas had to add up
+    // to a fixed threshold before anything moved, so paging meant swiping the
+    // full length of the pad and then waiting out a lockout.
+    //
+    // This lives on the overlay rather than inside the pager because a handler
+    // declared inside a Flickable is parented to its moving contentItem and
+    // never hit-tests where you expect.
     WheelHandler {
+        id: wheel
         acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
+
+        // A wheel notch is 120. High-resolution wheels send fractions of one, so
+        // they are added up rather than counted.
+        property real notchAccum: 0
+
         onWheel: event => {
-            if (wheelCooldown.running)
+            const touchpad = event.pixelDelta.x !== 0 || event.pixelDelta.y !== 0;
+
+            if (touchpad) {
+                // Horizontal if there is any, otherwise read a vertical swipe as
+                // paging - the grid has nothing to scroll vertically.
+                const dx = event.pixelDelta.x !== 0 ? event.pixelDelta.x : -event.pixelDelta.y;
+                pager.dragBy(dx * pager.swipeGain, true);
+                // Wayland reports the fingers lifting, which beats waiting for
+                // the stream to go quiet.
+                if (event.phase === Qt.ScrollEnd)
+                    pager.endDrag();
                 return;
+            }
+
             const delta = event.angleDelta.x !== 0 ? event.angleDelta.x : -event.angleDelta.y;
-            root.wheelAccum += delta;
-            if (Math.abs(root.wheelAccum) < 90)
-                return;
-            const step = root.wheelAccum > 0 ? -1 : 1;
-            root.wheelAccum = 0;
-            wheelCooldown.restart();
-            // Page only. Dragging the selection along would light up a tile the
-            // pointer is nowhere near.
-            pager.currentIndex = Math.max(0, Math.min(root.pageCount - 1, pager.currentIndex + step));
+            notchIdle.restart();
+            const [steps, rest] = Paging.notchSteps(wheel.notchAccum + delta);
+            wheel.notchAccum = rest;
+            if (steps !== 0)
+                pager.goTo(pager.currentPage + steps, true);
         }
     }
 
@@ -288,7 +309,13 @@ FocusScope {
             }
         }
 
-        ListView {
+        // A plain strip of pages rather than a ListView. A horizontal ListView
+        // drops vertical wheel events outright, and StrictlyEnforceRange - the
+        // only thing that makes it snap to whole pages - re-snaps the instant
+        // contentX is written by hand, so the view cannot be made to follow a
+        // gesture. Owning the offset directly is what allows the page to track
+        // the fingers and settle where they leave it.
+        Item {
             id: pager
             anchors {
                 top: searchField.bottom
@@ -300,62 +327,213 @@ FocusScope {
                 leftMargin: 60
                 rightMargin: 60
             }
+            clip: true
 
             readonly property real cellWidth: width / root.columns
             readonly property real cellHeight: height / root.rows
             readonly property real iconSize: Math.max(44, Math.min(96, Math.min(cellWidth, cellHeight) * 0.5))
 
-            orientation: ListView.Horizontal
-            snapMode: ListView.SnapOneItem
-            highlightRangeMode: ListView.StrictlyEnforceRange
-            // A zero-width range pinned at 0 is what forces a page boundary.
-            // Ending it at `width` instead makes the whole viewport the range,
-            // so a half-scrolled page already satisfies it and never snaps.
-            preferredHighlightBegin: 0
-            preferredHighlightEnd: 0
-            // Velocity has to be switched off explicitly or it wins over the
-            // duration: the 400px/s default drags a 1800px page across the
-            // screen over four and a half seconds, which reads as paging being
-            // broken rather than slow.
-            highlightMoveVelocity: -1
-            highlightMoveDuration: 320
-            boundsBehavior: Flickable.StopAtBounds
-            clip: true
-            model: root.pageCount
-            // Neighbouring pages stay realised so a drag reveals the next page
-            // already painted instead of a blank panel that fills in late.
-            cacheBuffer: width * 2
+            // Where the strip sits, counted in pages. Fractional mid-gesture,
+            // which is what lets the dots and the page loaders track a drag
+            // rather than jumping once it ends.
+            readonly property real position: width > 0 ? -strip.x / width : 0
+            readonly property int visiblePage: Math.max(0, Math.min(root.pageCount - 1, Math.round(position)))
+            // Where the strip has settled, or is settling.
+            property int currentPage: 0
 
-            delegate: Item {
-                id: page
-                required property int index
-                width: pager.width
+            readonly property real maxX: 0
+            readonly property real minX: -(root.pageCount - 1) * width
+
+            // Touchpad scroll arrives already scaled down by the touchpad's own
+            // scroll_factor, and a page is most of a screen wide, so tracking it
+            // one-to-one would need an unreasonably long swipe. This is the
+            // number to change if paging feels heavy or twitchy.
+            readonly property real swipeGain: 1.6
+            // How far past the ends a gesture can pull, and how hard it resists.
+            readonly property real rubberBand: 0.32
+            // A gesture that ends this far into a page carries over to it...
+            readonly property real settleFraction: 0.22
+            // ...and so does one still moving this fast, however short it was.
+            // This is what makes a quick flick page without covering distance.
+            readonly property real flickVelocity: 260
+
+            property bool dragging: false
+            property real dragStart: 0
+            property real velocity: 0
+            property real lastX: 0
+            property double lastTime: 0
+
+            // A resize - a monitor change, or the bar appearing - must not leave
+            // the strip stranded between two pages.
+            onWidthChanged: if (!dragging) goTo(currentPage, false)
+
+            function resist(x) {
+                return Paging.resist(x, minX, maxX, rubberBand);
+            }
+
+            function goTo(page, animate) {
+                settleAnim.stop();
+                currentPage = Math.max(0, Math.min(root.pageCount - 1, page));
+                const dest = -currentPage * width;
+                if (!animate || width <= 0) {
+                    strip.x = dest;
+                    return;
+                }
+                // Tie the snap to what is left to travel. Finishing the last
+                // sliver of a drag with a full-length animation is the thing
+                // that reads as lag.
+                const remaining = Math.abs(dest - strip.x) / width;
+                settleAnim.duration = Math.max(150, Math.min(400, 130 + remaining * 300));
+                settleAnim.from = strip.x;
+                settleAnim.to = dest;
+                settleAnim.start();
+            }
+
+            function beginDrag() {
+                settleAnim.stop();
+                dragging = true;
+                dragStart = position;
+                velocity = 0;
+                lastX = strip.x;
+                lastTime = Date.now();
+            }
+
+            function dragBy(dx, fromWheel) {
+                if (!dragging)
+                    beginDrag();
+                const now = Date.now();
+                const dt = Math.max(1, now - lastTime);
+                strip.x = resist(strip.x + dx);
+                // Averaged, so one stuttering frame cannot decide on its own
+                // whether this counted as a flick.
+                velocity = velocity * 0.6 + (-(strip.x - lastX) * 1000 / dt) * 0.4;
+                lastX = strip.x;
+                lastTime = now;
+                if (fromWheel)
+                    settleTimer.restart();
+            }
+
+            function endDrag() {
+                if (!dragging)
+                    return;
+                dragging = false;
+                settleTimer.stop();
+                // Fingers resting on the pad still send nothing, so a gap this
+                // long means the gesture was over before it was let go.
+                if (Date.now() - lastTime > 120)
+                    velocity = 0;
+
+                const base = Math.round(dragStart);
+                const target = Paging.settleTarget(dragStart, position, velocity, root.pageCount, {
+                    settleFraction: settleFraction,
+                    flickVelocity: flickVelocity
+                });
+                // Carry the keyboard selection along, or arrowing after a swipe
+                // jumps back to a page that is no longer on screen.
+                if (target !== base)
+                    root.selectedIndex = Math.min(root.apps.length - 1, target * root.pageSize);
+                goTo(target, true);
+            }
+
+            // Click-drag and touchscreen swipe, on the same machinery. Scoped to
+            // the grid rather than the whole overlay so it cannot swallow a
+            // drag-select in the search field. A tile's MouseArea grabs first,
+            // but a DragHandler is allowed to take a grab off an Item once it
+            // passes the threshold, which is how a swipe that starts on an icon
+            // still pages instead of launching it.
+            DragHandler {
+                id: swipeDrag
+                target: null
+                xAxis.enabled: true
+                yAxis.enabled: false
+                // Wider than the default, or a slightly shaky click on a tile
+                // turns the page instead of opening the app.
+                dragThreshold: 16
+
+                property real previous: 0
+
+                onActiveChanged: {
+                    if (active) {
+                        pager.beginDrag();
+                        previous = centroid.position.x;
+                    } else {
+                        pager.endDrag();
+                    }
+                }
+                onCentroidChanged: {
+                    if (!active)
+                        return;
+                    pager.dragBy(centroid.position.x - previous, false);
+                    previous = centroid.position.x;
+                }
+            }
+
+            Timer {
+                id: settleTimer
+                // Only ever reached when the scroll stream stops without a
+                // ScrollEnd phase. Short enough to feel like a release, long
+                // enough not to cut a slow swipe in half.
+                interval: 90
+                repeat: false
+                onTriggered: pager.endDrag()
+            }
+
+            NumberAnimation {
+                id: settleAnim
+                target: strip
+                property: "x"
+                easing.type: Easing.BezierSpline
+                easing.bezierCurve: Appearance.animationCurves.emphasizedDecel
+            }
+
+            Item {
+                id: strip
+                width: pager.width * root.pageCount
                 height: pager.height
 
-                // Anchored to the top rather than centred so a partly filled
-                // page - the last one, or a short set of search results - keeps
-                // its first row where every full page puts it.
-                Grid {
-                    anchors.top: parent.top
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    columns: root.columns
+                Repeater {
+                    model: root.pageCount
 
-                    Repeater {
-                        model: root.apps.slice(page.index * root.pageSize, (page.index + 1) * root.pageSize)
+                    delegate: Item {
+                        id: page
+                        required property int index
+                        x: index * pager.width
+                        width: pager.width
+                        height: pager.height
 
-                        delegate: LaunchpadItem {
-                            required property var modelData
-                            required property int index
+                        // Only the page in view and its neighbours are built. A
+                        // machine with a few hundred apps would otherwise pay
+                        // for every icon on every page the moment it opens, and
+                        // one page either side is all a gesture can reveal.
+                        readonly property bool near: Math.abs(index - pager.visiblePage) <= 1
 
-                            entry: modelData
-                            width: pager.cellWidth
-                            height: pager.cellHeight
-                            iconSize: pager.iconSize
-                            launching: root.launchingId.length > 0 && root.launchingId === modelData.id
-                            dimmed: root.launchingId.length > 0 && root.launchingId !== modelData.id
-                            selected: root.selectedIndex === page.index * root.pageSize + index
-                            onActivated: root.launch(modelData)
-                            onHovered: root.selectedIndex = page.index * root.pageSize + index
+                        // Anchored to the top rather than centred so a partly
+                        // filled page - the last one, or a short set of search
+                        // results - keeps its first row where every full page
+                        // puts it.
+                        Grid {
+                            anchors.top: parent.top
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            columns: root.columns
+
+                            Repeater {
+                                model: page.near ? root.apps.slice(page.index * root.pageSize, (page.index + 1) * root.pageSize) : []
+
+                                delegate: LaunchpadItem {
+                                    required property var modelData
+                                    required property int index
+
+                                    entry: modelData
+                                    width: pager.cellWidth
+                                    height: pager.cellHeight
+                                    iconSize: pager.iconSize
+                                    launching: root.launchingId.length > 0 && root.launchingId === modelData.id
+                                    dimmed: root.launchingId.length > 0 && root.launchingId !== modelData.id
+                                    selected: root.selectedIndex === page.index * root.pageSize + index
+                                    onActivated: root.launch(modelData)
+                                    onHovered: root.selectedIndex = page.index * root.pageSize + index
+                                }
+                            }
                         }
                     }
                 }
@@ -388,22 +566,18 @@ FocusScope {
                     width: 8
                     height: 8
                     radius: 4
-                    color: pager.currentIndex === index ? Appearance.colors.colOnLayer0 : Appearance.colors.colSubtext
-                    opacity: pager.currentIndex === index ? 0.9 : 0.35
-
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: Appearance.animation.elementMoveFast.duration
-                            easing.type: Easing.BezierSpline
-                            easing.bezierCurve: Appearance.animationCurves.expressiveEffects
-                        }
-                    }
+                    color: Appearance.colors.colOnLayer0
+                    // Read off the live position rather than the settled page,
+                    // so the dots hand over gradually as the grid is dragged and
+                    // the gesture has something answering back. Clamped to one
+                    // page of distance, so only the pair either side move.
+                    opacity: 0.35 + 0.55 * Math.max(0, 1 - Math.abs(pager.position - index))
 
                     MouseArea {
                         anchors.fill: parent
                         anchors.margins: -6
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: pager.currentIndex = index
+                        onClicked: pager.goTo(index, true)
                     }
                 }
             }
