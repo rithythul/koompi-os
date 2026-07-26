@@ -308,7 +308,10 @@ hl.config({
         animate_manual_resizes = false,
         animate_mouse_windowdragging = false,
         enable_swallow = false,
-        swallow_regex = "(foot|kitty|alacritty|Alacritty|wezterm|org.wezfurlong.wezterm)",
+        -- Only the terminals KOOMPI ships: wezterm, konsole, and kitty for the
+        -- scratchpads. Unanchored, so "wezterm" already covers the real class
+        -- org.wezfurlong.wezterm.
+        swallow_regex = "(wezterm|kitty|konsole)",
         on_focus_under_fullscreen = 2,
         allow_session_lock_restore = true,
         session_lock_xray = true,
