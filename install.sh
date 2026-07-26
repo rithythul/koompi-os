@@ -71,7 +71,17 @@ cd "$DEST"
 # stdin is the pipe carrying this script when run as `curl | bash`, so ./setup
 # would read its prompts from a closed stream and take the default for
 # everything. Reconnect to the terminal so the confirmations actually work.
-if [[ ! -t 0 ]] && [[ -r /dev/tty ]]; then
-    exec ./setup install "$@" < /dev/tty
+#
+# The open has to be attempted rather than tested for: `-r /dev/tty` answers on
+# the mode bits, which are readable even in a session with no controlling
+# terminal, and there opening it fails with ENXIO. A redirect that fails on an
+# exec takes the whole script down with it, so an installer run from cron, from
+# CI, or from any detached process would die here instead of falling through.
+# The open is attempted in a subshell so that a failed redirection kills that
+# subshell rather than this script, and so the whole attempt can be silenced -
+# `exec 3</dev/tty 2>/dev/null` applies its redirections left to right, so the
+# error is already on the real stderr by the time it is pointed at /dev/null.
+if [[ ! -t 0 ]] && ( exec 3</dev/tty ) 2>/dev/null; then
+    exec ./setup install "$@" </dev/tty
 fi
 exec ./setup install "$@"
