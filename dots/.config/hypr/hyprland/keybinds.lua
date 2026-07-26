@@ -209,6 +209,11 @@ hl.bind("SUPER + Semicolon", hl.dsp.layout("splitratio -0.1"), { repeating = tru
 hl.bind("SUPER + Apostrophe", hl.dsp.layout("splitratio +0.1"), { repeating = true })
 --# Positioning mode
 hl.bind("SUPER + ALT + Space", hl.dsp.window.float({ action = "toggle" }), { description = "Window: Float/Tile" })
+-- Whole-desktop counterpart of the per-window toggle above: floats everything
+-- and keeps new windows floating, for when a stacking desktop suits the task
+-- better than a tiling one. Press again to go back to tiling.
+hl.bind("SUPER + SHIFT + Space", hl.dsp.exec_cmd("koompi-stacking toggle"),
+    { description = "Window: Stacking/Tiling mode" })
 hl.bind("SUPER + D", hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" }),
     { description = "Window: Maximize" })
 hl.bind("SUPER + F", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }),
