@@ -14,6 +14,14 @@ eras (snapshot model, not frozen point-releases). This repo
 (`koompi-hyprland`) is the end-4/dots-hyprland (illogical-impulse) stack,
 rebranded throughout as `koompi-*`.
 
+> **The OS and the desktop are two products out of one tree.** This document
+> covers the *OS*: Arch-only, packaged, `/etc/skel`, ISO. The *desktop* on its
+> own installs onto Arch, Fedora, Debian and Ubuntu through `./setup` - see
+> [`install.md`](install.md). The two paths are mutually exclusive on a given
+> machine: `./setup` writes the shell into `$HOME`, the packages write it into
+> `/etc/skel` and `/etc/xdg`, and running both leaves two copies competing for
+> the same paths. KOOMPI OS uses the package path and never runs `./setup`.
+
 There are **two editions**, both KOOMPI-branded, sharing one house style:
 
 - **KOOMPI Hyprland** — Hyprland compositor + the Quickshell bar/shell.

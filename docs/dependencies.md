@@ -1,9 +1,29 @@
 # KOOMPI Desktop Experience - dependencies
 
 What the desktop needs to run, what is optional, and which packages provide it.
-The package layer lives in `sdata/dist-arch/`; installing `koompi-desktop-experience` pulls everything in the required section.
+
+The canonical list is the Arch one below, because Arch is where the desktop is developed and where KOOMPI OS ships from.
+The Fedora and Debian recipes (`sdata/dist-fedora/`, `sdata/dist-debian/`) translate it; when they disagree with this document, they are the bug.
+
+`./setup install` resolves all of this for you.
+Read on only if you are on an unsupported distro, or want to know why something is here.
+
+## Not packages
+
+Two requirements are not satisfied by any package manager, and `./setup` handles both in its setups step:
+
+- **A Python virtualenv** at `~/.local/state/quickshell/.venv`, built by `uv` from `sdata/uv/requirements.txt`.
+  The colour generation, thumbnailing and image-analysis helpers in `dots/.config/quickshell/koompi/scripts/` run out of it, addressed through `$ILLOGICAL_IMPULSE_VIRTUAL_ENV`.
+  It is created with `--system-site-packages` so PyGObject and OpenCV come from distro packages rather than being compiled.
+  Without it, wallpaper colour extraction and thumbnails silently do nothing.
+- **The global-menu daemon**, Zig source at `dots/.config/quickshell/koompi/scripts/global-menu/`.
+  `zig-out/` is gitignored, so a fresh clone has no binary and the global menu stays empty until `zig build` runs.
+  This makes `zig` a build-time dependency of the desktop, not just of the repo.
 
 ## Required
+
+The Arch package layer lives in `sdata/dist-arch/`.
+Installing `koompi-desktop-experience` pulls everything in this section; `./setup install` installs only the dependency metas from it, because `./setup` supplies the shell and config itself (see [`install.md`](install.md)).
 
 The core session, in dependency order:
 
@@ -50,7 +70,50 @@ The desktop is KDE-free and GNOME-free as infrastructure; these packages exist s
 GTK and Qt settings files are generated compatibility outputs.
 `~/.config/koompi/config.json` is the only user-owned source of truth.
 
+## Non-Arch distros
+
+The full package name mapping lives next to each recipe: [`../sdata/dist-fedora/packages.list`](../sdata/dist-fedora/packages.list) and [`../sdata/dist-debian/packages.list`](../sdata/dist-debian/packages.list).
+What follows is only what does **not** translate cleanly.
+
+### Where each distro gets the hard parts
+
+| | Fedora 43+ | Debian 13 | Debian 14 / sid | Ubuntu 26.04+ |
+|---|---|---|---|---|
+| Hyprland stack | COPR `sdegler/hyprland` | `trixie-backports` | main | universe |
+| quickshell | Fedora `updates` (0.2.1), or COPR `errornointernet/quickshell` (0.3.x) | `trixie-backports` | main | `ppa:avengemedia/danklinux` |
+| matugen | Fedora | **built/fetched** | **built/fetched** | the same PPA |
+| uv | Fedora | **astral.sh** | **astral.sh** | **astral.sh** |
+| go-yq | Fedora's `yq` is the right tool | `yq-go` in backports | `yq-go` | **static binary** |
+| hyprsunset | COPR `sdegler/hyprland` | backports | main | **source build** |
+| the KOOMPI fonts | COPR `ririko66z/dots-hyprland` | **fetched** | **fetched** | **fetched** |
+| adw-gtk3, bibata, hyprshot | COPRs | **fetched** | **fetched** | **fetched** |
+| darkly, breeze-plus, songrec, microtex | COPRs | not installed | not installed | not installed |
+
+Bold entries are handled by [`../sdata/lib/from-source.sh`](../sdata/lib/from-source.sh) rather than a package manager.
+
+### Traps worth knowing
+
+- **`yq` on Debian and Ubuntu is the wrong tool.** That package is a Python wrapper around jq with incompatible syntax; the shell scripts need mikefarah's Go implementation and its `-o=j`. The right package is `yq-go`, which does not exist on Ubuntu at all. Fedora's `yq` *is* mikefarah's.
+- **The fonts are not optional.** Nothing on Debian or Ubuntu packages Material Symbols, and without it every icon in the bar renders as a tofu box. Treat the font fetch as a required step, not a nicety.
+- **quickshell links private Qt APIs** and crashes on a Qt ABI bump. Both non-Arch recipes pin it (`dnf versionlock` / `apt-mark hold`). Unpin before a Qt upgrade, then re-run `./setup install --only-deps`.
+- **`uv` is not apt-installable on any Debian or Ubuntu release.** Without it the Python venv never gets built and the colour pipeline is dead, so the recipe installs it from `astral.sh`.
+- **Ubuntu 24.04 and 25.10 are refused, not degraded.** 24.04 has no Hyprland and Qt 6.4.2 against quickshell's 6.6 floor; 25.10 ships Hyprland 0.41 and is EOL.
+
+### Degrades gracefully off Arch
+
+These are missing on Debian and Ubuntu and the desktop keeps working without them:
+
+| Missing | What stops working |
+|---|---|
+| `darkly` | Qt apps fall back to Fusion. `switchwall.sh` still applies the palette through `qt6ct.conf`. |
+| `breeze-plus` | Some icons fall back to plain Breeze, which is installed. |
+| `songrec` | The music-recognition widget does nothing. |
+| `microtex` | LaTeX rendering in the shell is off. |
+| `matugen`, if the fetch fails | `koompi-theme` warns and keeps the current colours. |
+| `hyprsunset`, if the build is declined | No night light / blue-light filter. |
+
 ## Watch items
 
 - No polkit authentication agent is installed since the M5 plasma removal; `koompi-useradd` (pkexec) needs one for graphical auth prompts. If privileged GUI actions fail, add a lean agent (for example `hyprpolkitagent`) rather than resurrecting polkit-kde-agent.
+  The Fedora and Debian recipes already install `hyprpolkitagent`, so this gap is Arch-only now.
 - `kdialog` is a hard dependency of `koompi-quickshell-git` upstream; dropping it fully is a packaging change there, not here.
