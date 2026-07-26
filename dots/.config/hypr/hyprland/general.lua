@@ -35,9 +35,14 @@ hl.gesture({
         hl.dispatch(hl.dsp.global("quickshell:overviewWorkspacesToggle"))
     end
 })
--- Launchpad, on the motion macOS uses for it. Open and close are bound
--- separately rather than to one toggle so pinching the same way twice never
--- flaps the grid shut.
+-- Launchpad: spread four fingers to bring the grid out, close them to put it
+-- away. Bound as two gestures rather than one toggle so making the same motion
+-- twice never flaps the grid shut.
+--
+-- Read the direction names backwards. Measured on 0.55.4 against a synthetic
+-- touchpad: "pinchin" fires when the fingers move APART and "pinchout" when
+-- they come together, the opposite of how they read. Swap these and the
+-- gesture inverts, so check before believing the words.
 hl.gesture({
     fingers = 4,
     direction = "pinchin",

@@ -134,63 +134,66 @@ FocusScope {
         anchors.fill: parent
         color: Qt.rgba(Appearance.m3colors.m3background.r, Appearance.m3colors.m3background.g, Appearance.m3colors.m3background.b, 0.62)
 
+        // The backdrop carries the wheel rather than a WheelHandler, because a
+        // WheelHandler filters on a single `orientation` and throws away any
+        // event with no delta along it. The default is vertical, so a two-finger
+        // swipe straight across the pad - the whole point of the gesture - was
+        // dropped before it ever reached us, and only a swipe with enough
+        // up-and-down in it to register on the other axis got through. A
+        // MouseArea takes both axes, and the scroll phases along with them.
         MouseArea {
             anchors.fill: parent
             onClicked: root.close()
+            onWheel: event => root.handleScroll(event)
         }
     }
 
-    // A pointer handler is not an Item and has nowhere to put a child, so the
-    // wheel's idle timer lives out here beside it.
+    // A wheel notch is 120. High-resolution wheels send fractions of one, so
+    // they are added up rather than counted.
+    property real notchAccum: 0
+
     Timer {
         id: notchIdle
         interval: 300
         repeat: false
         // Left to itself a part-notch never expires, and the next nudge an hour
         // later inherits it and turns the page on its own.
-        onTriggered: wheel.notchAccum = 0
+        onTriggered: root.notchAccum = 0
     }
 
     // A touchpad and a mouse wheel want opposite things from the same event, so
-    // they are told apart and handled separately. Only a touchpad sends a pixel
-    // delta; a wheel sends angle steps of 120 and nothing else. Treating both as
-    // one stream is what made this feel bad - a touchpad's deltas had to add up
-    // to a fixed threshold before anything moved, so paging meant swiping the
-    // full length of the pad and then waiting out a lockout.
-    //
-    // This lives on the overlay rather than inside the pager because a handler
-    // declared inside a Flickable is parented to its moving contentItem and
-    // never hit-tests where you expect.
-    WheelHandler {
-        id: wheel
-        acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
-
-        // A wheel notch is 120. High-resolution wheels send fractions of one, so
-        // they are added up rather than counted.
-        property real notchAccum: 0
-
-        onWheel: event => {
-            const touchpad = event.pixelDelta.x !== 0 || event.pixelDelta.y !== 0;
-
-            if (touchpad) {
-                // Horizontal if there is any, otherwise read a vertical swipe as
-                // paging - the grid has nothing to scroll vertically.
-                const dx = event.pixelDelta.x !== 0 ? event.pixelDelta.x : -event.pixelDelta.y;
-                pager.dragBy(dx * pager.swipeGain, true);
-                // Wayland reports the fingers lifting, which beats waiting for
-                // the stream to go quiet.
-                if (event.phase === Qt.ScrollEnd)
-                    pager.endDrag();
-                return;
-            }
-
-            const delta = event.angleDelta.x !== 0 ? event.angleDelta.x : -event.angleDelta.y;
+    // they are told apart and handled separately. The scroll phase is what tells
+    // them apart: Wayland tags a touchpad's stream with one and a mouse wheel's
+    // with none. That beats looking for a pixel delta, because the event that
+    // reports the fingers lifting carries a phase and no delta at all - reading
+    // it as a wheel was why a swipe had to time out before it settled.
+    function handleScroll(event) {
+        if (event.phase === Qt.NoScrollPhase) {
+            const notch = event.angleDelta.x !== 0 ? event.angleDelta.x : event.angleDelta.y;
             notchIdle.restart();
-            const [steps, rest] = Paging.notchSteps(wheel.notchAccum + delta);
-            wheel.notchAccum = rest;
+            const [steps, rest] = Paging.notchSteps(root.notchAccum + notch);
+            root.notchAccum = rest;
             if (steps !== 0)
                 pager.goTo(pager.currentPage + steps, true);
+            return;
         }
+
+        if (event.phase === Qt.ScrollBegin) {
+            pager.beginDrag();
+            return;
+        }
+
+        if (event.phase === Qt.ScrollEnd) {
+            pager.endDrag();
+            return;
+        }
+
+        // Sideways if there is any, otherwise read an up-and-down swipe as
+        // paging too - the grid has nothing to scroll vertically. Both signs are
+        // the compositor's, unaltered, so the grid follows the fingers under the
+        // natural scrolling the touchpad is configured for.
+        const dx = event.pixelDelta.x !== 0 ? event.pixelDelta.x : event.pixelDelta.y;
+        pager.dragBy(dx * pager.swipeGain, true);
     }
 
     Item {
@@ -344,18 +347,22 @@ FocusScope {
             readonly property real maxX: 0
             readonly property real minX: -(root.pageCount - 1) * width
 
-            // Touchpad scroll arrives already scaled down by the touchpad's own
-            // scroll_factor, and a page is most of a screen wide, so tracking it
-            // one-to-one would need an unreasonably long swipe. This is the
-            // number to change if paging feels heavy or twitchy.
-            readonly property real swipeGain: 1.6
+            // The pad hands us about 7.5px of scroll for every millimetre of
+            // finger, measured, once its own scroll_factor has been applied. A
+            // page is most of a screen wide, so tracking that one-to-one would
+            // want a swipe several times longer than the pad. At this gain a
+            // full page is about 75mm of travel and a page turn about 17mm.
+            // This is the number to change if paging feels heavy or twitchy.
+            readonly property real swipeGain: 3.2
             // How far past the ends a gesture can pull, and how hard it resists.
             readonly property real rubberBand: 0.32
             // A gesture that ends this far into a page carries over to it...
             readonly property real settleFraction: 0.22
             // ...and so does one still moving this fast, however short it was.
             // This is what makes a quick flick page without covering distance.
-            readonly property real flickVelocity: 260
+            // Above the speed a deliberate, slow drag reaches, or every drag
+            // would count as a flick and nothing could be pulled back from.
+            readonly property real flickVelocity: 900
 
             property bool dragging: false
             property real dragStart: 0
