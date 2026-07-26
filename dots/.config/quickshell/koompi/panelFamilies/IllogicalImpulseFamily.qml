@@ -6,6 +6,7 @@ import qs.modules.koompi.background
 import qs.modules.koompi.bar
 import qs.modules.koompi.cheatsheet
 import qs.modules.koompi.dock
+import qs.modules.koompi.launchpad
 import qs.modules.koompi.lock
 import qs.modules.koompi.mediaControls
 import qs.modules.koompi.notificationPopup
@@ -29,6 +30,7 @@ Scope {
     PanelLoader { component: Background {} }
     PanelLoader { component: Cheatsheet {} }
     PanelLoader { extraCondition: Config.options.dock.enable; component: Dock {} }
+    PanelLoader { component: Launchpad {} }
     PanelLoader { component: Lock {} }
     PanelLoader { component: MediaControls {} }
     PanelLoader { component: NotificationPopup {} }

@@ -35,6 +35,23 @@ hl.gesture({
         hl.dispatch(hl.dsp.global("quickshell:overviewWorkspacesToggle"))
     end
 })
+-- Launchpad, on the motion macOS uses for it. Open and close are bound
+-- separately rather than to one toggle so pinching the same way twice never
+-- flaps the grid shut.
+hl.gesture({
+    fingers = 4,
+    direction = "pinchin",
+    action = function()
+        hl.dispatch(hl.dsp.global("quickshell:launchpadOpen"))
+    end
+})
+hl.gesture({
+    fingers = 4,
+    direction = "pinchout",
+    action = function()
+        hl.dispatch(hl.dsp.global("quickshell:launchpadClose"))
+    end
+})
 
 hl.config({
     -- The 4-finger swipe walks numeric neighbours (r+1/r-1) instead of cycling

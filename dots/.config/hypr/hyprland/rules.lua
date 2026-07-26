@@ -198,6 +198,10 @@ hl.layer_rule({ match = { namespace = "quickshell:actionCenter" }, no_anim = tru
 hl.layer_rule({ match = { namespace = "quickshell:cheatsheet" }, animation = "slide bottom"})
 hl.layer_rule({ match = { namespace = "quickshell:dock" }, animation = "slide bottom"})
 hl.layer_rule({ match = { namespace = "quickshell:screenCorners" }, animation = "popin 120%"})
+hl.layer_rule({ match = { namespace = "quickshell:launchpad" }, no_anim = true})
+-- The grid animates itself in; the scrim is what needs blurring behind it, and
+-- it sits well under the 0.79 alpha cutoff the quickshell:.* rule applies.
+hl.layer_rule({ match = { namespace = "quickshell:launchpad" }, ignore_alpha = 0.05})
 hl.layer_rule({ match = { namespace = "quickshell:lockWindowPusher" }, no_anim = true})
 hl.layer_rule({ match = { namespace = "quickshell:notificationPopup" }, animation = "fade"})
 hl.layer_rule({ match = { namespace = "quickshell:overlay" }, no_anim = true})
