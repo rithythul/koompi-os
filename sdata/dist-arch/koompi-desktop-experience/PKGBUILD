@@ -6,7 +6,7 @@
 # users at; the edition metas remain the installer-facing split.
 groups=(koompi)
 pkgname=koompi-desktop-experience
-pkgver=1.0
+pkgver=1.1
 pkgrel=1
 pkgdesc='KOOMPI Desktop Experience (metapackage)'
 arch=(any)
@@ -18,6 +18,10 @@ depends=(
   # The bootable KOOMPI session; pulls koompi-shell (package-owned shell tree
   # in /etc/xdg/quickshell/koompi and the /usr/bin koompi-* tools).
   koompi-session
+  # The applications the shipped config expects to find: wezterm, zed, the
+  # browsers, the viewers, LibreOffice. Only here, not in koompi-desktop-hyprland
+  # - an edition is a desktop, and this package is the complete experience.
+  koompi-apps
 )
 
 package() {
