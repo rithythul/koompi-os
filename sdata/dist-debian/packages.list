@@ -96,6 +96,10 @@ libnotify-bin                   # hyprshot notifies through notify-send
 
 # --- compositor and shell ----------------------------------------------------
 zig                             # builds the global-menu daemon; skipped if absent
+libglib2.0-dev                  # GDBus headers the global-menu daemon links against
+pkg-config                      # zig build resolves glib through it
+x11-utils                       # xprop; the global menu reads menu addresses with it
+xwayland                        # Qt exports its menubar over D-Bus only on X11
 hyprland
 hyprpolkitagent
 wl-clipboard

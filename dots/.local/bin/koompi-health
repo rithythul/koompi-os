@@ -81,6 +81,34 @@ check_proc -x hypridle -- "hypridle"
 check_proc -f xdg-desktop-portal-hyprland -- "portal backend (hyprland)"
 check_proc -f "xdg-desktop-portal$" -- "xdg-desktop-portal"
 
+# Every one of these failing looks identical from the bar: no menu at all.
+section "Global menu"
+check_cmd xprop core "xprop (reads menu addresses off XWayland windows)"
+menu_daemon="$SHELL_DIR/scripts/global-menu/zig-out/bin/global-menu-daemon"
+if [[ -x "$menu_daemon" ]]; then
+    ok "daemon built"
+elif have zig; then
+    bad "daemon not built: cd '$SHELL_DIR/scripts/global-menu' && zig build -Doptimize=ReleaseSafe"
+else
+    bad "daemon not built and zig is not installed; the menu stays empty"
+fi
+check_proc -f global-menu-daemon -- "global-menu daemon"
+if have busctl; then
+    if busctl --user list 2>/dev/null | grep -q 'com\.canonical\.AppMenu\.Registrar'; then
+        ok "AppMenu registrar owned"
+    else
+        bad "nobody owns com.canonical.AppMenu.Registrar; Qt apps cannot publish a menu"
+    fi
+fi
+# Qt exports its menubar over D-Bus only on X11, so a wayland-first setting here
+# leaves every Qt app menuless no matter what the daemon does.
+case "${QT_QPA_PLATFORM:-}" in
+    xcb) ok "QT_QPA_PLATFORM=xcb" ;;
+    "")  warn "QT_QPA_PLATFORM is unset; Qt apps default to Wayland and export no menu" ;;
+    wayland) ok "QT_QPA_PLATFORM=wayland (expected inside the shell itself)" ;;
+    *)   bad "QT_QPA_PLATFORM=$QT_QPA_PLATFORM starts on Wayland; Qt apps will export no menu" ;;
+esac
+
 section "Portals & secrets"
 if have gnome-keyring-daemon || have kwalletd6; then
     ok "Secret Service provider present"

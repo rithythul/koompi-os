@@ -365,6 +365,7 @@ open_preview() {
     KOOMPI_QUICKLOOK_PAGEDIR="$pagedir" \
     KOOMPI_QUICKLOOK_PAGECOUNT="$pagecount" \
     KOOMPI_QUICKLOOK_SCREEN="$(focused_screen)" \
+    QT_QPA_PLATFORM=wayland \
         setsid quickshell -p "$APP_DIR/shell.qml" >>"$LOG" 2>&1 &
     echo $! > "$PIDFILE"
 }

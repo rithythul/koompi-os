@@ -19,7 +19,10 @@ pkgrel=2
 pkgdesc='KOOMPI desktop shell (Quickshell config) and koompi-* tools'
 arch=(any)
 license=(GPL-3.0-only)
-depends=(koompi-quickshell-git rsync jq)
+# xorg-xprop and xorg-xwayland are not optional: Qt exports its menubar over
+# D-Bus only on X11, so the global menu reads the menu address off XWayland
+# window properties with xprop. Without either one the bar is silently empty.
+depends=(koompi-quickshell-git rsync jq xorg-xprop xorg-xwayland)
 
 package() {
   local _repo_root

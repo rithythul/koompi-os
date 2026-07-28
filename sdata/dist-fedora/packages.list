@@ -117,3 +117,7 @@ qt6ct
 # --- optional ----------------------------------------------------------------
 microtex                        # copr: ririko66z/dots-hyprland - LaTeX in the shell
 zig                             # builds the global-menu daemon
+glib2-devel                     # GDBus headers the global-menu daemon links against
+pkgconf-pkg-config              # zig build resolves glib through it
+xorg-x11-utils                  # xprop; the global menu reads menu addresses with it
+xorg-x11-server-Xwayland        # Qt exports its menubar over D-Bus only on X11
