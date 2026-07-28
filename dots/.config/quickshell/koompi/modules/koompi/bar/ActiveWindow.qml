@@ -10,15 +10,14 @@ import Quickshell.Hyprland
 
 Item { // Faux global menu: app icon + bold app name + window title
     id: root
+    property alias globalMenuOpen: globalMenu.menuOpen
     readonly property HyprlandMonitor monitor: Hyprland.monitorFor(root.QsWindow.window?.screen)
-    readonly property Toplevel activeWindow: ToplevelManager.activeToplevel
-
-    property string activeWindowAddress: `0x${activeWindow?.HyprlandToplevel?.address}`
-    property bool focusingThisMonitor: HyprlandData.activeWorkspace?.monitor == monitor?.name
+    readonly property var activeWindow: HyprlandData.activeWindow
+    property bool focusingThisMonitor: root.activeWindow?.monitor === root.monitor?.id
     property var biggestWindow: HyprlandData.biggestWindowForWorkspace(HyprlandData.monitors[root.monitor?.id]?.activeWorkspace.id)
 
-    readonly property bool hasWindow: root.focusingThisMonitor && (root.activeWindow?.activated ?? false) && root.biggestWindow !== undefined && root.biggestWindow !== null
-    readonly property string appClass: root.hasWindow ? (root.activeWindow?.appId ?? "") : ((root.biggestWindow?.class) ?? "")
+    readonly property bool hasWindow: root.focusingThisMonitor && (root.activeWindow?.mapped ?? false)
+    readonly property string appClass: root.hasWindow ? (root.activeWindow?.class ?? "") : ((root.biggestWindow?.class) ?? "")
     readonly property string windowTitle: root.hasWindow ? (root.activeWindow?.title ?? "") : ((root.biggestWindow?.title) ?? `${Translation.tr("Workspace")} ${monitor?.activeWorkspace?.id ?? 1}`)
 
     function prettyName(s) {
@@ -83,6 +82,7 @@ Item { // Faux global menu: app icon + bold app name + window title
                 spacing: 6
 
                 StyledText { // App name, menubar-style
+                    id: appName
                     font.pixelSize: Appearance.font.pixelSize.smaller
                     font.weight: Font.Bold
                     color: Appearance.colors.colOnLayer0
@@ -93,7 +93,10 @@ Item { // Faux global menu: app icon + bold app name + window title
                 GlobalMenu { // Inline File/Edit/View menu buttons
                     id: globalMenu
                     Layout.fillHeight: true
-                    visible: menuItems.length > 0
+                    visible: root.focusingThisMonitor && menuItems.length > 0
+                    // On a narrow bar the menu yields to the app name and icon;
+                    // whatever is left over goes into its overflow button.
+                    maxWidth: root.width - appIcon.width - appName.implicitWidth - 24
                 }
             }
 

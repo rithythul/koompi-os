@@ -12,6 +12,7 @@ import qs.modules.common.functions
 Item { // Bar content region
     id: root
 
+    property alias globalMenuOpen: activeWindow.globalMenuOpen
     property var screen: root.QsWindow.window?.screen
     property var brightnessMonitor: Brightness.getMonitorForScreen(screen)
     property real useShortenedForm: (Appearance.sizes.barHellaShortenScreenWidthThreshold >= screen?.width) ? 2 : (Appearance.sizes.barShortenScreenWidthThreshold >= screen?.width) ? 1 : 0
@@ -49,6 +50,9 @@ Item { // Bar content region
 
     FocusedScrollMouseArea { // Left side | scroll to change brightness
         id: barLeftSideMouseArea
+        // Clicks belong to the dedicated sidebar button and the global-menu
+        // controls below. This parent exists only for hover and wheel input.
+        acceptedButtons: Qt.NoButton
 
         anchors {
             top: parent.top
@@ -62,11 +66,6 @@ Item { // Bar content region
         onScrollDown: Brightness.decreaseBrightness()
         onScrollUp: Brightness.increaseBrightness()
         onMovedAway: GlobalStates.osdBrightnessOpen = false
-        onPressed: event => {
-            if (event.button === Qt.LeftButton)
-                GlobalStates.sidebarLeftOpen = !GlobalStates.sidebarLeftOpen;
-        }
-
         // Visual content
         ScrollHint {
             reveal: barLeftSideMouseArea.hovered
@@ -90,6 +89,7 @@ Item { // Bar content region
             }
 
             ActiveWindow {
+                id: activeWindow
                 Layout.leftMargin: 10 + (leftSidebarButton.visible ? 0 : Appearance.rounding.screenRounding)
                 Layout.rightMargin: Appearance.rounding.screenRounding
                 Layout.fillWidth: true

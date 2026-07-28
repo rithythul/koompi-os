@@ -19,6 +19,7 @@ Singleton {
     property var workspaceIds: []
     property var workspaceById: ({})
     property var activeWorkspace: null
+    property var activeWindow: null
     property var monitors: []
     property var layers: ({})
 
@@ -63,11 +64,23 @@ Singleton {
         getActiveWorkspace.running = true;
     }
 
+    function updateActiveWindow() {
+        getActiveWindow.running = true;
+    }
+
     function updateAll() {
         updateWindowList();
         updateMonitors();
         updateLayers();
         updateWorkspaces();
+        updateActiveWindow();
+    }
+
+    Timer {
+        id: refreshTimer
+        interval: 30
+        repeat: false
+        onTriggered: root.updateAll()
     }
 
     function biggestWindowForWorkspace(workspaceId) {
@@ -89,7 +102,7 @@ Singleton {
         function onRawEvent(event) {
             // console.log("Hyprland raw event:", event.name);
             if (["openlayer", "closelayer", "screencast"].includes(event.name)) return;
-            updateAll()
+            refreshTimer.restart()
         }
     }
 
@@ -160,6 +173,18 @@ Singleton {
             id: activeWorkspaceCollector
             onStreamFinished: {
                 root.activeWorkspace = JSON.parse(activeWorkspaceCollector.text);
+            }
+        }
+    }
+
+    Process {
+        id: getActiveWindow
+        command: ["hyprctl", "activewindow", "-j"]
+        stdout: StdioCollector {
+            id: activeWindowCollector
+            onStreamFinished: {
+                const text = activeWindowCollector.text.trim();
+                root.activeWindow = text.length > 0 ? JSON.parse(text) : null;
             }
         }
     }
