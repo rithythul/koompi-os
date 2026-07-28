@@ -56,17 +56,35 @@ arch_drop_deprecated() {
     run sudo pacman -Rdd --noconfirm "${present[@]}"
 }
 
-step "Arch: refreshing packages"
-run sudo pacman -Syu --noconfirm
-
+# Ahead of the survey, because it is a migration that has to happen on a machine
+# that is otherwise complete, and because removing a shadowing -git build is
+# exactly the kind of thing that leaves a metapackage's dependencies unsatisfied.
 arch_drop_deprecated
-arch_install_yay
 
-for _koompi_pkg in "${ARCH_DEP_PKGBUILDS[@]}"; do
-    step "Arch: $_koompi_pkg"
-    arch_install_pkgbuild "$_koompi_pkg"
-done
-unset _koompi_pkg
+# Work out what is actually missing before touching anything else. On a machine
+# that is already up to date this costs a handful of local database reads and
+# lets the whole step fall through - no upgrade, no yay, no rebuilds.
+mapfile -t _koompi_pending < <(arch_pending_pkgbuilds "${ARCH_DEP_PKGBUILDS[@]}")
+
+if (( ${#_koompi_pending[@]} == 0 )); then
+    ok "all ${#ARCH_DEP_PKGBUILDS[@]} dependency metapackages are already installed"
+else
+    info "${#_koompi_pending[@]} of ${#ARCH_DEP_PKGBUILDS[@]} metapackage(s) need work: ${_koompi_pending[*]}"
+
+    # Only now is the upgrade worth its cost. It still has to happen before any
+    # AUR build: building against a half-upgraded system is how Arch breaks.
+    step "Arch: refreshing packages"
+    run sudo pacman -Syu --noconfirm
+
+    arch_install_yay
+
+    for _koompi_pkg in "${_koompi_pending[@]}"; do
+        step "Arch: $_koompi_pkg"
+        arch_install_pkgbuild "$_koompi_pkg"
+    done
+    unset _koompi_pkg
+fi
+unset _koompi_pending
 
 # ~600 KiB itself, but on a machine without KDE it drags in ~600 MiB of Plasma.
 # Only worth it for media-position reporting out of Firefox.

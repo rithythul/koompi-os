@@ -13,17 +13,20 @@ have pacman || die "no pacman; sdata/dist-arch is for Arch and its derivatives"
 # shellcheck source=sdata/lib/arch.sh
 source "$REPO_ROOT/sdata/lib/arch.sh"
 
-# --only-apps skips the dependency step, and every browser here is an AUR build.
-arch_install_yay
-
 step "Arch: koompi-apps"
-arch_install_pkgbuild koompi-apps
+if arch_pkgbuild_satisfied "$REPO_ROOT/sdata/dist-arch/koompi-apps"; then
+    ok "koompi-apps already installed and complete"
+else
+    # --only-apps skips the dependency step, and every browser here is an AUR build.
+    arch_install_yay
+    arch_install_pkgbuild koompi-apps
+fi
 
 # mpvpaper is the only piece of shipped configuration with no packaged home on
 # any distro: switchwall.sh uses it to run a video file as the wallpaper. Every
 # other wallpaper type works without it, so it is asked for rather than assumed.
 if ! pacman -Qq mpvpaper >/dev/null 2>&1; then
     if confirm "Install mpvpaper? (lets you set a video as the wallpaper; AUR build)"; then
-        run yay -S --sudoloop --needed --noconfirm mpvpaper
+        run yay -S --needed --noconfirm mpvpaper
     fi
 fi

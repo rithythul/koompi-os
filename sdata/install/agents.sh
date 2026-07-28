@@ -4,9 +4,18 @@
 
 readonly AGENT_NPM_PREFIX="${XDG_DATA_HOME}/koompi/npm"
 
+# Symmetric with run_official_installer below: present means done. Both of these
+# CLIs update themselves, so re-running `npm install --global` on every setup
+# spends a network round trip and a package extraction to arrive back where it
+# started. KOOMPI_AGENTS_REFRESH=1 forces the install for a deliberate repair.
 install_npm_agent() {
     local command_name="$1"
     shift
+
+    if have "$command_name" && [[ "${KOOMPI_AGENTS_REFRESH:-0}" != 1 ]]; then
+        ok "$command_name already installed"
+        return 0
+    fi
 
     if ! have npm; then
         warn "npm is missing; cannot install ${command_name}"
@@ -31,7 +40,7 @@ install_cli_compat() {
 
 run_official_installer() {
     local name="$1" command_name="$2" url="$3"
-    if have "$command_name"; then
+    if have "$command_name" && [[ "${KOOMPI_AGENTS_REFRESH:-0}" != 1 ]]; then
         ok "$name already installed"
         return 0
     fi

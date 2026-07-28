@@ -30,16 +30,35 @@ readonly SYNC_DIRS=(
     ".config/quickshell/koompi-quicklook"
 )
 
-# Copy aside every path in $HOME that this install is about to write over.
+# Copy aside every path in $HOME that this install is about to *change*.
 # Driven off the contents of dots/, so it can never miss a file we install and
 # never hoards files we do not touch.
+#
+# The comparison is what keeps re-running this cheap. Without it an update that
+# changes three files still copies the whole thousand-file tree into a fresh
+# timestamped directory, and a user who runs the installer a few times ends up
+# with several gigabytes of identical backups. A file that already matches what
+# we are about to write cannot be lost by writing it, so it needs no copy.
 backup_existing() {
-    local backup_dir count=0 rel target
+    local backup_dir count=0 skipped=0 rel target source keep
     backup_dir="${BACKUP_ROOT}/$(date +%Y%m%d-%H%M%S)"
 
     while IFS= read -r -d '' rel; do
         target="$HOME/$rel"
         [[ -e "$target" || -L "$target" ]] || continue
+
+        # Override slots are preserved rather than written, so there is nothing
+        # to protect them from.
+        for keep in "${KEEP_PATHS[@]}"; do
+            [[ "$rel" == "$keep" ]] && continue 2
+        done
+
+        source="$REPO_ROOT/dots/$rel"
+        if cmp -s -- "$source" "$target"; then
+            skipped=$((skipped + 1))
+            continue
+        fi
+
         if [[ "$DRY_RUN" != true ]]; then
             mkdir -p "$backup_dir/$(dirname "$rel")"
             cp -a "$target" "$backup_dir/$rel" || { err "backup failed for ~/$rel"; return 1; }
@@ -48,7 +67,10 @@ backup_existing() {
     done < <(cd "$REPO_ROOT/dots" && find . \( -type f -o -type l \) -printf '%P\0')
 
     if (( count > 0 )); then
-        ok "backed up ${count} existing file(s) to ${backup_dir}"
+        ok "backed up ${count} file(s) this run will change, to ${backup_dir}"
+        (( skipped > 0 )) && info "${skipped} already matched and needed no copy"
+    elif (( skipped > 0 )); then
+        ok "config already matches; nothing to back up"
     else
         info "nothing to back up (no KOOMPI config present yet)"
     fi

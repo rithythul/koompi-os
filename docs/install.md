@@ -172,8 +172,9 @@ Until then `ddcutil` and `ydotool` will not work, and that is expected rather th
 | merge | the rest of `.config`, `.local/share`, `.local/bin` | Copied in, nothing deleted. Shared with whatever else you have. |
 | keep | `.config/hypr/custom/*.lua` | Written only if absent. Your overrides survive every update. |
 
-Before writing anything it copies every file it is about to overwrite into `~/.koompi-dots-backup/<timestamp>/`.
-`--no-backup` skips that; there is no good reason to use it.
+Before writing anything it copies every file it is about to *change* into `~/.koompi-dots-backup/<timestamp>/`.
+A file that already matches what is about to be written is left alone, so re-running the installer does not pile up another full copy of the tree.
+`--no-backup` skips the backup entirely; there is no good reason to use it.
 
 Everything written is appended to `~/.local/state/koompi/installed-files`.
 
@@ -194,6 +195,14 @@ If the update added a dependency, run the full `./setup install`.
 
 Re-running the one-liner does the same thing: it fetches, hard-resets the checkout, and runs `./setup install` again.
 Every step is idempotent, so this is the supported way to update an install that started as `curl | bash`.
+
+A re-run only does work that is actually outstanding.
+Each `koompi-*` metapackage is checked against what is installed - by version, and by whether its dependencies are still satisfied - and skipped when it is already complete.
+If nothing needs building, the whole package step falls through: no `pacman -Syu`, no AUR resolve, no rebuilds.
+The application-set question is only asked on a machine that does not already have the set, and the agent CLIs are skipped when they are on `PATH` (`KOOMPI_AGENTS_REFRESH=1` forces them to reinstall).
+
+You should be asked for your password once, at the start.
+It is kept valid for the length of the run, so a long package build does not strand the installer on a password prompt.
 
 If you skipped the applications the first time and changed your mind:
 

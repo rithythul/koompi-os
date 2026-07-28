@@ -70,13 +70,21 @@ require_not_root() {
 
 # One sudo prompt up front, kept warm for the length of the install so package
 # managers do not stall waiting for a password mid-download.
+#
+# The refresh must not give up on a single failure. A miss here is usually
+# transient - `pacman -Syu` replacing the sudo binary, or /run/sudo/ts being
+# recreated - and a loop that exits on it hands the rest of the install back to
+# a password prompt at every one of the thirty-odd sudo calls that follow, which
+# is exactly the behaviour this function exists to prevent. So keep looping, and
+# refresh well inside the shortest timestamp_timeout worth supporting.
 SUDO_KEEPALIVE_PID=''
 sudo_start() {
     have sudo || die "sudo not found; install it or run the per-distro dependency steps manually"
     [[ "$DRY_RUN" == true ]] && return 0
-    info "requesting sudo (needed to install packages)"
+    [[ -n "$SUDO_KEEPALIVE_PID" ]] && return 0
+    info "requesting sudo once; it stays valid for the whole install"
     sudo -v || die "could not obtain sudo"
-    ( while true; do sleep 50; sudo -n true 2>/dev/null || exit 0; done ) &
+    ( while true; do sudo -n -v 2>/dev/null || true; sleep 30; done ) &
     SUDO_KEEPALIVE_PID=$!
 }
 sudo_stop() {

@@ -25,10 +25,25 @@ install_apps() {
     # Several gigabytes, two proprietary browsers, and an office suite. That is
     # the right default for a KOOMPI machine and the wrong thing to do silently
     # to someone who piped this in to try the shell out.
-    printf '\n  The KOOMPI application set:\n  %s\n\n' "$APPS_SUMMARY"
-    if ! confirm "Install these? (no = keep the applications you already have)"; then
-        warn "skipped; the desktop works, but keybinds fall back to whatever is on PATH"
-        return 0
+    #
+    # Someone who already said yes once should not be asked again on every
+    # update, so the question is only worth putting to a machine that does not
+    # already have the set. The recipe still runs either way: it skips what is
+    # present by itself, and that is what picks up applications added upstream
+    # since the last run.
+    local cmd missing=0
+    for cmd in "${APP_CMDS[@]}" "${AGENT_CMDS[@]}"; do
+        have "$cmd" || missing=$((missing + 1))
+    done
+
+    if (( missing == 0 )); then
+        ok "the KOOMPI application set is already present; checking for additions"
+    else
+        printf '\n  The KOOMPI application set:\n  %s\n\n' "$APPS_SUMMARY"
+        if ! confirm "Install these? (no = keep the applications you already have)"; then
+            warn "skipped; the desktop works, but keybinds fall back to whatever is on PATH"
+            return 0
+        fi
     fi
 
     info "using $recipe"

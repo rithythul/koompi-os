@@ -17,7 +17,11 @@ setup_python_venv() {
     # No --python pin: the venv must be built on the distro's own interpreter or
     # --system-site-packages cannot see the distro PyGObject and opencv, which
     # are taken from packages rather than built here.
-    run uv venv --system-site-packages "$VENV_DIR"
+    if [[ -x "$VENV_DIR/bin/python" ]]; then
+        info "venv already exists; syncing requirements only"
+    else
+        run uv venv --system-site-packages "$VENV_DIR"
+    fi
     run uv pip install --python "$VENV_DIR/bin/python" \
         -r "$REPO_ROOT/sdata/uv/requirements.txt"
     ok "venv ready at $VENV_DIR"
