@@ -13,6 +13,26 @@
 wezterm                         # trixie and later; absent on older Ubuntu
 konsole
 
+# --- KOOMPI Workbench --------------------------------------------------------
+# Agent CLIs are installed user-locally after these foundations. apt-cache
+# filtering keeps derivatives usable when one convenience tool is unavailable.
+neovim
+nodejs
+npm
+git
+gh
+ripgrep
+fd-find
+fzf
+jq
+bat
+eza
+zoxide
+direnv
+shellcheck
+shfmt
+just
+
 # --- editor ------------------------------------------------------------------
 # Zed is in no Debian or Ubuntu archive; install-apps.sh runs its own installer.
 

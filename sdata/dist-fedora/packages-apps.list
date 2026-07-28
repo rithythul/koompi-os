@@ -11,6 +11,24 @@
 wezterm
 konsole
 
+# --- KOOMPI Workbench --------------------------------------------------------
+neovim
+nodejs
+npm
+git
+gh
+ripgrep
+fd-find
+fzf
+jq
+bat
+eza
+zoxide
+direnv
+ShellCheck
+shfmt
+just
+
 # --- editor ------------------------------------------------------------------
 # Zed is not packaged for Fedora; install-apps.sh runs its official installer.
 

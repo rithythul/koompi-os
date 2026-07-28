@@ -17,6 +17,7 @@ fi
 
 KOOMPI_STATE_DIR="${XDG_STATE_HOME}/koompi"
 MANIFEST="${KOOMPI_STATE_DIR}/installed-files"
+SYSTEM_MANIFEST="${KOOMPI_STATE_DIR}/installed-system-files"
 BACKUP_ROOT="${BACKUP_ROOT:-$HOME/.koompi-dots-backup}"
 # Used by sdata/install/setups.sh and sdata/install/uninstall.sh.
 # shellcheck disable=SC2034

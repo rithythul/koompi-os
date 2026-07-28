@@ -19,7 +19,9 @@ cd koompi-os
 ./setup install
 ```
 
-Then log out and pick **KOOMPI** at your display manager.
+Then log out and pick **KOOMPI** at your display manager. It is installed as
+an additional Hyprland-based session; existing KDE Plasma and GNOME sessions
+stay installed and selectable.
 
 ## What `./setup` does
 
@@ -30,11 +32,14 @@ Four steps, each skippable:
    `sdata/dist-debian`).
 2. **Applications** - the opinionated set the shipped config is written around:
    WezTerm, Konsole, Zed, Chrome, Brave, Dolphin's viewers and thumbnailers,
-   LibreOffice, btop, KDE Connect. Asked for separately; `--no-apps` skips it.
+   LibreOffice, btop, KDE Connect, Neovim, a modern CLI toolkit, and the
+   KOOMPI Workbench with Claude Code, Codex, Pi and Herdr. Asked for
+   separately; `--no-apps` skips it.
    See [Applications](#applications).
 3. **Setups** - creates the Python virtualenv the colour pipeline runs in,
    builds the global-menu daemon, adds you to `video`/`input`/`i2c`, loads the
-   `uinput` and `i2c-dev` modules, enables `ydotool`.
+   `uinput` and `i2c-dev` modules, enables `ydotool`, and registers the KOOMPI
+   session system-wide so GDM and SDDM can show it before login.
 4. **Files** - copies `dots/` into `$HOME`, backing up anything it overwrites to
    `~/.koompi-dots-backup/<timestamp>/`.
 
@@ -75,6 +80,12 @@ intends:
 | Office | LibreOffice |
 | System | btop, GNOME System Monitor, `nm-connection-editor` |
 | Phone | KDE Connect |
+| Agent workbench | Herdr orchestrating Claude Code, Codex and Pi; Neovim available directly |
+| CLI toolkit | Git/GitHub CLI, ripgrep, fd, fzf, jq, bat, eza, zoxide, direnv, ShellCheck, shfmt and just |
+
+Press `Super+Shift+Return` (or launch **KOOMPI Workbench**) to open Herdr in
+the preferred terminal. The agent installers are user-local and authentication
+is deliberately left to each user; KOOMPI does not copy or manage credentials.
 
 None of it is load-bearing.
 Install something else and it wins as soon as it is earlier in the list, or set your own order in `~/.config/hypr/custom/variables.lua`.

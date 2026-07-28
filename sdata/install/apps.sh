@@ -8,8 +8,9 @@
 
 # Named for the confirmation prompt, so someone who has never read this repo
 # still knows what is about to land on their disk.
-readonly APPS_SUMMARY='wezterm, konsole, zed, chrome, brave, dolphin extras, okular,
-  loupe, mpv, libreoffice, btop, kdeconnect and friends'
+readonly APPS_SUMMARY='KOOMPI Workbench (Claude Code, Codex, Pi, Herdr, Neovim),
+  wezterm, konsole, zed, chrome, brave, dolphin extras, okular, loupe, mpv,
+  libreoffice, btop, kdeconnect and a modern command-line toolkit'
 
 install_apps() {
     step "Installing applications"
@@ -33,6 +34,13 @@ install_apps() {
     info "using $recipe"
     # shellcheck source=/dev/null
     source "$recipe"
+
+    # Agent CLIs update too quickly for distro archives. They are installed
+    # user-locally from their official distribution channels after the distro
+    # recipe has supplied Node/npm and the native CLI foundation.
+    # shellcheck source=sdata/install/agents.sh
+    source "$REPO_ROOT/sdata/install/agents.sh"
+    install_agent_tools
 
     ok "applications installed"
 }

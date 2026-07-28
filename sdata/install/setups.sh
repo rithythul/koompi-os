@@ -97,10 +97,60 @@ setup_toolkit_defaults() {
     fi
 }
 
+setup_system_session() {
+    step "System login session"
+
+    # Display managers discover sessions before a user session exists, so most
+    # of them do not scan ~/.local/share/wayland-sessions. Keep that user copy
+    # as a fallback, but register KOOMPI system-wide for GDM, SDDM and friends.
+    local launcher=/usr/local/bin/koompi-session
+    local entry=/usr/share/wayland-sessions/koompi.desktop
+    local launcher_src="$REPO_ROOT/dots/.local/bin/koompi-session"
+    local entry_src="$REPO_ROOT/dots/.local/share/wayland-sessions/koompi.desktop"
+    local install_launcher=true
+
+    if [[ -x /usr/bin/koompi-session ]]; then
+        launcher=/usr/bin/koompi-session
+        install_launcher=false
+        ok "packaged /usr/bin/koompi-session present"
+    fi
+
+    if $install_launcher && [[ -e "$launcher" ]] \
+       && ! grep -q "koompi-session - launch the KOOMPI" "$launcher" 2>/dev/null; then
+        warn "$launcher exists and is not KOOMPI-managed; not overwriting it"
+        return 0
+    fi
+    if [[ -e "$entry" ]] && ! grep -q '^X-KOOMPI-Managed=true$' "$entry" 2>/dev/null; then
+        warn "$entry exists and is not KOOMPI-managed; not overwriting it"
+        return 0
+    fi
+
+    local staged_entry
+    staged_entry="$(mktemp)"
+    sed "s|^Exec=/usr/bin/koompi-session$|Exec=${launcher}|" "$entry_src" > "$staged_entry"
+
+    if $install_launcher; then
+        run sudo install -Dm755 "$launcher_src" "$launcher"
+    fi
+    run sudo install -Dm644 "$staged_entry" "$entry"
+    rm -f "$staged_entry"
+
+    if [[ "$DRY_RUN" != true && -x "$launcher" && -f "$entry" ]]; then
+        mkdir -p "$(dirname "$SYSTEM_MANIFEST")"
+        if $install_launcher; then
+            printf '%s\n%s\n' "$launcher" "$entry" > "$SYSTEM_MANIFEST"
+        else
+            printf '%s\n' "$entry" > "$SYSTEM_MANIFEST"
+        fi
+        ok "KOOMPI is registered alongside the host desktop"
+    fi
+}
+
 run_setups() {
     setup_python_venv
     setup_global_menu
     setup_groups_and_modules
     setup_services
     setup_toolkit_defaults
+    setup_system_session
 }

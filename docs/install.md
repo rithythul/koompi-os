@@ -3,6 +3,13 @@
 This document covers installing the desktop **onto an existing Linux install**.
 If you are building the KOOMPI OS image itself, you want [`os-build.md`](os-build.md) instead - that path packages the same `dots/` tree into `/etc/skel` and never runs `./setup`.
 
+The install adds a separate **KOOMPI** Wayland session. It does not replace,
+rename or disable an existing KDE Plasma or GNOME session. Log out after the
+install and choose KOOMPI from the display manager's session menu. KOOMPI does
+install shared applications and sets the current user's GTK font/dark-mode
+defaults, so those application-level preferences can also be visible in the
+user's other sessions.
+
 ## Quick start
 
 ```sh
@@ -92,6 +99,8 @@ What this step installs is exactly what makes those lists resolve the way KOOMPI
 | Office | `libreoffice` | `variables.lua` prefers WPS then OnlyOffice then LibreOffice. Only LibreOffice is packaged on every supported distro, so it is the one the installer guarantees; install either of the others and it wins. |
 | System | `btop`, `gnome-system-monitor`, `nm-connection-editor` | The sysmon scratchpad runs btop; the network widget's advanced settings open `nm-connection-editor`. |
 | Phone | `kdeconnect` | The shell's KDE Connect integration does nothing without the daemon. |
+| Agent workbench | `herdr`, `claude`, `codex`, `pi`, `nvim` | `Super+Shift+Return` opens Herdr in the preferred terminal. Each agent remains usable directly. |
+| CLI toolkit | `git`, `gh`, `ripgrep`, `fd`, `fzf`, `jq`, `bat`, `eza`, `zoxide`, `direnv`, `shellcheck`, `shfmt`, `just` | A compact, modern terminal baseline for coding and automation. |
 
 Kitty is **not** in this list, despite being the KOOMPI terminal in several places.
 It is a `koompi-fonts-themes` dependency because the shell hardcodes it rather than dispatching: the `Super+grave` scratchpad, `launch_sysmon.sh` and the `Config.qml` terminal actions all name it directly, and `applycolor.sh` writes it a generated theme.
@@ -110,6 +119,29 @@ If it fails, the editor keybind falls through to the next entry rather than the 
 Everything else is installed with `--skip-unavailable` on Fedora and behind an `apt-cache` check on Debian, so a name one release has dropped costs you that program rather than the step.
 `./setup doctor` reports which of the set actually landed.
 
+#### KOOMPI Workbench
+
+The application step also builds a user-local agent workbench:
+
+| Tool | Install channel | Command |
+|---|---|---|
+| Claude Code | Anthropic's native installer | `claude` |
+| Codex | OpenAI's `@openai/codex` npm package | `codex` |
+| Pi | `@earendil-works/pi-coding-agent` with its recommended `--ignore-scripts` flag | `pi` |
+| Herdr | Herdr's stable native installer | `herdr` |
+| Neovim | The distro package manager | `nvim` |
+
+Codex and Pi live under `~/.local/share/koompi/npm`, with command links in
+`~/.local/bin`; this avoids taking ownership of the system npm prefix. Claude
+Code and Herdr use their official user-level native channels. The installer
+never signs into an agent, copies credentials or chooses a provider. Run each
+command once to complete its own authentication.
+
+`koompi-workbench` launches Herdr in `~/Projects`, then `~/workspace`, then
+`~`, choosing the first directory that exists. It prefers WezTerm and falls
+back through kitty, Konsole and foot. Use `Super+Shift+Return` or launch
+**KOOMPI Workbench** from the application launcher.
+
 ### 3. Setups
 
 The parts that are neither a package nor a file:
@@ -117,11 +149,15 @@ The parts that are neither a package nor a file:
 - **Python venv** at `~/.local/state/quickshell/.venv`, built with `uv` from `sdata/uv/requirements.txt`.
   The shell's colour generation, thumbnailing and image analysis run out of it.
   It is created with `--system-site-packages` so PyGObject and OpenCV come from the distro packages instead of being compiled here.
-- **global-menu daemon**, a Zig program in the shell tree.
+- **global-menu daemon**, a Zig program in the shell tree. It links GLib/GDBus.
   `zig-out/` is gitignored, so a fresh clone has no binary and the global menu silently stays empty until this builds it.
 - **Groups**: `video`, `input`, and `i2c` where it exists. `i2c` is what lets `ddcutil` set the brightness of an external monitor.
 - **Kernel modules**: `uinput` (ydotool, on-screen keyboard) and `i2c-dev`.
 - **Services**: `ydotool` as a user service, `bluetooth` as a system one.
+- **Login session**: registers `/usr/share/wayland-sessions/koompi.desktop`
+  and, when no packaged launcher exists, `/usr/local/bin/koompi-session`.
+  Display managers read this system location before login; the entry appears
+  beside KDE Plasma and GNOME rather than replacing either.
 
 Group membership only takes effect at your next login.
 Until then `ddcutil` and `ydotool` will not work, and that is expected rather than a failed install.
@@ -141,9 +177,10 @@ Before writing anything it copies every file it is about to overwrite into `~/.k
 
 Everything written is appended to `~/.local/state/koompi/installed-files`.
 
-The shipped `koompi.desktop` session entry points at `/usr/bin/koompi-session`, which is where the Arch package puts it.
-On a user-level install that file does not exist, so the `Exec=` line is rewritten to `~/.local/bin/koompi-session`.
-If a system `koompi-session` *is* present it is left pointing there.
+The user-level copy of `koompi.desktop` points at the user's launcher as a
+fallback. The setups step also installs a system session entry for reliable
+GDM/SDDM discovery. If `/usr/bin/koompi-session` came from a KOOMPI package,
+the entry uses it; otherwise it uses the managed `/usr/local/bin` copy.
 
 ## Updating
 
@@ -172,6 +209,10 @@ If you skipped the applications the first time and changed your mind:
 
 Removes the paths in the manifest and prunes the directories that are then empty.
 `rmdir`, never `rm -r`, so a directory you put your own files in stays.
+
+The uninstaller separately offers to remove the system login entry and
+launcher it recorded. It will only touch the two allowlisted KOOMPI paths and
+will not remove or modify KDE/GNOME sessions.
 
 It does **not** remove packages.
 The installer cannot tell which of them you also wanted for something else, and removing a shared library out from under a running session is not a recoverable mistake.
@@ -248,6 +289,6 @@ It reports the detected distro, which required and optional commands are on `PAT
 |---|---|
 | Session missing from the login screen | The display manager only rescans `~/.local/share/wayland-sessions` on restart. Restart it, or log out and back in. |
 | Wallpaper does not change the colour scheme | No `matugen`, or no venv. `./setup doctor` will say which. |
-| Global menu is always empty | `global-menu-daemon` was not built. Install `zig` and run `./setup install --only-setups`. |
+| Global menu is always empty | `global-menu-daemon` was not built. Install `zig` plus the GLib headers and run `./setup install --only-setups`. |
 | External monitor brightness does nothing | You are not in `i2c` yet. Log out and back in. |
 | On-screen keyboard types nothing | `uinput` is not loaded, or you are not in `input` yet. |

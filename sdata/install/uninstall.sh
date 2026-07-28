@@ -52,6 +52,19 @@ run_uninstall() {
         run rm -rf "$VENV_DIR"
     fi
 
+    if [[ -f "$SYSTEM_MANIFEST" ]] && confirm "Also remove the system KOOMPI login-session registration?"; then
+        local system_path
+        while IFS= read -r system_path; do
+            case "$system_path" in
+                /usr/local/bin/koompi-session|/usr/share/wayland-sessions/koompi.desktop)
+                    run sudo rm -f "$system_path"
+                    ;;
+                *) warn "refusing unexpected system path: $system_path" ;;
+            esac
+        done < "$SYSTEM_MANIFEST"
+        [[ "$DRY_RUN" == true ]] || rm -f "$SYSTEM_MANIFEST"
+    fi
+
     if [[ "$DRY_RUN" != true ]]; then
         rm -f "$MANIFEST"
         rmdir "$KOOMPI_STATE_DIR" 2>/dev/null || true

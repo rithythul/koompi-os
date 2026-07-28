@@ -6,3 +6,4 @@ Type=Application
 DesktopNames=KOOMPI;Hyprland
 Keywords=hyprland;wayland;koompi;
 Icon=koompi
+X-KOOMPI-Managed=true

@@ -40,6 +40,27 @@ depends=(
   # F4 and Open Terminal both go through KIO, which does not read variables.lua.
   konsole
 
+  # --- KOOMPI Workbench ------------------------------------------------------
+  # Native editor plus the runtime and command-line foundation used by Claude
+  # Code, Codex, Pi and Herdr. The fast-moving agents themselves are installed
+  # user-locally by sdata/install/agents.sh.
+  neovim
+  nodejs
+  npm
+  git
+  github-cli
+  ripgrep
+  fd
+  fzf
+  jq
+  bat
+  eza
+  zoxide
+  direnv
+  shellcheck
+  shfmt
+  just
+
   # --- editor ----------------------------------------------------------------
   # Arch ships this in extra. On Fedora and Debian there is no package and the
   # recipe falls back to Zed's own installer; see sdata/lib/from-source.sh.

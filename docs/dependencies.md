@@ -19,6 +19,9 @@ Two requirements are not satisfied by any package manager, and `./setup` handles
 - **The global-menu daemon**, Zig source at `dots/.config/quickshell/koompi/scripts/global-menu/`.
   `zig-out/` is gitignored, so a fresh clone has no binary and the global menu stays empty until `zig build` runs.
   This makes `zig` a build-time dependency of the desktop, not just of the repo.
+  The daemon links GLib/GDBus, so `glib2` and `pkgconf` (Debian: `libglib2.0-dev`, `pkg-config`; Fedora: `glib2-devel`, `pkgconf-pkg-config`) must be present at build time.
+  It also owns `com.canonical.AppMenu.Registrar` on the session bus, which is how applications are told a global menu exists at all.
+  Nothing else in the session may own that name.
 
 ## Required
 
@@ -58,6 +61,22 @@ Feature packages the desktop uses when present and degrades without:
 - `koompi-microtex-git` renders LaTeX in the shell; without it math rendering is off.
 - `easyeffects` audio effects, `wayvnc` remote desktop, `fprintd` fingerprint login.
 - `plasma-browser-integration` media control from the browser.
+
+## Opinionated application and agent layer
+
+The application step is not required to start Hyprland, but it is part of the
+intended KOOMPI experience. Alongside the graphical defaults it installs
+Neovim and a terminal toolkit (`git`, `gh`, `ripgrep`, `fd`, `fzf`, `jq`,
+`bat`, `eza`, `zoxide`, `direnv`, `shellcheck`, `shfmt`, `just`).
+
+Claude Code, Codex, Pi and Herdr are installed from their upstream user-level
+channels because supported distro repositories do not provide a consistent,
+current set. Codex and Pi use an isolated npm prefix at
+`~/.local/share/koompi/npm`; Claude Code and Herdr use their native installers.
+No agent credentials are managed by KOOMPI.
+
+Run `./setup install --only-apps` to install or repair this layer, and
+`./setup doctor` to see which commands are available.
 
 ## GTK/Qt compatibility (outputs, not infrastructure)
 

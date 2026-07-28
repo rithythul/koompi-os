@@ -5,8 +5,9 @@
 #   ./setup uninstall    remove what a previous install put in $HOME
 #   ./setup doctor       report what is detected and what is missing
 #
-# This installs into $HOME. On KOOMPI OS itself the desktop arrives through the
-# koompi-* packages and /etc/skel instead; see docs/os-build.md.
+# Most files install into $HOME. The login entry and a small launcher are
+# registered system-wide so GDM, SDDM and other display managers can discover
+# KOOMPI before login. On KOOMPI OS itself those arrive through packages.
 
 set -uo pipefail
 
@@ -102,8 +103,9 @@ readonly OPTIONAL_CMDS=(
 readonly APP_CMDS=(
     wezterm konsole zeditor google-chrome-stable brave dolphin okular
     loupe mpv ark libreoffice btop gnome-system-monitor nm-connection-editor
-    kdeconnect-app
+    kdeconnect-app nvim git gh rg fd fzf bat eza zoxide direnv shellcheck shfmt just
 )
+readonly AGENT_CMDS=(claude codex pi herdr)
 
 doctor() {
     step "KOOMPI desktop doctor"
@@ -132,6 +134,17 @@ doctor() {
         info "$missing_apps not installed; ./setup install --only-apps adds them"
     fi
 
+    step "KOOMPI Workbench"
+    local missing_agents=0
+    for cmd in "${AGENT_CMDS[@]}"; do
+        if have "$cmd"; then ok "$cmd"; else err "$cmd is missing"; missing_agents=$((missing_agents + 1)); fi
+    done
+    if (( missing_agents == 0 )); then
+        ok "agent workbench ready"
+    else
+        info "$missing_agents agent tool(s) missing; ./setup install --only-apps repairs them"
+    fi
+
     step "Install state"
     if [[ -f "$MANIFEST" ]]; then ok "manifest: $MANIFEST ($(wc -l < "$MANIFEST") paths)"
     else warn "no manifest; this was not installed by ./setup"; fi
@@ -139,6 +152,14 @@ doctor() {
     else warn "no venv at $VENV_DIR"; fi
     if [[ -d "$XDG_CONFIG_HOME/quickshell/koompi" ]]; then ok "shell tree present"
     else warn "no shell at $XDG_CONFIG_HOME/quickshell/koompi"; fi
+    if [[ -f /usr/share/wayland-sessions/koompi.desktop ]] \
+       && { [[ -x /usr/bin/koompi-session ]] || [[ -x /usr/local/bin/koompi-session ]]; }; then
+        ok "system KOOMPI login session registered"
+    elif [[ -f "$XDG_DATA_HOME/wayland-sessions/koompi.desktop" ]]; then
+        warn "only the user-local session entry exists; some display managers will not show it"
+    else
+        err "KOOMPI login session is not registered"
+    fi
     local menu="$XDG_CONFIG_HOME/quickshell/koompi/scripts/global-menu/zig-out/bin/global-menu-daemon"
     if [[ -x "$menu" ]]; then ok "global-menu-daemon built"
     else warn "global-menu-daemon not built"; fi
@@ -171,8 +192,8 @@ main() {
 
     printf '\n%sAbout to install the KOOMPI desktop for %s%s\n' "${C_BOLD}" "$(id -un)" "${C_RST}"
     $DO_DEPS   && printf '  - install packages with the %s recipe\n' "$OS_GROUP_ID"
-    $DO_APPS   && printf '  - offer the KOOMPI application set (asked for separately)\n'
-    $DO_SETUPS && printf '  - create the Python venv, join groups, enable services\n'
+    $DO_APPS   && printf '  - offer the application set and KOOMPI agent workbench\n'
+    $DO_SETUPS && printf '  - configure the venv, services and KOOMPI login session\n'
     $DO_FILES  && printf '  - copy config files into %s\n' "$HOME"
     [[ "$DRY_RUN" == true ]] && printf '  %s(dry run: nothing will change)%s\n' "${C_YELLOW}" "${C_RST}"
     printf '\n'
@@ -197,6 +218,7 @@ main() {
   Already in Hyprland? ${C_BOLD}hyprctl reload${C_RST} picks up the new config.
 
   ${C_BOLD}Super + /${C_RST}       keybind cheatsheet
+  ${C_BOLD}Super + Shift + Return${C_RST} KOOMPI Workbench (Herdr)
   ${C_BOLD}Ctrl + Super + T${C_RST} pick a wallpaper (this also generates the colour scheme)
 
   Group changes need a fresh login before ddcutil and ydotool work.
