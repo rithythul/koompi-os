@@ -21,16 +21,20 @@ AbstractQuickPanel {
     property real spacing: 6
     property real padding: 6
     readonly property real baseCellWidth: {
-        // This is the wrong calculation, but it looks correct in reality???
-        // (theoretically spacing should be multiplied by 1 column less)
-        const availableWidth = root.width - (root.padding * 2) - (root.spacing * (root.columns))
+        const availableWidth = root.width - (root.padding * 2) - (root.spacing * (root.columns - 1))
         return availableWidth / root.columns
     }
     readonly property real baseCellHeight: 56
 
     // Toggles
     readonly property list<string> availableToggleTypes: ["network", "bluetooth", "idleInhibitor", "easyEffects", "nightLight", "darkMode", "cloudflareWarp", "gameMode", "screenSnip", "colorPicker", "onScreenKeyboard", "mic", "audio", "notifications", "powerProfile","musicRecognition", "antiFlashbang"]
-    readonly property int columns: Config.options.sidebar.quickToggles.android.columns
+    readonly property int configuredColumns: Math.max(1, Config.options.sidebar.quickToggles.android.columns)
+    // Six logical columns make size-2 toggles three-up, which truncates nearly
+    // every useful label in the standard sidebar. Collapse to four logical
+    // columns on narrow panels so expanded toggles become a readable two-up.
+    readonly property int columns: root.width > 0 && root.width < 480
+        ? Math.min(configuredColumns, 4)
+        : configuredColumns
     readonly property list<var> toggles: Config.ready ? Config.options.sidebar.quickToggles.android.toggles : []
     readonly property list<var> toggleRows: toggleRowsForList(toggles)
     readonly property list<var> unusedToggles: {
