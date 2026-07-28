@@ -11,8 +11,10 @@ MouseArea {
 
     readonly property bool running: TimerService.pomodoroRunning
     readonly property bool isBreak: TimerService.pomodoroBreak
-    readonly property color phaseColor: isBreak ? Appearance.colors.colTertiary : Appearance.colors.colPrimary
-    readonly property string phaseIcon: isBreak ? "local_cafe" : "local_fire_department"
+    readonly property color phaseColor: running
+        ? (isBreak ? Appearance.colors.colTertiary : Appearance.colors.colPrimary)
+        : Appearance.colors.colOnLayer1Inactive
+    readonly property string phaseIcon: !running ? "play_arrow" : (isBreak ? "local_cafe" : "local_fire_department")
     readonly property string timeText: {
         let m = Math.floor(TimerService.pomodoroSecondsLeft / 60).toString().padStart(2, '0');
         let s = Math.floor(TimerService.pomodoroSecondsLeft % 60).toString().padStart(2, '0');
@@ -30,11 +32,6 @@ MouseArea {
             TimerService.togglePomodoro();
         else if (event.button === Qt.RightButton)
             TimerService.resetPomodoro();
-    }
-
-    opacity: running ? 1 : 0.6
-    Behavior on opacity {
-        animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
     }
 
     RowLayout {
@@ -64,8 +61,12 @@ MouseArea {
             Layout.alignment: Qt.AlignVCenter
             font.pixelSize: Appearance.font.pixelSize.normal
             font.family: Appearance.font.family.monospace // tabular -> width stays constant as it ticks
-            color: Appearance.colors.colOnLayer1
+            color: root.running ? Appearance.colors.colOnLayer1 : Appearance.colors.colOnLayer1Inactive
             text: root.timeText
+
+            Behavior on color {
+                animation: Appearance.animation.elementMoveFast.colorAnimation.createObject(this)
+            }
         }
     }
 
