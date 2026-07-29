@@ -63,7 +63,23 @@ hl.config({
     -- only the open workspaces, so every workspace is reachable by swiping,
     -- the same way the bar's scroll wheel already behaves.
     gestures = {
-        workspace_swipe_use_r = true
+        workspace_swipe_use_r = true,
+        -- Gearing: px of finger travel that equals one full workspace. The 300
+        -- default throws the whole screen across on a small movement, which at
+        -- 60Hz lands as a few huge per-frame jumps. 450 tracks the finger at
+        -- roughly two thirds the speed for the same motion.
+        workspace_swipe_distance = 450,
+        -- Commit threshold, as a fraction of the above. Kept at an equivalent
+        -- absolute travel to the old 0.5-of-300 rather than scaling with the
+        -- longer distance, so a deliberate drag does not have to go further
+        -- than it used to.
+        workspace_swipe_cancel_ratio = 0.4,
+        -- Speed that forces the switch regardless of the ratio. At the 30
+        -- default a quick flick lands short and snaps back, which is the
+        -- roughest thing the gesture does. 5 lets flicks commit.
+        workspace_swipe_min_speed_to_force = 5,
+        -- Keep swiping across several workspaces without lifting.
+        workspace_swipe_forever = true
     },
     general = {
         -- Gaps and border
@@ -171,9 +187,19 @@ hl.curve("stall", {
     type = "bezier",
     points = {{1, -0.1}, {0.7, 0.85}}
 })
-hl.curve("easeOutExpo", {
+-- A 60Hz panel with no VRR gives a workspace slide ~20-24 frames to move the
+-- full monitor width + gaps_workspaces. Front-loaded curves spend most of that
+-- distance in the first handful of frames and the rest crawling: measured on
+-- 1920px, easeOutExpo peaks at 554px of travel in a single frame and
+-- emphasizedDecel at 882px. That per-frame jump is the strobing, not the
+-- duration. This curve has a small ease-in and a long decel tail, which spreads
+-- the same distance over every frame and caps the peak at 292px. The mild start
+-- also matters for the swipe: on release Hyprland animates the remainder with
+-- this curve, so a near-zero initial velocity would stall against a finger that
+-- was already moving, while an expo start would visibly rocket away from it.
+hl.curve("workspaceSlide", {
     type = "bezier",
-    points = {{0.16, 1}, {0.3, 1}}
+    points = {{0.25, 0.1}, {0.05, 1.0}}
 })
 -- Configs
 -- windows
@@ -247,13 +273,18 @@ hl.animation({
 })
 -- workspaces
 -- menu_decel at 700ms moved almost everything in the first frames then crawled
--- the rest of the way, which read as clunky. easeOutExpo at 350ms keeps the
--- fast start but settles cleanly.
+-- the rest of the way, which read as clunky. easeOutExpo at 350ms had the same
+-- shape, just compressed - the crawl became a 4-frame dead tail. See the
+-- workspaceSlide curve for why the fix is the shape rather than the duration.
+-- 400ms is deliberately longer than the old 350ms: at 60Hz the extra 3 frames
+-- are 3 more motion samples, and this curve has no dead tail to pad out.
+-- Leave workspacesIn/workspacesOut inherited. Overriding them separately
+-- desyncs the two halves of a `slide`, which opens a gap mid-animation.
 hl.animation({
     leaf = "workspaces",
     enabled = true,
-    speed = 3.5,
-    bezier = "easeOutExpo",
+    speed = 4,
+    bezier = "workspaceSlide",
     style = "slide"
 })
 -- specialWorkspace
