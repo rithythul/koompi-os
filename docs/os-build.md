@@ -207,13 +207,38 @@ identity and house style are applied.
 - Logo asset
 - Plymouth theme (placeholder for now)
 - GRUB theme
-- SDDM theme directory + `/etc/sddm.conf.d/10-koompi.conf`
-  (interim `Current=breeze` until the branded greeter art lands)
+- SDDM greeter theme + `/etc/sddm.conf.d/10-koompi.conf` selecting it
+  (`Current=koompi`)
 - `/usr/lib/systemd/system-preset/90-koompi.preset` that enables
   `sddm.service`
 
-`koompi-branding` `depends=(sddm)` and lists `breeze` as an `optdepends`
-(the stock theme the interim greeter selector references).
+`koompi-branding` `depends=(sddm qt6-declarative qt6-5compat)` and lists
+`breeze` as an `optdepends`, the stock theme to fall back to if the KOOMPI
+greeter ever fails to render.
+
+### The greeter
+
+`sdata/dist-arch/koompi-branding/files/sddm/theme/` is a real Qt 6 QML greeter,
+not a skeleton: a dark card with the clock above it, session selector and power
+buttons in the footer, and a shake on a wrong password.
+
+Two things in it are worth not undoing.
+
+**The background has three tiers.** `theme.conf` gives a `backgroundDir`, a
+single `background` image and a flat `color`, and `Main.qml` falls through them
+in that order. The previous greeter had only the flat colour left once its one
+hardcoded wallpaper path stopped existing, and a pure black login screen is what
+that looks like from the outside. `backgroundDir` points at
+`/usr/share/backgrounds/koompi`, the wallpapers this same package installs, and
+one is picked at random per greeter start.
+
+**Nothing is gated on the image loading.** Wallpaper, blur and dim each become
+visible on their own, so an unreadable or missing file costs you the photo, not
+the login screen.
+
+The lock screen (`modules/koompi/lock/LockSurface.qml`) scans the same directory
+with the same blur, which is what makes lock and login read as one system rather
+than two themes that happen to ship together.
 
 ### Why os-release is NOT a package
 
@@ -237,10 +262,11 @@ the `10-koompi.conf` drop-in selecting the greeter theme.
 
 ### Naga art — TODO
 
-The branded greeter/boot art for the **Naga** (v1) era is a TODO. Today the
-sddm theme is interim `breeze`, and the plymouth theme is a placeholder. The
-target is the per-era visual identity from `docs/naming.md`: a stylized
-multi-headed Naga boot splash + wallpaper. This is Phase 6 (see §9).
+The greeter is done and no longer interim. What is still TODO is the **Naga**
+(v1) *art*: the plymouth theme is a placeholder, and the wallpapers the greeter
+draws from are the two brand images plus whatever the wallpaper tarball tier
+adds. The target is the per-era visual identity from `docs/naming.md`: a
+stylized multi-headed Naga boot splash + wallpaper. This is Phase 6 (see §9).
 
 ---
 
@@ -418,7 +444,7 @@ Mental model: locally you are *running* the Hyprland edition; the repo/ISO is th
 | **3** | **archiso** — `sdata/dist-arch/iso/koompi/` profile (profiledef.sh, packages.x86_64, pacman.conf injecting `[koompi]`, airootfs + os-release), `mkarchiso`. | TODO |
 | **4** | **Zig installer** — `installer/` libvaxis TUI → archinstall JSON → `--silent` → post-install chroot hook. Pin archinstall version. | TODO |
 | **5** | **Immutability wiring** — btrfs subvols, snapper, snap-pac, grub-btrfs, pinned `@baseline`, `/etc/skel` reseed. | TODO |
-| **6** | **Branded art** — Naga (v1) sddm greeter, plymouth boot splash, wallpaper; replace interim `breeze`/placeholder. | TODO |
+| **6** | **Branded art** — Naga (v1) plymouth boot splash and wallpapers. The sddm greeter itself is **DONE** (Qt 6 QML theme, `Current=koompi`); what remains is the art it and plymouth display. | TODO |
 | **LAST** | **AI integration** — intentionally the final phase (assistant currently unnamed; candidate name *Mealea*). | TODO |
 
 ---
