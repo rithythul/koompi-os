@@ -12,7 +12,10 @@
 
 # Files under dots/.config/hypr/custom are the documented place for personal
 # overrides. Shipping them is how the user learns they exist; overwriting them
-# on the next update would throw away their config.
+# on the next update would throw away their config. The terminal config is the
+# same kind of slot: KOOMPI has opinions worth shipping to someone who has none,
+# but a user who already configured their terminal would not thank us for
+# replacing it on every update.
 readonly KEEP_PATHS=(
     ".config/hypr/custom/env.lua"
     ".config/hypr/custom/execs.lua"
@@ -20,6 +23,7 @@ readonly KEEP_PATHS=(
     ".config/hypr/custom/keybinds.lua"
     ".config/hypr/custom/rules.lua"
     ".config/hypr/custom/variables.lua"
+    ".config/wezterm/wezterm.lua"
 )
 
 # Repo-owned: safe to mirror exactly, including deletions.
