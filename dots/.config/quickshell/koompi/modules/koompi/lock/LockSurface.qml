@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Effects
 import Qt5Compat.GraphicalEffects
 import Quickshell.Services.UPower
 import qs
@@ -98,9 +99,10 @@ MouseArea {
     // }
 
     // The lock surface covers everything, so without this it is a black void.
-    // A different wallpaper each time it locks, drawn from the same pool the
-    // random keybind uses. Dimmed so the password field stays readable on a
-    // bright image.
+    // A different wallpaper each time it locks, drawn from the same set the SDDM
+    // greeter picks from so lock and login read as one system. Blurred and
+    // dimmed to the same values the greeter theme uses, so the password field
+    // stays readable on a bright image.
     Image {
         id: lockWallpaper
         anchors.fill: parent
@@ -108,7 +110,20 @@ MouseArea {
         asynchronous: true
         cache: false
         smooth: true
+        // Blurring a downscaled copy is indistinguishable from blurring the
+        // full-resolution frame and costs a fraction of the memory.
+        sourceSize.height: 1080
+        visible: false
         source: lockWallpaperProc.path.length > 0 ? `file://${lockWallpaperProc.path}` : ""
+    }
+    MultiEffect {
+        anchors.fill: parent
+        source: lockWallpaper
+        visible: lockWallpaper.status === Image.Ready
+        blurEnabled: true
+        blur: 1.0
+        blurMax: 96
+        autoPaddingEnabled: false
         z: -1
     }
     Rectangle {
@@ -123,7 +138,15 @@ MouseArea {
         id: lockWallpaperProc
         running: true
         property string path: ""
-        command: [FileUtils.trimFileProtocol(`${Directories.scriptPath}/colors/random/random_library_wall.sh`), "--print"]
+        // The greeter pool first, so the login screen and the lock screen show
+        // the same set. A machine without koompi-branding installed has no such
+        // directory, so fall back to the user's own wallpaper library rather
+        // than locking to a black screen.
+        readonly property string libraryScript: FileUtils.trimFileProtocol(Directories.scriptPath) + "/colors/random/random_library_wall.sh"
+        command: ["sh", "-c",
+            'pick=$(find /usr/share/backgrounds/koompi -type f 2>/dev/null | shuf -n 1); '
+            + '[ -n "$pick" ] || pick=$("' + lockWallpaperProc.libraryScript + '" --print); '
+            + 'printf \'%s\' "$pick"']
         stdout: StdioCollector {
             onStreamFinished: lockWallpaperProc.path = text.trim()
         }
