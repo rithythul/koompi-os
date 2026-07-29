@@ -11,24 +11,28 @@ import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Hyprland
 
+// Search and Overview are two surfaces sharing one window. Super opens search,
+// Super+Tab opens the workspace grid, and only one of them is ever up. The
+// waffle family already models it this way with the same GlobalStates flags.
 Scope {
     id: overviewScope
     property bool dontAutoCancelSearch: false
+    readonly property bool anyOpen: GlobalStates.overviewOpen || GlobalStates.searchOpen
 
     PanelWindow {
         id: panelWindow
         property string searchingText: ""
         readonly property HyprlandMonitor monitor: Hyprland.monitorFor(panelWindow.screen)
         property bool monitorIsFocused: (Hyprland.focusedMonitor?.id == monitor?.id)
-        visible: GlobalStates.overviewOpen
+        visible: overviewScope.anyOpen
 
         WlrLayershell.namespace: "quickshell:overview"
         WlrLayershell.layer: WlrLayer.Top
-        WlrLayershell.keyboardFocus: GlobalStates.overviewOpen ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
+        WlrLayershell.keyboardFocus: overviewScope.anyOpen ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
         color: "transparent"
 
         mask: Region {
-            item: GlobalStates.overviewOpen ? columnLayout : null
+            item: overviewScope.anyOpen ? columnLayout : null
         }
 
         anchors {
@@ -41,15 +45,27 @@ Scope {
         Connections {
             target: GlobalStates
             function onOverviewOpenChanged() {
-                if (!GlobalStates.overviewOpen) {
-                    searchWidget.disableExpandAnimation();
-                    overviewScope.dontAutoCancelSearch = false;
+                if (GlobalStates.overviewOpen) {
+                    GlobalStates.searchOpen = false;
+                    GlobalFocusGrab.addDismissable(panelWindow);
+                } else if (!GlobalStates.searchOpen) {
                     GlobalFocusGrab.dismiss();
-                } else {
+                }
+            }
+            function onSearchOpenChanged() {
+                if (GlobalStates.searchOpen) {
+                    GlobalStates.overviewOpen = false;
                     if (!overviewScope.dontAutoCancelSearch) {
                         searchWidget.cancelSearch();
                     }
                     GlobalFocusGrab.addDismissable(panelWindow);
+                    searchWidget.focusSearchInput();
+                } else {
+                    searchWidget.disableExpandAnimation();
+                    overviewScope.dontAutoCancelSearch = false;
+                    if (!GlobalStates.overviewOpen) {
+                        GlobalFocusGrab.dismiss();
+                    }
                 }
             }
         }
@@ -58,6 +74,7 @@ Scope {
             target: GlobalFocusGrab
             function onDismissed() {
                 GlobalStates.overviewOpen = false;
+                GlobalStates.searchOpen = false;
             }
         }
         implicitWidth: columnLayout.implicitWidth
@@ -70,7 +87,7 @@ Scope {
 
         Column {
             id: columnLayout
-            visible: GlobalStates.overviewOpen
+            visible: overviewScope.anyOpen
             anchors {
                 horizontalCenter: parent.horizontalCenter
                 top: parent.top
@@ -80,11 +97,13 @@ Scope {
             Keys.onPressed: event => {
                 if (event.key === Qt.Key_Escape) {
                     GlobalStates.overviewOpen = false;
+                    GlobalStates.searchOpen = false;
                 }
             }
 
             SearchWidget {
                 id: searchWidget
+                visible: GlobalStates.searchOpen
                 anchors.horizontalCenter: parent.horizontalCenter
                 Synchronizer on searchingText {
                     property alias source: panelWindow.searchingText
@@ -97,46 +116,46 @@ Scope {
                 active: GlobalStates.overviewOpen && (Config?.options.overview.enable ?? true)
                 sourceComponent: OverviewWidget {
                     screen: panelWindow.screen
-                    visible: (panelWindow.searchingText == "")
                 }
             }
         }
     }
 
+    // Clipboard and emoji are search modes, not overview modes.
     function toggleClipboard() {
-        if (GlobalStates.overviewOpen && overviewScope.dontAutoCancelSearch) {
-            GlobalStates.overviewOpen = false;
+        if (GlobalStates.searchOpen && overviewScope.dontAutoCancelSearch) {
+            GlobalStates.searchOpen = false;
             return;
         }
         overviewScope.dontAutoCancelSearch = true;
         panelWindow.setSearchingText(Config.options.search.prefix.clipboard);
-        GlobalStates.overviewOpen = true;
+        GlobalStates.searchOpen = true;
     }
 
     function toggleEmojis() {
-        if (GlobalStates.overviewOpen && overviewScope.dontAutoCancelSearch) {
-            GlobalStates.overviewOpen = false;
+        if (GlobalStates.searchOpen && overviewScope.dontAutoCancelSearch) {
+            GlobalStates.searchOpen = false;
             return;
         }
         overviewScope.dontAutoCancelSearch = true;
         panelWindow.setSearchingText(Config.options.search.prefix.emojis);
-        GlobalStates.overviewOpen = true;
+        GlobalStates.searchOpen = true;
     }
 
     IpcHandler {
         target: "search"
 
         function toggle() {
-            GlobalStates.overviewOpen = !GlobalStates.overviewOpen;
+            GlobalStates.searchOpen = !GlobalStates.searchOpen;
         }
         function workspacesToggle() {
             GlobalStates.overviewOpen = !GlobalStates.overviewOpen;
         }
         function close() {
-            GlobalStates.overviewOpen = false;
+            GlobalStates.searchOpen = false;
         }
         function open() {
-            GlobalStates.overviewOpen = true;
+            GlobalStates.searchOpen = true;
         }
         function toggleReleaseInterrupt() {
             GlobalStates.superReleaseMightTrigger = false;
@@ -151,7 +170,7 @@ Scope {
         description: "Toggles search on press"
 
         onPressed: {
-            GlobalStates.overviewOpen = !GlobalStates.overviewOpen;
+            GlobalStates.searchOpen = !GlobalStates.searchOpen;
         }
     }
     GlobalShortcut {
@@ -183,7 +202,7 @@ Scope {
                 GlobalStates.superReleaseMightTrigger = true;
                 return;
             }
-            GlobalStates.overviewOpen = !GlobalStates.overviewOpen;
+            GlobalStates.searchOpen = !GlobalStates.searchOpen;
         }
     }
     GlobalShortcut {

@@ -63,7 +63,7 @@ RowLayout {
         Layout.topMargin: 4
         Layout.bottomMargin: 4
         implicitHeight: 40
-        focus: GlobalStates.overviewOpen
+        focus: GlobalStates.searchOpen
         font.pixelSize: Appearance.font.pixelSize.small
         placeholderText: Translation.tr("Search, calculate or run")
         implicitWidth: root.searchingText == "" ? Appearance.sizes.searchWidthCollapsed : Appearance.sizes.searchWidth
@@ -105,7 +105,7 @@ RowLayout {
         Layout.topMargin: 4
         Layout.bottomMargin: 4
         onClicked: {
-            GlobalStates.overviewOpen = false;
+            GlobalStates.searchOpen = false;
             Quickshell.execDetached(["qs", "-p", Quickshell.shellPath(""), "ipc", "call", "region", "search"]);
         }
         text: "image_search"
