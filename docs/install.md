@@ -13,14 +13,14 @@ user's other sessions.
 ## Quick start
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/rithythul/koompi-os/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/rithythul/koompi-desktop/main/install.sh | bash
 ```
 
 Or, to read the thing before running it:
 
 ```sh
-git clone --recursive https://github.com/rithythul/koompi-os.git
-cd koompi-os
+git clone --recursive https://github.com/rithythul/koompi-desktop.git
+cd koompi-desktop
 ./setup install
 ```
 
@@ -37,9 +37,9 @@ Three environment variables override it, mostly for testing:
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `KOOMPI_REPO` | `https://github.com/rithythul/koompi-os.git` | Clone from a fork or a local mirror |
+| `KOOMPI_REPO` | `https://github.com/rithythul/koompi-desktop.git` | Clone from a fork or a local mirror |
 | `KOOMPI_REF` | `main` | Install from a branch or tag |
-| `KOOMPI_DEST` | `~/.local/share/koompi-os` | Where the checkout lives |
+| `KOOMPI_DEST` | `~/.local/share/koompi-desktop` | Where the checkout lives |
 
 Arguments after `-s --` reach `./setup install` unchanged:
 

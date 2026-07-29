@@ -21,7 +21,7 @@ gates. This doc describes the *target* architecture and the *current* reality si
 by side, and never lets the vision masquerade as shipped.
 
 **Date:** 2026-06-07
-**Repo:** `~/workspace/koompi-os` — github.com/rithythul/koompi-os
+**Repo:** `~/workspace/koompi-desktop` — github.com/rithythul/koompi-desktop
 **Companion docs:** [`os-build.md`](os-build.md) (build/package graph),
 [`data-ownership.md`](data-ownership.md),
 [`roadmap.md`](roadmap.md).

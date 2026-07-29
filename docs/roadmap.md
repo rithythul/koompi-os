@@ -1,7 +1,7 @@
 # KOOMPI OS — Execution Roadmap
 
 **Date:** 2026-06-07
-**Repo:** `~/workspace/koompi-os` (canonical) — github.com/rithythul/koompi-os
+**Repo:** `~/workspace/koompi-desktop` (canonical) — github.com/rithythul/koompi-desktop
 **North Star:** KOOMPI OS — "The OS That Thinks." AI-first, data-aware, intuitive;
 a general-purpose OS for the world. (`docs/prd.md` is the product spec; this is the
 build plan.)

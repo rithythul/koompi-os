@@ -462,14 +462,14 @@ ApplicationWindow {
                             materialIcon: "help"
                             mainText: Translation.tr("Usage")
                             onClicked: {
-                                Qt.openUrlExternally("https://github.com/rithythul/koompi-hyprland");
+                                Qt.openUrlExternally("https://github.com/rithythul/koompi-desktop");
                             }
                         }
                         RippleButtonWithIcon {
                             materialIcon: "construction"
                             mainText: Translation.tr("Configuration")
                             onClicked: {
-                                Qt.openUrlExternally("https://github.com/rithythul/koompi-hyprland#configuration");
+                                Qt.openUrlExternally("https://github.com/rithythul/koompi-desktop#configuration");
                             }
                         }
                     }
@@ -487,7 +487,7 @@ ApplicationWindow {
                             nerdIcon: "󰊤"
                             mainText: Translation.tr("GitHub")
                             onClicked: {
-                                Qt.openUrlExternally("https://github.com/rithythul/koompi-hyprland");
+                                Qt.openUrlExternally("https://github.com/rithythul/koompi-desktop");
                             }
                         }
                         RippleButtonWithIcon {

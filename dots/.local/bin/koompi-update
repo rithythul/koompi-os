@@ -149,15 +149,19 @@ update_from_git() {
     if [[ -z "$repo" || ! -x "$repo/setup" ]]; then
         # A checkout that moved, or an install from before this file existed.
         local guess
-        for guess in "$HOME/koompi-hyprland" "$HOME/workspace/koompi-hyprland" \
-                     "$HOME/src/koompi-hyprland" "$HOME/.local/share/koompi-hyprland"; do
+        # koompi-hyprland is the pre-rename name, still on disk for older installs.
+        for guess in "$HOME/koompi-desktop" "$HOME/workspace/koompi-desktop" \
+                     "$HOME/src/koompi-desktop" "$HOME/.local/share/koompi-desktop" \
+                     "$HOME/koompi-hyprland" "$HOME/workspace/koompi-hyprland" \
+                     "$HOME/src/koompi-hyprland" "$HOME/.local/share/koompi-hyprland" \
+                     "$HOME/.local/share/koompi-os"; do
             [[ -x "$guess/setup" ]] && { repo="$guess"; break; }
         done
     fi
     [[ -n "$repo" && -x "$repo/setup" ]] || die \
-"cannot find the koompi-hyprland checkout this desktop was installed from.
+"cannot find the koompi-desktop checkout this desktop was installed from.
   Clone it and run ./setup update there, or record the path:
-    mkdir -p $STATE_DIR && echo /path/to/koompi-hyprland > $REPO_PATH_FILE"
+    mkdir -p $STATE_DIR && echo /path/to/koompi-desktop > $REPO_PATH_FILE"
 
     step "Updating from $repo"
     local -a args=()

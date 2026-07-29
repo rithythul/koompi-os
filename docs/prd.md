@@ -3,7 +3,7 @@
 **The OS That Thinks.** An AI-first, data-aware, local-first operating system for the world — a rolling Arch Linux base (Hyprland + KDE Plasma) where you work with your data instead of hunting for dead files, the assistant is the foundation rather than a sidebar, and your data and your AI stay on your machine unless you choose to sync them to infrastructure you control.
 
 **Date:** 2026-06-07
-**Repo:** `~/workspace/koompi-os` (canonical, public) — github.com/rithythul/koompi-os
+**Repo:** `~/workspace/koompi-desktop` (canonical, public) — github.com/rithythul/koompi-desktop
 **Status:** Pre-v1 (Naga). Desktop base production-grade; the "thinks" stack (~0% built today) is the work this PRD scopes. The current AI surface is a commodity chatbot sidebar — see §4.
 **Companion docs:** [`docs/roadmap.md`](roadmap.md) (current ship-gates, restore stack), [`docs/os-build.md`](os-build.md) (build/package architecture), [`docs/data-ownership.md`](data-ownership.md) (the ownership/sync plane design), [`docs/naming.md`](naming.md) (release eras), [`UPSTREAM.md`](../UPSTREAM.md) (fork attribution).
 

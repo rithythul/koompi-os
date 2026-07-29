@@ -93,7 +93,7 @@ ContentPage {
                 font.pixelSize: Appearance.font.pixelSize.normal
             }
             StyledText {
-                text: "https://github.com/rithythul/koompi-hyprland"
+                text: "https://github.com/rithythul/koompi-desktop"
                 font.pixelSize: Appearance.font.pixelSize.normal
                 textFormat: Text.MarkdownText
                 onLinkActivated: (link) => {
@@ -120,7 +120,7 @@ ContentPage {
                 materialIcon: "auto_stories"
                 mainText: Translation.tr("Documentation")
                 onClicked: {
-                    Qt.openUrlExternally("https://github.com/rithythul/koompi-hyprland")
+                    Qt.openUrlExternally("https://github.com/rithythul/koompi-desktop")
                 }
             }
             RippleButtonWithIcon {
@@ -128,14 +128,14 @@ ContentPage {
                 materialIconFill: false
                 mainText: Translation.tr("Issues")
                 onClicked: {
-                    Qt.openUrlExternally("https://github.com/rithythul/koompi-hyprland/issues")
+                    Qt.openUrlExternally("https://github.com/rithythul/koompi-desktop/issues")
                 }
             }
             RippleButtonWithIcon {
                 materialIcon: "forum"
                 mainText: Translation.tr("Discussions")
                 onClicked: {
-                    Qt.openUrlExternally("https://github.com/rithythul/koompi-hyprland/discussions")
+                    Qt.openUrlExternally("https://github.com/rithythul/koompi-desktop/discussions")
                 }
             }
             RippleButtonWithIcon {

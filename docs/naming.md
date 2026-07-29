@@ -6,7 +6,7 @@ Decided here so it isn't re-litigated per release.
 ## Product
 
 **KOOMPI OS** — the product/brand name (unchanged).
-Development name / repo: `koompi-hyprland`.
+Development name / repo: `koompi-desktop`.
 
 ## Release codenames — *Sacred Beings of Angkor*
 

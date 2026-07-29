@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # One-line installer for the KOOMPI desktop.
 #
-#   curl -fsSL https://raw.githubusercontent.com/rithythul/koompi-os/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/rithythul/koompi-desktop/main/install.sh | bash
 #
 # All this does is get the repository onto the machine and hand over to
 # ./setup, which is the real installer. Keeping the bootstrap this thin means
@@ -11,16 +11,16 @@
 # Overridable, mostly for testing against a branch or a local mirror:
 #   KOOMPI_REPO   git URL to clone from
 #   KOOMPI_REF    branch or tag                  (default: main)
-#   KOOMPI_DEST   where to keep the checkout     (default: ~/.local/share/koompi-os)
+#   KOOMPI_DEST   where to keep the checkout     (default: ~/.local/share/koompi-desktop)
 #
 # Arguments are passed straight through to ./setup install, so this works:
 #   curl -fsSL .../install.sh | bash -s -- --dry-run
 
 set -euo pipefail
 
-REPO_URL="${KOOMPI_REPO:-https://github.com/rithythul/koompi-os.git}"
+REPO_URL="${KOOMPI_REPO:-https://github.com/rithythul/koompi-desktop.git}"
 REPO_REF="${KOOMPI_REF:-main}"
-DEST="${KOOMPI_DEST:-$HOME/.local/share/koompi-os}"
+DEST="${KOOMPI_DEST:-$HOME/.local/share/koompi-desktop}"
 
 if [[ -t 1 ]] && [[ -z "${NO_COLOR:-}" ]]; then
     C_BOLD=$'\e[1m'; C_RED=$'\e[31m'; C_CYAN=$'\e[36m'; C_RST=$'\e[0m'

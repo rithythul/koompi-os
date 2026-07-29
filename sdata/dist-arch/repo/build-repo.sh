@@ -30,7 +30,7 @@
 # that relative tree is ABSENT. As noted in the headers of
 # koompi-hyprland-config/PKGBUILD and koompi-kde-config/PKGBUILD, a clean-chroot
 # build must switch their `source` to a pinned git tag of THIS repo and copy from
-# "$srcdir/koompi-hyprland/dots". Do that source switch before running this under
+# "$srcdir/koompi-desktop/dots". Do that source switch before running this under
 # devtools. (See those PKGBUILD "BUILD NOTE" headers for the exact change.)
 set -euo pipefail
 
