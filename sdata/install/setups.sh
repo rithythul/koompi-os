@@ -83,6 +83,42 @@ setup_services() {
     fi
 }
 
+# The cursor theme KOOMPI ships, kept in one place because it has to be stated
+# in five: hyprland/env.lua (XCURSOR_THEME), hyprland/execs.lua (hyprctl
+# setcursor), gsettings for GTK, wezterm's xcursor_theme for X11 clients, and
+# the default-cursors fallback below. Change it here and in the two lua files.
+readonly KOOMPI_CURSOR_THEME='Bibata-Modern-Classic'
+readonly KOOMPI_CURSOR_SIZE=24
+
+# The cursor of last resort. An X11 client that asks for no theme in particular,
+# and any toolkit that misses the gsettings key, follows the `default` icon
+# theme: ~/.icons/default first, then /usr/share/icons/default. The system copy
+# is owned by the `default-cursors` package and inherits Adwaita, so on a stock
+# Arch machine every explicit setting says Bibata while the fallback says
+# Adwaita, and the session ends up showing two different pointers depending on
+# which window is under the mouse. Writing the user-level copy fixes that
+# without fighting pacman over a packaged file.
+setup_cursor_default() {
+    local theme_dir="$HOME/.icons/default"
+    local index="$theme_dir/index.theme"
+    local want="[Icon Theme]
+Inherits=${KOOMPI_CURSOR_THEME}"
+
+    if [[ -f "$index" ]] && ! grep -q '^Inherits=' "$index"; then
+        warn "$index exists but sets no Inherits=; leaving it alone"
+        return 0
+    fi
+    if [[ -f "$index" ]] && [[ "$(cat "$index")" == "$want" ]]; then
+        ok "cursor fallback already points at ${KOOMPI_CURSOR_THEME}"
+        return 0
+    fi
+    info "pointing the default cursor fallback at ${KOOMPI_CURSOR_THEME}"
+    if [[ "$DRY_RUN" == true ]]; then return 0; fi
+    mkdir -p "$theme_dir"
+    printf '%s\n' "$want" > "$index" || { err "could not write $index"; return 1; }
+    manifest_add "$index"
+}
+
 # GTK apps read their font and dark-mode preference from gsettings, not from
 # ~/.config/koompi/config.json, so the defaults have to be pushed once.
 setup_toolkit_defaults() {
@@ -90,9 +126,12 @@ setup_toolkit_defaults() {
     if have gsettings; then
         run gsettings set org.gnome.desktop.interface font-name 'Google Sans Flex Medium 11 @opsz=11,wght=500'
         run gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+        run gsettings set org.gnome.desktop.interface cursor-theme "$KOOMPI_CURSOR_THEME"
+        run gsettings set org.gnome.desktop.interface cursor-size "$KOOMPI_CURSOR_SIZE"
     else
         warn "gsettings not found; GTK apps keep their stock font and light theme"
     fi
+    setup_cursor_default
     if have fc-cache; then
         run fc-cache -f
     fi
