@@ -15,7 +15,7 @@
 groups=(koompi)
 pkgname=koompi-shell
 pkgver=1.0
-pkgrel=2
+pkgrel=3
 pkgdesc='KOOMPI desktop shell (Quickshell config) and koompi-* tools'
 arch=(any)
 license=(GPL-3.0-only)
@@ -42,7 +42,8 @@ package() {
 
   local tool
   for tool in koompi-health koompi-theme koompi-settings koompi-displays koompi-migrate \
-              koompi-useradd koompi-stacking koompi-quicklook koompi-flatpak-open; do
+              koompi-useradd koompi-stacking koompi-quicklook koompi-flatpak-open \
+              koompi-workbench koompi-update; do
     install -Dm755 "$_repo_root/dots/.local/bin/$tool" "$pkgdir/usr/bin/$tool"
   done
   # In dots/ this is a symlink into the hypr tree; installed system-wide it is

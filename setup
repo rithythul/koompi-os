@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # KOOMPI desktop installer.
 #
-#   ./setup install      install or update the desktop for the current user
+#   ./setup install      install the desktop for the current user
+#   ./setup update       pull and re-apply, on a machine that already runs it
 #   ./setup uninstall    remove what a previous install put in $HOME
 #   ./setup doctor       report what is detected and what is missing
 #
@@ -28,6 +29,8 @@ source "$REPO_ROOT/sdata/install/setups.sh"
 source "$REPO_ROOT/sdata/install/files.sh"
 # shellcheck source=sdata/install/uninstall.sh
 source "$REPO_ROOT/sdata/install/uninstall.sh"
+# shellcheck source=sdata/install/update.sh
+source "$REPO_ROOT/sdata/install/update.sh"
 
 usage() {
     cat <<'EOF'
@@ -37,12 +40,17 @@ Usage:
   ./setup <command> [options]
 
 Commands:
-  install      Install or update the desktop into $HOME
+  install      Install the desktop into $HOME
+  update       Pull the latest config and re-apply it, then reload the session.
+               For a machine that already runs KOOMPI: it never re-offers the
+               application set, and leaves ~/.config/hypr/custom alone.
+               On KOOMPI OS the desktop comes from packages instead; there,
+               `koompi-update` is the command.
   uninstall    Remove the files a previous install recorded
   doctor       Report the detected distro and any missing runtime commands
   help         This message
 
-Install options:
+Install and update options:
   --no-deps        Skip package installation (use if you manage packages yourself)
   --no-apps        Skip the opinionated application set
   --no-setups      Skip the venv, groups, modules and services step
@@ -160,6 +168,8 @@ doctor() {
     else
         err "KOOMPI login session is not registered"
     fi
+    if [[ -f "$REPO_PATH_FILE" ]]; then ok "update source: $(< "$REPO_PATH_FILE")"
+    else warn "no recorded checkout path; koompi-update will have to guess where to pull from"; fi
     local menu="$XDG_CONFIG_HOME/quickshell/koompi/scripts/global-menu/zig-out/bin/global-menu-daemon"
     if [[ -x "$menu" ]]; then ok "global-menu-daemon built"
     else warn "global-menu-daemon not built"; fi
@@ -175,7 +185,7 @@ main() {
     case "$cmd" in
         help|--help|-h|'') usage; exit 0 ;;
         doctor)            doctor; exit $? ;;
-        install|uninstall) ;;
+        install|update|uninstall) ;;
         *)                 usage >&2; die "unknown command: $cmd" ;;
     esac
 
@@ -184,6 +194,11 @@ main() {
 
     if [[ "$cmd" == uninstall ]]; then
         run_uninstall
+        exit 0
+    fi
+
+    if [[ "$cmd" == update ]]; then
+        run_update
         exit 0
     fi
 
@@ -209,6 +224,8 @@ main() {
     $DO_SETUPS && run_setups
     $DO_FILES  && install_files
 
+    record_repo_path
+
     sudo_stop
     trap - EXIT INT TERM
 
@@ -216,6 +233,7 @@ main() {
     cat <<EOF
   Log out and pick ${C_BOLD}KOOMPI${C_RST} at your display manager.
   Already in Hyprland? ${C_BOLD}hyprctl reload${C_RST} picks up the new config.
+  Later on, ${C_BOLD}koompi-update${C_RST} (or ${C_BOLD}./setup update${C_RST}) brings you up to date.
 
   ${C_BOLD}Super + /${C_RST}       keybind cheatsheet
   ${C_BOLD}Super + Shift + Return${C_RST} KOOMPI Workbench (Herdr)

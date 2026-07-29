@@ -52,6 +52,7 @@ Every file it writes is recorded in `~/.local/state/koompi/installed-files`, so
 ./setup install --no-apps     # keep the applications you already have
 ./setup install --only-apps   # add the application set to an existing install
 ./setup install --only-files  # just refresh the config after a git pull
+./setup update                # already running KOOMPI? pull and re-apply
 ./setup doctor                # what is detected, what is missing
 ./setup uninstall             # undo an install
 ```
@@ -61,6 +62,21 @@ The one-liner passes its arguments straight through, so this works too:
 ```sh
 curl -fsSL https://raw.githubusercontent.com/rithythul/koompi-os/main/install.sh | bash -s -- --no-apps
 ```
+
+## Updating
+
+On a machine that already runs KOOMPI, one command, from anywhere:
+
+```sh
+koompi-update
+```
+
+It works out how this machine got its desktop.
+On KOOMPI OS, where the desktop comes from packages, that is a `pacman -Syu`.
+On an install from a checkout it is a `git pull` followed by `./setup update`,
+which re-applies the config, leaves your `~/.config/hypr/custom/` overrides
+alone, and reloads the running session so you do not have to log out.
+See [Updating](docs/install.md#updating).
 
 ## Applications
 

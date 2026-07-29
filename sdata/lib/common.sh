@@ -18,6 +18,9 @@ fi
 KOOMPI_STATE_DIR="${XDG_STATE_HOME}/koompi"
 MANIFEST="${KOOMPI_STATE_DIR}/installed-files"
 SYSTEM_MANIFEST="${KOOMPI_STATE_DIR}/installed-system-files"
+# Read by dots/.local/bin/koompi-update, which has no other way to find the
+# checkout. Keep the two in step if this ever moves.
+REPO_PATH_FILE="${KOOMPI_STATE_DIR}/repo-path"
 BACKUP_ROOT="${BACKUP_ROOT:-$HOME/.koompi-dots-backup}"
 # Used by sdata/install/setups.sh and sdata/install/uninstall.sh.
 # shellcheck disable=SC2034
@@ -114,4 +117,38 @@ manifest_finalize() {
     local tmp
     tmp="$(mktemp)"
     sort -u -- "$MANIFEST" > "$tmp" && mv -f -- "$tmp" "$MANIFEST"
+}
+
+# Where the checkout that installed this desktop lives. `koompi-update` runs
+# from $PATH with no idea where the repo is, and asking the user to remember is
+# the kind of thing that makes people stop updating.
+record_repo_path() {
+    [[ "$DRY_RUN" == true ]] && return 0
+    mkdir -p "$KOOMPI_STATE_DIR"
+    printf '%s\n' "$REPO_ROOT" > "$REPO_PATH_FILE"
+}
+
+# Pick up new config in the running session. Reloading Hyprland is cheap and
+# safe; the shell has to be restarted outright because Quickshell does not
+# reliably hot-reload a changed tree.
+#
+# The QT_QPA_PLATFORM override matters: hyprland/env.lua puts the session on xcb
+# so the global menu works, and a Quickshell that inherits that maps no layer
+# surfaces at all - the bar and sidebars come back invisible. Same reasoning as
+# the CTRL+SUPER+R bind in hyprland/keybinds.lua, which is why they are written
+# the same way.
+reload_session() {
+    have hyprctl || return 0
+    [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]] || {
+        info "not inside a Hyprland session; the new config loads at your next login"
+        return 0
+    }
+    step "Reloading the running session"
+    run hyprctl reload
+    if have qs; then
+        run killall -w -q global-menu-daemon qs quickshell || true
+        [[ "$DRY_RUN" == true ]] || \
+            ( setsid env QT_QPA_PLATFORM=wayland qs -c koompi >/dev/null 2>&1 & )
+        ok "shell restarted"
+    fi
 }

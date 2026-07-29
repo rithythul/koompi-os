@@ -186,15 +186,49 @@ the entry uses it; otherwise it uses the managed `/usr/local/bin` copy.
 ## Updating
 
 ```sh
+koompi-update
+```
+
+One command from anywhere, on any KOOMPI machine.
+It works out how this machine got its desktop and does the matching thing:
+
+| How KOOMPI was installed | What `koompi-update` runs |
+|---|---|
+| KOOMPI OS, from packages (`koompi-shell`, `koompi-hyprland-config`) | `pacman -Syu`, then `yay -Sua` or `paru -Sua` if you have one |
+| From a checkout, via `./setup install` | `git pull` in that checkout, then `./setup update` |
+
+The checkout's path is read from `~/.local/state/koompi/repo-path`, written at install time.
+An install from before that file existed still works: the command looks in the usual places, and tells you how to record the path if it cannot find the checkout.
+
+The dependency metapackages are what tells the two apart, and they deliberately do not count as a packaged install.
+`./setup install` puts those same metas on an ordinary Arch machine, so treating them as the signal would upgrade the system while leaving the `$HOME` copy that actually owns the config untouched.
+Only `koompi-shell` and `koompi-hyprland-config`, which ship the desktop itself under `/usr`, are evidence.
+
+Inside the repo, the same thing is `./setup update`:
+
+```sh
+./setup update              # pull, re-apply, reload the running session
+./setup update --dry-run    # show what it would do
+./setup update --no-deps    # config only, leave packages alone
+```
+
+This is not a synonym for `install`.
+It pulls the checkout first, it never re-offers the application set - someone updating has already answered that question - and it reloads the running session at the end instead of telling you to log out.
+A pull that would clobber local edits is refused with a warning, because `hypr/custom/` exists precisely so people edit this tree.
+
+The reload is `hyprctl reload` plus a restart of the shell, with `QT_QPA_PLATFORM=wayland` forced.
+That override is not cosmetic: the session puts Qt on `xcb` so the global menu works, and a Quickshell that inherits it maps no layer surfaces at all, which looks exactly like the shell failing to start.
+`--no-reload` leaves the running session alone; the update then applies at your next login.
+
+The older, more manual route still works:
+
+```sh
 git pull
 ./setup install --only-files
 ```
 
-That refreshes the config without touching packages.
-If the update added a dependency, run the full `./setup install`.
-
-Re-running the one-liner does the same thing: it fetches, hard-resets the checkout, and runs `./setup install` again.
-Every step is idempotent, so this is the supported way to update an install that started as `curl | bash`.
+Re-running the one-liner also still works: it fetches, hard-resets the checkout, and runs `./setup install` again.
+Every step is idempotent.
 
 A re-run only does work that is actually outstanding.
 Each `koompi-*` metapackage is checked against what is installed - by version, and by whether its dependencies are still satisfied - and skipped when it is already complete.
