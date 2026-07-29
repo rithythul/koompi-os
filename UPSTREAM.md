@@ -1,7 +1,7 @@
 # Upstream & attribution
 
-KOOMPI OS's desktop shell is **not original work**. It is a downstream fork of
-**[illogical-impulse]** — the Hyprland dotfiles by **end-4**
+KOOMPI OS's desktop shell is **not original work**. It is a downstream
+derivative of **[illogical-impulse]** — the Hyprland dotfiles by **end-4**
 (<https://github.com/end-4/dots-hyprland>). The bar, sidebars, notifications,
 OSD, settings, the Material You theming engine, and the QML service layer are
 all end-4's design and code. We are deeply grateful for it.
@@ -18,16 +18,21 @@ If you copy code from a *third* repository into this one, follow the rule in
 [`licenses/README.md`](licenses/README.md): add a license notice to the file and
 drop a copy of the license under `licenses/`.
 
-## How the fork is structured
+## How this repo relates to upstream
 
-This is a **real git fork with full shared history**, not a content copy:
+The **content** is derived from end-4's tree; the **git history is not shared**.
+This repository was restarted from a single root commit, so none of end-4's
+commits are present here:
 
-- We share end-4's entire commit history (~6300 commits, including their merged PRs).
-- Fork point: `614f02e6` (end-4 `main`, 2026-06-03).
+- Fork point: `614f02e6` (end-4 `main`, 2026-06-03). Everything inherited in this
+  tree descends from that commit.
 - The directory/namespace rename `ii → koompi` (config dir, `modules/`, the
-  `~/.config/illogical-impulse` state dir, keyring id, metapackages) was done as
-  **git renames (R100)**, so git tracks them across merges — end-4's future edits
-  to `modules/ii/...` land on our `modules/koompi/...` files automatically.
+  `~/.config/illogical-impulse` state dir, keyring id, metapackages) happened
+  before the restart, so inherited files now sit at `modules/koompi/...`.
+- The full pre-restart history — end-4's ~6300 commits plus KOOMPI's, with the
+  renames recorded as `R100` — is preserved read-only at
+  <https://github.com/rithythul/koompi-desktop-history>. That archive is the
+  authoritative record of what came from where.
 - The only submodule is `modules/common/widgets/shapes`
   (end-4/rounded-polygon-qmljs).
 
@@ -47,19 +52,24 @@ Our divergence is small and deliberate — keep it that way:
 
 ## Tracking upstream
 
-end-4 actively maintains the shell (Wayland/Quickshell breakage, fixes). Staying
-a trackable fork means we get those for free. To pull upstream:
+end-4 actively maintains the shell (Wayland/Quickshell breakage, fixes). Because
+there is no shared history, `git merge end-4/main` no longer works — every
+upstream fix has to be reviewed and ported by hand:
 
 ```sh
 git remote add end-4 https://github.com/end-4/dots-hyprland.git   # once
 git fetch end-4
-git log --oneline 614f02e6..end-4/main      # review what's new
-git merge end-4/main                         # renames are auto-followed
+git log --oneline 614f02e6..end-4/main                 # review what's new
+git diff 614f02e6..end-4/main -- <upstream/path>       # read one change
 ```
 
-To keep merges cheap: **make KOOMPI changes on KOOMPI-owned surfaces** (the Lua
-bridge, branding, installer, packaging) and touch end-4-owned QML as little as
-possible. Every edit to an inherited file is a future merge conflict.
+Then apply the change to the corresponding `modules/koompi/...` file. When a
+port is done, move the `614f02e6` marker above to the upstream commit you
+reviewed up to, so the next person knows where to resume.
+
+Porting is now manual work, so it only stays affordable if **KOOMPI changes live
+on KOOMPI-owned surfaces** (the Lua bridge, branding, installer, packaging).
+Every edit to an inherited file makes the next port harder to read.
 
 ## Supporting end-4
 
