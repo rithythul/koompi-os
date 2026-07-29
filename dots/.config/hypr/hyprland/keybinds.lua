@@ -27,7 +27,9 @@ hl.bind("SUPER + V", hl.dsp.global("quickshell:overviewClipboardToggle"))
 hl.bind("SUPER + Period", hl.dsp.global("quickshell:overviewEmojiToggle"))
 hl.bind("SUPER + A", hl.dsp.global("quickshell:sidebarLeftToggle"), { description = "Shell: Toggle left sidebar" })
 hl.bind("SUPER + ALT + A", hl.dsp.global("quickshell:sidebarLeftToggleDetach"))
-hl.bind("SUPER + B", hl.dsp.exec_cmd(appScratch .. " telegram 'org.telegram.desktop' Telegram"), { description = "App: Telegram widget" })
+-- Both classes, for the same reason the Telegram window rules match both: under
+-- QT_QPA_PLATFORM=xcb Telegram reports the X11 WM_CLASS, not the Wayland app_id.
+hl.bind("SUPER + B", hl.dsp.exec_cmd(appScratch .. " telegram 'org\\.telegram\\.desktop|TelegramDesktop' Telegram"), { description = "App: Telegram widget" })
 hl.bind("SUPER + SHIFT + D", hl.dsp.exec_cmd(appScratch .. " discord 'discord' discord"), { description = "App: Discord widget" })
 hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd(appScratch .. " whatsapp 'web.whatsapp.com' " .. hyprScripts .. "/launch_whatsapp_web.sh"), { description = "App: WhatsApp widget" })
 hl.bind("SUPER + grave", hl.dsp.exec_cmd(appScratch .. " term 'term-scratch' 'kitty --class term-scratch'"), { description = "App: Terminal widget" })
@@ -62,7 +64,13 @@ hl.bind("CTRL + SUPER + ALT + T", hl.dsp.global("quickshell:wallpaperSelectorRan
 hl.bind("CTRL + SUPER + SHIFT + D", hl.dsp.global("quickshell:toggleLightDark"),
     { description = "Shell: Toggle light/dark mode" })
 hl.bind("CTRL + SUPER + T", hl.dsp.exec_cmd(qsIsAlive .. " || " .. qsScripts .. "/colors/switchwall.sh"))
-hl.bind("CTRL + SUPER + R", hl.dsp.exec_cmd("killall global-menu-daemon qs quickshell; qs -c $qsConfig &"),
+-- Mirrors the launch in execs.lua: without the wayland override the respawned
+-- shell inherits the session-wide xcb default from env.lua and maps no layer
+-- surfaces at all, so the bar and sidebars come back invisible. killall -w so
+-- the new instance does not race the old one for the layer surfaces and the IPC
+-- socket.
+hl.bind("CTRL + SUPER + R", hl.dsp.exec_cmd(
+        "killall -w global-menu-daemon qs quickshell; hyprctl reload; env QT_QPA_PLATFORM=wayland qs -c $qsConfig &"),
     { description = "Shell: Restart widgets" })
 hl.bind("CTRL + SUPER + P", hl.dsp.global("quickshell:panelFamilyCycle"), { description = "Shell: Cycle panel family" })
 

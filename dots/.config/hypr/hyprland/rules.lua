@@ -1,9 +1,7 @@
 -- ######## Window rules ########
 
--- Disable blur for xwayland context menus
-hl.window_rule({match = {class = "^()$", title = "^()$" },                   no_blur = true })
-
--- Disable blur for every window
+-- Disable blur for every window (the `.*` also covers the empty class/title
+-- that xwayland context menus report)
 hl.window_rule({match = {class = ".*" }, no_blur = true })
 
 -- Floating
@@ -45,40 +43,53 @@ hl.window_rule({match = {class = "^(nm-connection-editor)$" },               flo
 hl.window_rule({match = {class = "^(nm-connection-editor)$" },               size = {"(monitor_w*0.45)", "(monitor_h*0.45)"} })
 hl.window_rule({match = {class = "^(nm-connection-editor)$" },               center = true})
 hl.window_rule({match = {title = ".*Welcome" },                              float = true})
+-- The cheatsheet box, shared by KOOMPI Settings and the chat widgets below:
+-- every overlay the shell puts in front of you lands in one place at one size.
+-- 1402x951 is the cheatsheet card measured on a 1920x1200 panel. The card is
+-- content-sized, so it does not scale with the monitor and a fixed size tracks
+-- it better than a monitor_w fraction; the min() clamps keep the box on screen
+-- on a smaller panel.
+local overlayW = "(min(1402, monitor_w-64))"
+local overlayH = "(min(951, monitor_h-92))"
 hl.window_rule({match = {title = "^(KOOMPI Settings)$" },                    float = true})
+hl.window_rule({match = {title = "^(KOOMPI Settings)$" },                    size = {overlayW, overlayH} })
+hl.window_rule({match = {title = "^(KOOMPI Settings)$" },                    center = true})
 hl.window_rule({match = {title = ".*Shell conflicts.*" },                    float = true})
 hl.window_rule({match = {class = "^(Zotero)$" },                             float = true})
 hl.window_rule({match = {class = "^(Zotero)$" },                             size = {"(monitor_w*0.45)", "(monitor_h*0.45)"} })
 -- Chat-widget scratchpads (toggled via scripts/toggle_app_scratchpad.sh). Each
--- app is pinned to its own special workspace by class and floated. Telegram and
--- WhatsApp are LEFT-DOCKED tall side panels (mirror of the SUPER+grave terminal,
--- which is right-docked): 0.5w wide (wider than the terminal's 0.42w) x FULL
--- height - they fill exactly the vertical band a maximized/tiled window gets, so a
--- floating widget reads as "same window, just half width". Anchored to the left
--- edge (x=16). See the terminal math for the full-height derivation. Discord is
--- still wide + centered. See keybinds App: *.
--- Telegram: SUPER + Y. Tiled, NOT floated: a floating half-width widget
--- forces the call/video window into the same cramped panel, which breaks calls.
--- Tiled on its special workspace it fills the workspace (full-size), so SUPER+Y
--- still toggles it and calls open at a usable size.
-hl.window_rule({match = {class = "^(org.telegram.desktop)$" },               workspace = "special:telegram silent"})
+-- app is pinned to its own special workspace by class, floated and centered in
+-- the same overlay box declared above. See keybinds App: *.
+-- Telegram was previously TILED, on the theory that a floating half-width dock
+-- cramped the call/video window. The overlay box is far larger than that old
+-- dock, so calls open at a usable size while floating.
+-- Telegram: BOTH classes on purpose. Telegram is Qt, and env.lua forces
+-- QT_QPA_PLATFORM=xcb session wide so the global menu works, so it comes up on
+-- XWayland and Hyprland reports its X11 WM_CLASS "TelegramDesktop" instead of
+-- the Wayland app_id "org.telegram.desktop". Matching only the app_id silently
+-- stopped matching anything, which is why it started opening tiled. Any rule
+-- keyed on a Qt app's Wayland app_id has the same problem.
+local telegramClass = "^(org\\.telegram\\.desktop|TelegramDesktop)$"
+hl.window_rule({match = {class = telegramClass },                            workspace = "special:telegram silent"})
+hl.window_rule({match = {class = telegramClass },                            float = true})
+hl.window_rule({match = {class = telegramClass },                            size = {overlayW, overlayH} })
+hl.window_rule({match = {class = telegramClass },                            center = true})
 -- Discord: SUPER + SHIFT + D
 hl.window_rule({match = {class = "^(discord)$" },                            workspace = "special:discord silent"})
 hl.window_rule({match = {class = "^(discord)$" },                            float = true})
-hl.window_rule({match = {class = "^(discord)$" },                            size = {"(monitor_w*0.7)", "(min(monitor_w*0.45, monitor_h*0.8))"} })
+hl.window_rule({match = {class = "^(discord)$" },                            size = {overlayW, overlayH} })
 hl.window_rule({match = {class = "^(discord)$" },                            center = true})
--- WhatsApp Web: SUPER + SHIFT + W  (left; browser app-window, class contains web.whatsapp.com)
+-- WhatsApp Web: SUPER + SHIFT + W  (browser app-window, class contains web.whatsapp.com)
 hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               workspace = "special:whatsapp silent"})
 hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               float = true})
-hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               size = {"(monitor_w*0.5)", "(monitor_h-52)"} })
-hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               move = {"(16)", "(46)"} })
+hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               size = {overlayW, overlayH} })
+hl.window_rule({match = {class = ".*web\\.whatsapp\\.com.*" },               center = true})
 -- Quick-fire scratchpads sharing the chat-widget pattern. Same launch-or-toggle
 -- script, same float/center/size convention; each uses a UNIQUE --class so it
 -- never collides with the normal SUPER + Return terminal.
--- Terminal: SUPER + grave - RIGHT-docked panel (NOT centered like Discord),
--- since SUPER + T already opens a terminal in the workspace. Tall + narrow so it
--- reads as a side panel coming from the right. Telegram/WhatsApp above mirror it
--- on the LEFT (x=16) with the same size + vertical math.
+-- Terminal: SUPER + grave - RIGHT-docked panel (NOT centered like the chat
+-- widgets), since SUPER + T already opens a terminal in the workspace. Tall +
+-- narrow so it reads as a side panel coming from the right.
 hl.window_rule({match = {class = "^(term-scratch)$" },                       workspace = "special:term silent"})
 hl.window_rule({match = {class = "^(term-scratch)$" },                       float = true})
 -- FULL height - the panel fills exactly the band a maximized/tiled window gets, so
