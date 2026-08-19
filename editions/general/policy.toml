@@ -8,3 +8,6 @@ allow_distrobox_offer = false
 
 [snapper]
 timeline_limit_daily = 10
+
+[account]
+model = "sudo-user"

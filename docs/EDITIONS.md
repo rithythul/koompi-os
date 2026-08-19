@@ -63,10 +63,22 @@ allow_distrobox_offer = false   # only "dev" defaults this true
 
 [snapper]
 timeline_limit_daily = 10
+
+[account]
+model = "sudo-user"   # or "separate-root"
 ```
 
 Any key not present in an edition's `policy.toml` falls back to a base
 default — editions only need to state what differs.
+
+`account.model` decides what the installer's account-creation step (see
+ARCHITECTURE.md §6, step 8) does with the user's answers: `sudo-user`
+creates one user account with full sudo and leaves the root account
+locked (Ubuntu/Debian-desktop-installer style — the base default, used
+by `general`); `separate-root` additionally sets a distinct root
+password and creates the user without sudo by default. No edition has
+set `separate-root` yet — it exists for `government`/`enterprise` to opt
+into once their `policy.toml` is written.
 
 ## 2. Composition with `base/`
 

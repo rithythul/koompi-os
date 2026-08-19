@@ -138,7 +138,10 @@ Sequence:
 ## 6. Installer TUI sequence
 
 `koompi-install` (Zig, same toolchain rules as vita — see VITA_SPEC.md §1)
-runs from the live ISO session:
+runs from the live ISO session. It reads edition manifests, policies, and
+overlays from `/usr/share/koompi-os/editions/<name>/` on the live
+filesystem — `base/live-build/` config (Phase 4) is responsible for
+copying this repo's `editions/` tree there when building the ISO.
 
 1. Language (Khmer / English) — first screen, sets the language for every
    subsequent screen.
