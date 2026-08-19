@@ -12,5 +12,5 @@ lb config noauto \
     --apt-recommends false \
     --iso-application "KOOMPI OS" \
     --iso-volume "KOOMPI OS" \
-    --bootappend-live "console=ttyS0,115200n8 console=tty1" \
+    --bootappend-live "boot=live components console=tty1 console=ttyS0,115200n8" \
     "${@}"
