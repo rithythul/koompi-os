@@ -1,0 +1,21 @@
+# Additive on top of base/'s common package list — see docs/EDITIONS.md §2.
+
+[koompi-repo]
+packages = [
+    "khmer-fonts",
+    "khmer-input-method",
+]
+
+[debian]
+packages = [
+    "kde-plasma-desktop",
+    "sddm",
+    "firefox-esr",
+    "libreoffice",
+]
+
+[flatpak]
+packages = [
+    "org.gimp.GIMP",
+    "org.videolan.VLC",
+]

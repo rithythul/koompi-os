@@ -1,0 +1,14 @@
+# Common package list installed for every edition, regardless of manifest
+# content — see docs/EDITIONS.md §2. One package name per line, plain
+# Debian package names (this list is not backend-tagged like an edition
+# manifest.toml — everything here comes from Debian stable/security).
+
+koompi-archive-keyring
+btrfs-progs
+snapper
+grub-btrfs
+koompi-snapper-hooks
+systemd-zram-generator
+grub-efi-amd64
+network-manager
+flatpak

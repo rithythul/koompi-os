@@ -1,0 +1,10 @@
+# Values differing from base defaults — see docs/EDITIONS.md §1.3.
+
+[apt]
+backports = true
+
+[vita]
+allow_distrobox_offer = false
+
+[snapper]
+timeline_limit_daily = 10
