@@ -13,3 +13,5 @@ systemd-zram-generator
 grub-efi-amd64
 network-manager
 flatpak
+locales
+sudo
