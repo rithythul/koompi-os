@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+
+lb config noauto \
+    --distribution trixie \
+    --archive-areas main \
+    --architectures amd64 \
+    --binary-images iso-hybrid \
+    --bootloader grub-efi \
+    --uefi-secure-boot disable \
+    --debian-installer none \
+    --apt-recommends false \
+    --iso-application "KOOMPI OS" \
+    --iso-volume "KOOMPI OS" \
+    --bootappend-live "console=ttyS0,115200n8 console=tty1" \
+    "${@}"
