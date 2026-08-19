@@ -1,0 +1,15 @@
+Source: koompi-archive-keyring
+Section: admin
+Priority: optional
+Maintainer: KOOMPI <packages@koompi.org>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+Rules-Requires-Root: no
+
+Package: koompi-archive-keyring
+Architecture: all
+Depends: ${misc:Depends}
+Description: GPG archive key for koompi-repo
+ The public half of the key koompi-repo's Release file is signed with
+ (see docs/REPO_POLICY.md §1), so apt trusts koompi-repo without a manual
+ key-import step.

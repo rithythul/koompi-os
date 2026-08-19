@@ -1,0 +1,8 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: koompi-archive-keyring
+Source: https://github.com/rithythul/koompi-os
+
+Files: *
+Copyright: 2026 KOOMPI
+License: proprietary
+ All rights reserved. No license has been chosen for this repository yet.
