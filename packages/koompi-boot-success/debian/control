@@ -1,0 +1,16 @@
+Source: koompi-boot-success
+Section: admin
+Priority: optional
+Maintainer: KOOMPI <packages@koompi.org>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+Rules-Requires-Root: no
+
+Package: koompi-boot-success
+Architecture: all
+Depends: ${misc:Depends}
+Description: clears the boot-fallback flag once graphical.target is reached
+ koompi-boot-success.service runs once graphical.target is reached and
+ unsets koompi_boot_pending/koompi_pending_snapshot in grubenv, the other
+ half of the boot-success auto-fallback GRUB reads at the next boot (see
+ docs/ARCHITECTURE.md §5).

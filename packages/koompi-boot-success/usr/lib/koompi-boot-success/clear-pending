@@ -1,0 +1,7 @@
+#!/bin/sh
+set -e
+
+grubenv=/boot/grub/grubenv
+[ -e "$grubenv" ] || exit 0
+
+grub-editenv "$grubenv" unset koompi_boot_pending koompi_pending_snapshot

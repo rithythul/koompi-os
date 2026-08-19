@@ -1,0 +1,2 @@
+usr/lib/koompi-boot-success/clear-pending usr/lib/koompi-boot-success/
+usr/lib/systemd/system/koompi-boot-success.service usr/lib/systemd/system/

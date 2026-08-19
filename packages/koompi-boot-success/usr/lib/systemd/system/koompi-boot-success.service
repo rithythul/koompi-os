@@ -1,0 +1,11 @@
+[Unit]
+Description=Clear the koompi boot-fallback flag after reaching graphical.target
+After=graphical.target
+ConditionPathExists=/boot/grub/grubenv
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/koompi-boot-success/clear-pending
+
+[Install]
+WantedBy=graphical.target
