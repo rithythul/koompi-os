@@ -152,8 +152,9 @@ copying this repo's `editions/` tree there when building the ISO.
 6. Destructive-partition confirmation (explicit, typed confirmation, not a
    single keypress).
 7. Hostname.
-8. User account + passwords (user + root, or user with sudo — TBD in
-   Phase 3, not fixed here).
+8. User account + password. Whether a separate root password is also
+   asked for depends on the selected edition's `account.model`
+   (EDITIONS.md §1.3), so that prompt comes after step 9.
 9. Edition selection (government / school / enterprise / dev / general).
 10. Bootstrap via `mmdebstrap` (see §6.2 for why over `debootstrap`).
 11. Apply the selected edition's overlay + manifest (see EDITIONS.md) —
