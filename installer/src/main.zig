@@ -226,6 +226,8 @@ pub fn runInstall(allocator: std.mem.Allocator, answers: Answers, disks: []const
     try runInTarget(allocator, env, &system.grubInstallArgv());
     try runInTarget(allocator, env, &system.grubMkconfigArgv());
 
+    try runInTarget(allocator, env, &system.snapperCreateConfigArgv());
+
     for (system.systemd_units) |unit| {
         try runInTarget(allocator, env, &system.systemctlEnableArgv(unit));
     }
@@ -437,6 +439,44 @@ test "runInstall populates /etc/skel before it creates the account" {
     try std.testing.expect(bootstrap < useradd);
     try std.testing.expect(!RecordingRun.calls.items[bootstrap].skel_present);
     try std.testing.expect(RecordingRun.calls.items[useradd].skel_present);
+}
+
+test "runInstall registers the snapper root config before enabling the snapper timers" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    const allocator = arena.allocator();
+
+    var tmp = std.testing.tmpDir(.{});
+    defer tmp.cleanup();
+    const target = try tmp.dir.realpathAlloc(allocator, ".");
+    RecordingRun.reset(allocator, target);
+
+    const disks = [_]disk.BlockDevice{
+        .{ .name = "sda", .size_bytes = 256000000000, .kind = "disk", .model = null },
+    };
+    const answers = Answers{
+        .keymap = "us",
+        .locale = "en_US.UTF-8",
+        .timezone = "Asia/Phnom_Penh",
+        .disk_index = 0,
+        .hostname = "koompi-pc",
+        .username = "user",
+        .password = "hunter2",
+        .root_password = null,
+        .edition_index = 4,
+    };
+
+    try runInstall(allocator, answers, &disks, .{
+        .editions_root = "../editions",
+        .base_packages_path = "../base/packages.list",
+        .base_overlay_path = "../base/overlay",
+        .target_root = target,
+        .run = RecordingRun.run,
+    });
+
+    const create_config = RecordingRun.find("create-config").?;
+    const timeline_timer = RecordingRun.find("snapper-timeline.timer").?;
+    try std.testing.expect(create_config < timeline_timer);
 }
 
 test "runInstall writes the real blkid UUID into fstab and feeds chpasswd the password" {
