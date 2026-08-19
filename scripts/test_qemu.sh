@@ -10,7 +10,8 @@ iso="$root/build/iso/koompi-os.iso"
 [ -f "$iso" ] || { echo "no ISO at $iso -- run scripts/build_iso.sh first" >&2; exit 1; }
 
 mkdir -p "$qemu_dir"
-rm -f "$qemu_dir"/boot1.log "$qemu_dir"/boot2.log "$qemu_dir"/boot1.sock "$qemu_dir"/boot2.sock
+rm -f "$qemu_dir"/boot1.log "$qemu_dir"/boot2.log "$qemu_dir"/boot1.sock "$qemu_dir"/boot2.sock \
+    "$qemu_dir"/boot1.monitor.sock "$qemu_dir"/boot2.monitor.sock
 qemu-img create -f qcow2 "$qemu_dir/target.qcow2" 20G >/dev/null
 cp "$ovmf/OVMF_VARS.4m.fd" "$qemu_dir/OVMF_VARS.fd"
 
@@ -39,6 +40,7 @@ testpass123
 4
 INSTALLER_EOF
 echo "AUTOTEST_INSTALL_EXIT=$?"
+cat /root/install.log
 mkdir -p /mnt/dev /mnt/dev/pts /mnt/proc /mnt/sys
 mount --bind /dev /mnt/dev
 mount --bind /dev/pts /mnt/dev/pts
@@ -48,7 +50,7 @@ mkdir -p /mnt/etc/systemd/system/serial-getty@ttyS0.service.d
 cat > /mnt/etc/systemd/system/serial-getty@ttyS0.service.d/autotest.conf <<'GETTY_EOF'
 [Service]
 ExecStart=
-ExecStart=-/sbin/agetty --autologin root -o '-p -- \\u' --keep-baud 115200,38400,9600 %I $TERM
+ExecStart=-/sbin/agetty --autologin root --keep-baud 115200,38400,9600 %I $TERM
 GETTY_EOF
 mkdir -p /mnt/etc/systemd/system/getty.target.wants
 ln -sf /lib/systemd/system/serial-getty@.service /mnt/etc/systemd/system/getty.target.wants/serial-getty@ttyS0.service
@@ -80,9 +82,11 @@ PAYLOAD
 echo "=== boot 1: install ==="
 common_qemu \
     -cdrom "$iso" -boot order=d \
-    -serial unix:"$qemu_dir/boot1.sock",server=on,wait=off &
+    -serial unix:"$qemu_dir/boot1.sock",server=on,wait=off \
+    -monitor unix:"$qemu_dir/boot1.monitor.sock",server=on,wait=off &
 qemu1_pid=$!
-python3 "$here/qemu_console.py" "$qemu_dir/boot1.sock" "$qemu_dir/boot1.sh" "$qemu_dir/boot1.log" 1800 60
+python3 "$here/qemu_monitor_sendkey.py" "$qemu_dir/boot1.monitor.sock" ret 10 3 &
+python3 "$here/qemu_console.py" "$qemu_dir/boot1.sock" "$qemu_dir/boot1.sh" "$qemu_dir/boot1.log" 1800 5 "login:"
 wait "$qemu1_pid" || true
 
 echo "=== boot1.log tail ==="
@@ -92,12 +96,18 @@ if ! grep -q "AUTOTEST_BOOT1_DONE" "$qemu_dir/boot1.log"; then
     echo "boot 1 did not reach AUTOTEST_BOOT1_DONE -- see $qemu_dir/boot1.log" >&2
     exit 1
 fi
+if ! grep -q "^AUTOTEST_INSTALL_EXIT=0$" "$qemu_dir/boot1.log"; then
+    echo "koompi-install did not exit 0 -- see $qemu_dir/boot1.log and /root/install.log inside the image" >&2
+    exit 1
+fi
 
 echo "=== boot 2: verify ==="
 common_qemu \
-    -serial unix:"$qemu_dir/boot2.sock",server=on,wait=off &
+    -serial unix:"$qemu_dir/boot2.sock",server=on,wait=off \
+    -monitor unix:"$qemu_dir/boot2.monitor.sock",server=on,wait=off &
 qemu2_pid=$!
-python3 "$here/qemu_console.py" "$qemu_dir/boot2.sock" "$qemu_dir/boot2.sh" "$qemu_dir/boot2.log" 900 25
+python3 "$here/qemu_monitor_sendkey.py" "$qemu_dir/boot2.monitor.sock" ret 10 3 &
+python3 "$here/qemu_console.py" "$qemu_dir/boot2.sock" "$qemu_dir/boot2.sh" "$qemu_dir/boot2.log" 900 5 "login:"
 wait "$qemu2_pid" || true
 
 echo "=== boot2.log tail ==="

@@ -14,8 +14,11 @@ podman image exists "$image" || podman build -t "$image" -f "$here/builder.Conta
 
 podman run --init --rm -v "$root":/repo:Z -w /repo "$image" sh repo/build-repo.sh
 
-rm -rf "$work"
-cp -a "$root/base/live-build" "$work"
+if [ -d "$work" ]; then
+    podman run --init --rm --privileged -v "$work":/build:Z "$image" sh -c 'rm -rf /build/..?* /build/.[!.]* /build/*'
+fi
+mkdir -p "$work"
+cp -a "$root/base/live-build/." "$work/"
 
 chroot_share="$work/config/includes.chroot/usr/share/koompi-os"
 mkdir -p "$chroot_share" "$work/config/includes.chroot/usr/bin" \
