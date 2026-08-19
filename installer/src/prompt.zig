@@ -15,6 +15,7 @@ pub fn askNonEmpty(reader: anytype, writer: anytype, buf: []u8, comptime questio
 }
 
 pub fn askChoice(reader: anytype, writer: anytype, buf: []u8, comptime question: []const u8, options: []const []const u8) !usize {
+    if (options.len == 0) return error.NoOptions;
     while (true) {
         try writer.print(question ++ ":\n", .{});
         for (options, 0..) |opt, i| {
@@ -72,6 +73,16 @@ test "askChoice validates the number is in range" {
 
     const idx = try askChoice(input.reader(), output.writer(), &buf, "edition", &.{ "general", "dev" });
     try std.testing.expectEqual(@as(usize, 1), idx);
+}
+
+test "askChoice errors instead of looping forever when given zero options" {
+    var input = std.io.fixedBufferStream("");
+    var output = std.ArrayList(u8).init(std.testing.allocator);
+    defer output.deinit();
+    var buf: [256]u8 = undefined;
+
+    const result = askChoice(input.reader(), output.writer(), &buf, "edition", &.{});
+    try std.testing.expectError(error.NoOptions, result);
 }
 
 test "askYesNo accepts y/n and rejects anything else" {
