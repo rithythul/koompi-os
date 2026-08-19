@@ -1,0 +1,3 @@
+usr/lib/koompi-snapper-hooks/pre-apt.sh usr/lib/koompi-snapper-hooks/
+usr/lib/koompi-snapper-hooks/post-apt.sh usr/lib/koompi-snapper-hooks/
+etc/apt/apt.conf.d/80koompi-snapper etc/apt/apt.conf.d/

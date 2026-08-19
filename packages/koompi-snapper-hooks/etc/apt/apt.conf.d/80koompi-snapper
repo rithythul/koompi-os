@@ -1,0 +1,2 @@
+DPkg::Pre-Invoke { "/usr/lib/koompi-snapper-hooks/pre-apt.sh"; };
+DPkg::Post-Invoke { "/usr/lib/koompi-snapper-hooks/post-apt.sh"; };

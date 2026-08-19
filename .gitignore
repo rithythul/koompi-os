@@ -3,3 +3,14 @@ zig-out/
 .zig-cache/
 .zig-toolchain/
 graphify-out/
+/build/
+packages/koompi-archive-keyring/usr/share/keyrings/koompi-archive-keyring.gpg
+packages/*/debian/.debhelper/
+packages/*/debian/*.substvars
+packages/*/debian/*.debhelper
+packages/*/debian/debhelper-build-stamp
+packages/*/debian/files
+packages/*/debian/*/
+packages/*.deb
+packages/*.buildinfo
+packages/*.changes

@@ -1,0 +1,16 @@
+Source: koompi-snapper-hooks
+Section: admin
+Priority: optional
+Maintainer: KOOMPI <packages@koompi.org>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+Rules-Requires-Root: no
+
+Package: koompi-snapper-hooks
+Architecture: all
+Depends: ${misc:Depends}
+Description: snapper pre/post snapshots around apt transactions
+ Registers DPkg::Pre-Invoke and DPkg::Post-Invoke apt hooks that take a
+ snapper snapshot pair around every apt transaction, mirroring the
+ zypp/snap-pac integration Debian's snapper package doesn't ship. No-ops
+ if / isn't Btrfs or no "root" snapper config exists.
