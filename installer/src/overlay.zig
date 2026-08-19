@@ -10,6 +10,16 @@ pub fn copyTree(allocator: std.mem.Allocator, src_dir: std.fs.Dir, dst_dir: std.
                 if (std.fs.path.dirname(entry.path)) |dir| try dst_dir.makePath(dir);
                 try src_dir.copyFile(entry.path, dst_dir, entry.path, .{});
             },
+            .sym_link => {
+                if (std.fs.path.dirname(entry.path)) |dir| try dst_dir.makePath(dir);
+                var link_buf: [std.fs.max_path_bytes]u8 = undefined;
+                const link_target = try src_dir.readLink(entry.path, &link_buf);
+                dst_dir.deleteFile(entry.path) catch |err| switch (err) {
+                    error.FileNotFound => {},
+                    else => return err,
+                };
+                try dst_dir.symLink(link_target, entry.path, .{});
+            },
             else => {},
         }
     }
@@ -65,6 +75,28 @@ test "edition overlay wins over base overlay on a conflicting path" {
     const base_only = try tmp.dir.readFileAlloc(allocator, "target/etc/only-in-base", 1024);
     defer allocator.free(base_only);
     try std.testing.expectEqualStrings("base\n", base_only);
+}
+
+test "copyTree preserves symlinks instead of dropping them" {
+    const allocator = std.testing.allocator;
+    var tmp = std.testing.tmpDir(.{});
+    defer tmp.cleanup();
+
+    try tmp.dir.makePath("src/etc");
+    try tmp.dir.writeFile(.{ .sub_path = "src/etc/real-target", .data = "x" });
+    try tmp.dir.symLink("real-target", "src/etc/link-name", .{});
+    try tmp.dir.makePath("dst");
+
+    var src_dir = try tmp.dir.openDir("src", .{ .iterate = true });
+    defer src_dir.close();
+    var dst_dir = try tmp.dir.openDir("dst", .{});
+    defer dst_dir.close();
+
+    try copyTree(allocator, src_dir, dst_dir);
+
+    var link_buf: [std.fs.max_path_bytes]u8 = undefined;
+    const link_target = try dst_dir.readLink("etc/link-name", &link_buf);
+    try std.testing.expectEqualStrings("real-target", link_target);
 }
 
 test "a missing edition overlay directory is not an error" {
