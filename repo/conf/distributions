@@ -1,0 +1,7 @@
+Origin: KOOMPI
+Label: koompi-repo
+Codename: trixie
+Architectures: amd64
+Components: main
+Description: koompi-repo -- KOOMPI OS's own apt repository
+SignWith: yes
