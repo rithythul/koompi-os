@@ -44,7 +44,7 @@ a full replacement list.
 ### 1.2 `overlay/`
 
 A filesystem tree merged onto the target root during install (after
-bootstrap, before first boot — installer step 14 in ARCHITECTURE.md §6).
+bootstrap, before account creation — installer step 11 in ARCHITECTURE.md §6).
 Paths mirror their final location, e.g. `overlay/etc/skel/.config/...`.
 Files here take priority over anything from `base/`'s overlay when both
 provide the same path.

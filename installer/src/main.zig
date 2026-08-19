@@ -174,6 +174,11 @@ pub fn runInstall(allocator: std.mem.Allocator, answers: Answers, disks: []const
     const bootstrap_argv = try system.mmdebstrapArgv(allocator, apt_packages.items, debian_suite, target_root);
     _ = try exec.runExpectOk(allocator, bootstrap_argv);
 
+    // overlay before useradd, so /etc/skel is populated when `useradd -m`
+    // copies it into the new home directory (docs/ARCHITECTURE.md §6 step 11)
+    const edition_overlay_src = try std.fs.path.join(allocator, &.{ editions_root, edition_name, "overlay" });
+    try overlay.applyOverlays(allocator, base_overlay_path, edition_overlay_src, target_root);
+
     const fstab_text = try fstab.generate(allocator, .{ .root_uuid = root_uuid, .esp_uuid = esp_uuid });
     try writeTargetFile(allocator, "etc/fstab", fstab_text);
 
@@ -230,9 +235,6 @@ pub fn runInstall(allocator: std.mem.Allocator, answers: Answers, disks: []const
         try runInTarget(allocator, &system.flatpakRemoteAddArgv());
         try runInTarget(allocator, try system.flatpakInstallArgv(allocator, edition.manifest.flatpak));
     }
-
-    const edition_overlay_src = try std.fs.path.join(allocator, &.{ editions_root, edition_name, "overlay" });
-    try overlay.applyOverlays(allocator, base_overlay_path, edition_overlay_src, target_root);
 }
 
 pub fn main() !void {
@@ -335,6 +337,17 @@ test "collectAnswers cancels when the typed confirmation doesn't match" {
     const models = [_]config.AccountModel{.@"sudo-user"} ** edition_names.len;
     const result = collectAnswers(allocator, input.reader(), output.writer(), &disks, &models);
     try std.testing.expectError(error.InstallCancelled, result);
+}
+
+// runInstall is never exercised by a test (it mutates real disk/system
+// state -- see the doc comment above it); this guards the overlay-vs-useradd
+// ordering fix (docs/ARCHITECTURE.md §6 step 11) the only way available
+// without running the destructive path.
+test "runInstall applies the overlay before creating the user account" {
+    const source = @embedFile("main.zig");
+    const overlay_pos = std.mem.indexOf(u8, source, "overlay.applyOverlays(allocator,").?;
+    const useradd_pos = std.mem.indexOf(u8, source, "system.useraddArgv(answers.username)").?;
+    try std.testing.expect(overlay_pos < useradd_pos);
 }
 
 test {

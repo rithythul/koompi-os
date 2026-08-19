@@ -156,12 +156,16 @@ copying this repo's `editions/` tree there when building the ISO.
    Phase 3, not fixed here).
 9. Edition selection (government / school / enterprise / dev / general).
 10. Bootstrap via `mmdebstrap` (see §6.2 for why over `debootstrap`).
-11. fstab generation (by subvol name, per §2).
-12. `grub-install --target=x86_64-efi` + `grub-mkconfig`.
-13. Enable systemd units: `grub-btrfsd`, snapper timers, `zram-generator`,
+11. Apply the selected edition's overlay + manifest (see EDITIONS.md) —
+    before account creation, so `/etc/skel` is populated by the time
+    `useradd -m` copies it into the new home directory.
+12. fstab generation (by subvol name, per §2).
+13. `grub-install --target=x86_64-efi` + `grub-mkconfig`.
+14. Enable systemd units: `grub-btrfsd`, snapper timers, `zram-generator`,
     `NetworkManager`.
-14. Apply the selected edition's overlay + manifest (see EDITIONS.md).
-15. Done — prompt reboot.
+15. Create the user account (and root account, per the edition's account
+    model).
+16. Done — prompt reboot.
 
 ### 6.1 Khmer-in-TUI strategy
 
