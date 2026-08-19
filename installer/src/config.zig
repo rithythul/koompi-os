@@ -49,7 +49,7 @@ fn intValue(table: ?toml.Table, key: []const u8, default: u32) u32 {
     const t = table orelse return default;
     const v = t.get(key) orelse return default;
     return switch (v) {
-        .integer => |n| if (n >= 0) @intCast(n) else default,
+        .integer => |n| if (n >= 0 and n <= std.math.maxInt(u32)) @intCast(n) else default,
         else => default,
     };
 }
@@ -63,9 +63,10 @@ fn stringValue(table: ?toml.Table, key: []const u8, default: []const u8) []const
     };
 }
 
-fn accountModel(s: []const u8) AccountModel {
+fn accountModel(s: []const u8) !AccountModel {
+    if (std.mem.eql(u8, s, "sudo-user")) return .@"sudo-user";
     if (std.mem.eql(u8, s, "separate-root")) return .@"separate-root";
-    return .@"sudo-user";
+    return error.UnknownAccountModel;
 }
 
 fn parseManifest(doc: toml.Doc) Manifest {
@@ -76,12 +77,12 @@ fn parseManifest(doc: toml.Doc) Manifest {
     };
 }
 
-fn parsePolicy(doc: toml.Doc) Policy {
+fn parsePolicy(doc: toml.Doc) !Policy {
     return .{
         .apt_backports = boolValue(doc.get("apt"), "backports", false),
         .vita_allow_distrobox_offer = boolValue(doc.get("vita"), "allow_distrobox_offer", false),
         .snapper_timeline_limit_daily = intValue(doc.get("snapper"), "timeline_limit_daily", 10),
-        .account_model = accountModel(stringValue(doc.get("account"), "model", "sudo-user")),
+        .account_model = try accountModel(stringValue(doc.get("account"), "model", "sudo-user")),
     };
 }
 
@@ -119,7 +120,7 @@ pub fn load(gpa: std.mem.Allocator, editions_root: []const u8, edition_name: []c
     return .{
         .arena = arena,
         .manifest = parseManifest(manifest_doc),
-        .policy = parsePolicy(policy_doc),
+        .policy = try parsePolicy(policy_doc),
         .base_packages = base_packages,
     };
 }
@@ -157,4 +158,19 @@ test "a stub edition with no manifest/policy files falls back to defaults" {
     try std.testing.expectEqual(@as(usize, 0), edition.manifest.koompi_repo.len);
     try std.testing.expectEqual(AccountModel.@"sudo-user", edition.policy.account_model);
     try std.testing.expect(!edition.policy.apt_backports);
+}
+
+test "an unrecognized account.model is an error, not a silent sudo-user downgrade" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    const doc = try toml.parse(arena.allocator(), "[account]\nmodel = \"seperate-root\"\n");
+    try std.testing.expectError(error.UnknownAccountModel, parsePolicy(doc));
+}
+
+test "an out-of-range policy.toml integer falls back to the default instead of panicking" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    const doc = try toml.parse(arena.allocator(), "[snapper]\ntimeline_limit_daily = 99999999999\n");
+    const policy = try parsePolicy(doc);
+    try std.testing.expectEqual(@as(u32, 10), policy.snapper_timeline_limit_daily);
 }
