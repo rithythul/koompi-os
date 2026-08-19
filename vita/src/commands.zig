@@ -10,6 +10,10 @@ const output = @import("output.zig");
 pub const default_ledger_path = "/var/lib/vita/state.json";
 pub const default_grubenv_path = "/boot/grub/grubenv";
 
+/// Answers an interactive yes/no question. Null means non-interactive:
+/// anything needing a choice fails closed (VITA_SPEC §2).
+pub const Confirmer = *const fn (question: []const u8) bool;
+
 pub const Ctx = struct {
     allocator: std.mem.Allocator,
     env_map: ?*const std.process.EnvMap = null,
@@ -19,6 +23,11 @@ pub const Ctx = struct {
     // calling process's real PATH, not env_map -- so tests point backend
     // commands at fake binaries by absolute path via this field instead.
     bin_dir: ?[]const u8 = null,
+    // VITA_SPEC §7 requires the failing backend and its exit status in the
+    // error output, so the caller owns the diagnostic every backend call
+    // writes into.
+    diag: ?*exec.Diagnostic = null,
+    confirm: ?Confirmer = null,
 };
 
 fn resolveArgv(ctx: Ctx, argv: []const []const u8) ![]const []const u8 {
@@ -26,6 +35,10 @@ fn resolveArgv(ctx: Ctx, argv: []const []const u8) ![]const []const u8 {
     const resolved = try ctx.allocator.dupe([]const u8, argv);
     resolved[0] = try std.fs.path.join(ctx.allocator, &.{ bin_dir, argv[0] });
     return resolved;
+}
+
+fn diagOf(ctx: Ctx, local: *exec.Diagnostic) *exec.Diagnostic {
+    return ctx.diag orelse local;
 }
 
 pub const RemoveSource = enum { ledger, dpkg, flatpak, not_found };
@@ -65,16 +78,25 @@ fn nowRfc3339(buf: []u8) ![]const u8 {
     });
 }
 
+/// A backend that exits nonzero means "this tier doesn't have it"; an
+/// allocation failure is a real error and must not be flattened into a
+/// missing package (that would report exit 3 for exit 1).
+fn probe(ctx: Ctx, backend: []const u8, argv: []const []const u8) !?exec.Result {
+    var local: exec.Diagnostic = .{};
+    return exec.runExpectOkEnv(ctx.allocator, backend, try resolveArgv(ctx, argv), diagOf(ctx, &local), ctx.env_map) catch |err| switch (err) {
+        error.BackendFailed => null,
+        else => err,
+    };
+}
+
 fn resolveApt(ctx: Ctx, pkg: []const u8) !?apt.Resolution {
-    var diag: exec.Diagnostic = undefined;
-    const res = exec.runExpectOkEnv(ctx.allocator, "apt-cache", &apt.policyArgv(pkg), &diag, ctx.env_map) catch return null;
+    const res = (try probe(ctx, "apt-cache", &apt.policyArgv(pkg))) orelse return null;
     const candidates = try apt.parseAptCachePolicy(ctx.allocator, res.stdout);
     return apt.resolve(candidates);
 }
 
 fn searchFlatpakExact(ctx: Ctx, pkg: []const u8) !?flatpak.SearchResult {
-    var diag: exec.Diagnostic = undefined;
-    const res = exec.runExpectOkEnv(ctx.allocator, "flatpak", &flatpak.searchArgv(pkg), &diag, ctx.env_map) catch return null;
+    const res = (try probe(ctx, "flatpak", &flatpak.searchArgv(pkg))) orelse return null;
     const hits = try flatpak.parseSearch(ctx.allocator, res.stdout);
     for (hits) |h| {
         if (std.mem.eql(u8, h.app_id, pkg)) return h;
@@ -83,24 +105,34 @@ fn searchFlatpakExact(ctx: Ctx, pkg: []const u8) !?flatpak.SearchResult {
 }
 
 fn dpkgVersion(ctx: Ctx, pkg: []const u8) !?[]const u8 {
-    var diag: exec.Diagnostic = undefined;
-    const res = exec.runExpectOkEnv(ctx.allocator, "dpkg-query", &apt.dpkgQueryStatusArgv(pkg), &diag, ctx.env_map) catch return null;
+    const res = (try probe(ctx, "dpkg-query", &apt.dpkgQueryStatusArgv(pkg))) orelse return null;
     const dpkg_info = apt.parseDpkgQueryStatus(res.stdout);
     return if (dpkg_info.installed) dpkg_info.version else null;
 }
 
 fn flatpakVersion(ctx: Ctx, pkg: []const u8) !?[]const u8 {
-    var diag: exec.Diagnostic = undefined;
-    const res = exec.runExpectOkEnv(ctx.allocator, "flatpak", &flatpak.listArgv(), &diag, ctx.env_map) catch return null;
+    const res = (try probe(ctx, "flatpak", &flatpak.listArgv())) orelse return null;
     const entries = try flatpak.parseList(ctx.allocator, res.stdout);
     if (flatpak.findInstalled(entries, pkg)) |e| return e.version;
     return null;
 }
 
+/// VITA_SPEC §2: the distrobox tier is never reached silently. `--yes`
+/// without `--allow-distrobox` fails closed (exit 4); an interactive run
+/// may offer, and a declined offer leaves the package unresolved.
+fn acceptDistrobox(ctx: Ctx, pkg: []const u8, flags: cli.Flags) !void {
+    if (flags.allow_distrobox) return;
+    if (flags.yes) return error.ConfirmationRequired;
+    const confirm = ctx.confirm orelse return error.ConfirmationRequired;
+    const question = try std.fmt.allocPrint(ctx.allocator, "{s} is not in koompi-repo, Debian or Flathub. Install it into a distrobox container?", .{pkg});
+    if (!confirm(question)) return error.PackageNotFound;
+}
+
 pub fn install(ctx: Ctx, pkgs: []const []const u8, flags: cli.Flags) !output.InstallResult {
     var installed = std.ArrayList(output.InstalledPkg).init(ctx.allocator);
     var state = try ledger.load(ctx.allocator, ctx.ledger_path);
-    var diag: exec.Diagnostic = undefined;
+    var local: exec.Diagnostic = .{};
+    const diag = diagOf(ctx, &local);
     var ts_buf: [32]u8 = undefined;
 
     for (pkgs) |pkg| {
@@ -111,7 +143,7 @@ pub fn install(ctx: Ctx, pkgs: []const []const u8, flags: cli.Flags) !output.Ins
         const resolved: InstallTarget = switch (decision) {
             .resolved => |r| r,
             .distrobox_offer => blk: {
-                if (!flags.allow_distrobox) return error.ConfirmationRequired;
+                try acceptDistrobox(ctx, pkg, flags);
                 break :blk .{ .backend = .distrobox, .version = "unknown" };
             },
         };
@@ -119,10 +151,10 @@ pub fn install(ctx: Ctx, pkgs: []const []const u8, flags: cli.Flags) !output.Ins
         switch (resolved.backend) {
             .@"koompi-repo", .debian => {
                 const install_argv = try apt.installArgv(ctx.allocator, &.{pkg});
-                _ = try exec.runExpectOkEnv(ctx.allocator, "apt-get", install_argv, &diag, ctx.env_map);
+                _ = try exec.runExpectOkEnv(ctx.allocator, "apt-get", try resolveArgv(ctx, install_argv), diag, ctx.env_map);
             },
             .flatpak => {
-                _ = try exec.runExpectOkEnv(ctx.allocator, "flatpak", &flatpak.installArgv(pkg), &diag, ctx.env_map);
+                _ = try exec.runExpectOkEnv(ctx.allocator, "flatpak", try resolveArgv(ctx, &flatpak.installArgv(pkg)), diag, ctx.env_map);
             },
             .distrobox => {},
         }
@@ -133,17 +165,20 @@ pub fn install(ctx: Ctx, pkgs: []const []const u8, flags: cli.Flags) !output.Ins
             .installed_at = try nowRfc3339(&ts_buf),
             .requested = true,
         });
+        // saved per package: a failure on a later package must not lose the
+        // ledger entries for the ones already on the system
+        try ledger.save(&state, ctx.allocator, ctx.ledger_path);
         try installed.append(.{ .package = pkg, .backend = resolved.backend, .version = resolved.version });
     }
 
-    try ledger.save(&state, ctx.allocator, ctx.ledger_path);
     return .{ .installed = try installed.toOwnedSlice() };
 }
 
 pub fn remove(ctx: Ctx, pkgs: []const []const u8) !output.RemoveResult {
     var removed = std.ArrayList([]const u8).init(ctx.allocator);
     var state = try ledger.load(ctx.allocator, ctx.ledger_path);
-    var diag: exec.Diagnostic = undefined;
+    var local: exec.Diagnostic = .{};
+    const diag = diagOf(ctx, &local);
 
     for (pkgs) |pkg| {
         const entry = state.get(pkg);
@@ -153,29 +188,28 @@ pub fn remove(ctx: Ctx, pkgs: []const []const u8) !output.RemoveResult {
         switch (decideRemoveSource(entry, dpkg_installed, flatpak_installed)) {
             .ledger => {
                 switch (entry.?.backend) {
-                    .@"koompi-repo", .debian => _ = try exec.runExpectOkEnv(ctx.allocator, "apt-get", &apt.removeArgv(pkg), &diag, ctx.env_map),
-                    .flatpak => _ = try exec.runExpectOkEnv(ctx.allocator, "flatpak", &flatpak.removeArgv(pkg), &diag, ctx.env_map),
+                    .@"koompi-repo", .debian => _ = try exec.runExpectOkEnv(ctx.allocator, "apt-get", try resolveArgv(ctx, &apt.removeArgv(pkg)), diag, ctx.env_map),
+                    .flatpak => _ = try exec.runExpectOkEnv(ctx.allocator, "flatpak", try resolveArgv(ctx, &flatpak.removeArgv(pkg)), diag, ctx.env_map),
                     .distrobox => {},
                 }
                 _ = state.remove(pkg);
+                try ledger.save(&state, ctx.allocator, ctx.ledger_path);
             },
-            .dpkg => _ = try exec.runExpectOkEnv(ctx.allocator, "apt-get", &apt.removeArgv(pkg), &diag, ctx.env_map),
-            .flatpak => _ = try exec.runExpectOkEnv(ctx.allocator, "flatpak", &flatpak.removeArgv(pkg), &diag, ctx.env_map),
+            .dpkg => _ = try exec.runExpectOkEnv(ctx.allocator, "apt-get", try resolveArgv(ctx, &apt.removeArgv(pkg)), diag, ctx.env_map),
+            .flatpak => _ = try exec.runExpectOkEnv(ctx.allocator, "flatpak", try resolveArgv(ctx, &flatpak.removeArgv(pkg)), diag, ctx.env_map),
             .not_found => return error.PackageNotFound,
         }
         try removed.append(pkg);
     }
 
-    try ledger.save(&state, ctx.allocator, ctx.ledger_path);
     return .{ .removed = try removed.toOwnedSlice() };
 }
 
 pub fn search(ctx: Ctx, query: []const u8) !output.SearchResult {
     var hits = std.ArrayList(output.SearchHit).init(ctx.allocator);
-    var diag: exec.Diagnostic = undefined;
 
     apt_names: {
-        const res = exec.runExpectOkEnv(ctx.allocator, "apt-cache", &apt.searchArgv(query), &diag, ctx.env_map) catch break :apt_names;
+        const res = (try probe(ctx, "apt-cache", &apt.searchArgv(query))) orelse break :apt_names;
         const names = try apt.parseSearchNames(ctx.allocator, res.stdout);
         for (names) |name| {
             const resolved = (try resolveApt(ctx, name)) orelse continue;
@@ -185,7 +219,7 @@ pub fn search(ctx: Ctx, query: []const u8) !output.SearchResult {
     }
 
     flatpak_hits: {
-        const res = exec.runExpectOkEnv(ctx.allocator, "flatpak", &flatpak.searchArgv(query), &diag, ctx.env_map) catch break :flatpak_hits;
+        const res = (try probe(ctx, "flatpak", &flatpak.searchArgv(query))) orelse break :flatpak_hits;
         const results = try flatpak.parseSearch(ctx.allocator, res.stdout);
         const installed = try isFlatpakInstalledList(ctx, results);
         for (results, 0..) |r, i| {
@@ -198,8 +232,7 @@ pub fn search(ctx: Ctx, query: []const u8) !output.SearchResult {
 
 fn isFlatpakInstalledList(ctx: Ctx, results: []const flatpak.SearchResult) ![]bool {
     var installed = try ctx.allocator.alloc(bool, results.len);
-    var diag: exec.Diagnostic = undefined;
-    const res = exec.runExpectOkEnv(ctx.allocator, "flatpak", &flatpak.listArgv(), &diag, ctx.env_map) catch {
+    const res = (try probe(ctx, "flatpak", &flatpak.listArgv())) orelse {
         @memset(installed, false);
         return installed;
     };
@@ -209,9 +242,10 @@ fn isFlatpakInstalledList(ctx: Ctx, results: []const flatpak.SearchResult) ![]bo
 }
 
 pub fn update(ctx: Ctx) !output.UpdateResult {
-    var diag: exec.Diagnostic = undefined;
+    var local: exec.Diagnostic = .{};
+    const diag = diagOf(ctx, &local);
 
-    const pre_res = exec.runExpectOkEnv(ctx.allocator, "snapper", try resolveArgv(ctx, &snapshot.preCreateArgv("vita update")), &diag, ctx.env_map) catch |err| switch (err) {
+    const pre_res = exec.runExpectOkEnv(ctx.allocator, "snapper", try resolveArgv(ctx, &snapshot.preCreateArgv("vita update")), diag, ctx.env_map) catch |err| switch (err) {
         error.BackendFailed => return error.SnapshotFailed,
         else => return err,
     };
@@ -219,23 +253,23 @@ pub fn update(ctx: Ctx) !output.UpdateResult {
     const pre_str = try std.fmt.allocPrint(ctx.allocator, "{d}", .{pre_number});
 
     const pending_kv = try std.fmt.allocPrint(ctx.allocator, "koompi_pending_snapshot={s}", .{pre_str});
-    _ = exec.runExpectOkEnv(ctx.allocator, "grub-editenv", try resolveArgv(ctx, &snapshot.grubEditenvSetArgv(ctx.grubenv_path, pending_kv)), &diag, ctx.env_map) catch |err| switch (err) {
+    _ = exec.runExpectOkEnv(ctx.allocator, "grub-editenv", try resolveArgv(ctx, &snapshot.grubEditenvSetArgv(ctx.grubenv_path, pending_kv)), diag, ctx.env_map) catch |err| switch (err) {
         error.BackendFailed => return error.SnapshotFailed,
         else => return err,
     };
-    _ = exec.runExpectOkEnv(ctx.allocator, "grub-editenv", try resolveArgv(ctx, &snapshot.grubEditenvSetArgv(ctx.grubenv_path, "koompi_boot_pending=1")), &diag, ctx.env_map) catch |err| switch (err) {
+    _ = exec.runExpectOkEnv(ctx.allocator, "grub-editenv", try resolveArgv(ctx, &snapshot.grubEditenvSetArgv(ctx.grubenv_path, "koompi_boot_pending=1")), diag, ctx.env_map) catch |err| switch (err) {
         error.BackendFailed => return error.SnapshotFailed,
         else => return err,
     };
 
-    _ = try exec.runExpectOkEnv(ctx.allocator, "apt-get", try resolveArgv(ctx, &apt.updateIndexArgv()), &diag, ctx.env_map);
-    const upgrade_res = try exec.runExpectOkEnv(ctx.allocator, "apt-get", try resolveArgv(ctx, &apt.fullUpgradeArgv()), &diag, ctx.env_map);
+    _ = try exec.runExpectOkEnv(ctx.allocator, "apt-get", try resolveArgv(ctx, &apt.updateIndexArgv()), diag, ctx.env_map);
+    const upgrade_res = try exec.runExpectOkEnv(ctx.allocator, "apt-get", try resolveArgv(ctx, &apt.fullUpgradeArgv()), diag, ctx.env_map);
     const apt_upgraded = apt.parseUpgradedCount(upgrade_res.stdout);
 
-    const flatpak_res = try exec.runExpectOkEnv(ctx.allocator, "flatpak", try resolveArgv(ctx, &flatpak.updateArgv()), &diag, ctx.env_map);
+    const flatpak_res = try exec.runExpectOkEnv(ctx.allocator, "flatpak", try resolveArgv(ctx, &flatpak.updateArgv()), diag, ctx.env_map);
     const flatpak_upgraded = flatpak.parseUpdatedCount(flatpak_res.stdout);
 
-    const post_res = exec.runExpectOkEnv(ctx.allocator, "snapper", try resolveArgv(ctx, &snapshot.postCreateArgv(pre_str, "vita update")), &diag, ctx.env_map) catch |err| switch (err) {
+    const post_res = exec.runExpectOkEnv(ctx.allocator, "snapper", try resolveArgv(ctx, &snapshot.postCreateArgv(pre_str, "vita update")), diag, ctx.env_map) catch |err| switch (err) {
         error.BackendFailed => return error.SnapshotFailed,
         else => return err,
     };
@@ -249,13 +283,31 @@ pub fn update(ctx: Ctx) !output.UpdateResult {
     };
 }
 
+/// VITA_SPEC §3.5: stated on every rollback, whatever the flags.
+pub const rollback_limitation_notice =
+    "note: @home and @var_log are not part of the rollback -- files changed there since the snapshot are unaffected";
+
+pub const manual_reboot_instruction =
+    "reboot required: run `systemctl reboot` to boot the rolled-back snapshot (vita never reboots the machine itself)";
+
+pub const reboot_later_notice =
+    "the rollback takes effect on the next boot; nothing else is needed now";
+
+/// vita never reboots the machine itself (VITA_SPEC §3.5), so both the
+/// `--yes` path and a declined prompt still end in an instruction.
+pub fn rebootMessage(yes: bool, confirmed: bool) []const u8 {
+    if (yes or confirmed) return manual_reboot_instruction;
+    return reboot_later_notice;
+}
+
 pub fn rollback(ctx: Ctx, snapshot_num: ?u32) !output.RollbackResult {
-    var diag: exec.Diagnostic = undefined;
+    var local: exec.Diagnostic = .{};
+    const diag = diagOf(ctx, &local);
     var num_buf: [16]u8 = undefined;
     var argv_buf: [3][]const u8 = undefined;
     const argv = try snapshot.rollbackArgv(snapshot_num, &num_buf, &argv_buf);
 
-    const res = exec.runExpectOkEnv(ctx.allocator, "snapper", argv, &diag, ctx.env_map) catch |err| switch (err) {
+    const res = exec.runExpectOkEnv(ctx.allocator, "snapper", try resolveArgv(ctx, argv), diag, ctx.env_map) catch |err| switch (err) {
         error.BackendFailed => return error.SnapshotFailed,
         else => return err,
     };
@@ -267,11 +319,10 @@ pub fn rollback(ctx: Ctx, snapshot_num: ?u32) !output.RollbackResult {
 pub fn info(ctx: Ctx, pkg: []const u8) !output.InfoResult {
     var state = try ledger.load(ctx.allocator, ctx.ledger_path);
     const entry = state.get(pkg);
-    var diag: exec.Diagnostic = undefined;
 
     var available: output.AvailableVersions = .{};
     policy: {
-        const res = exec.runExpectOkEnv(ctx.allocator, "apt-cache", &apt.policyArgv(pkg), &diag, ctx.env_map) catch break :policy;
+        const res = (try probe(ctx, "apt-cache", &apt.policyArgv(pkg))) orelse break :policy;
         const candidates = try apt.parseAptCachePolicy(ctx.allocator, res.stdout);
         const best = apt.bestPerOrigin(candidates);
         if (best.koompi_repo) |k| available.@"koompi-repo" = k.version;
@@ -337,6 +388,162 @@ const FakeUpdateFixture = struct {
         return .{ .allocator = allocator, .grubenv_path = self.grubenv_path, .bin_dir = bin_dir };
     }
 };
+
+fn alwaysYes(_: []const u8) bool {
+    return true;
+}
+
+fn alwaysNo(_: []const u8) bool {
+    return false;
+}
+
+const FakeInstallFixture = struct {
+    ledger_path: []const u8,
+    bin_dir: []const u8,
+
+    const resolving_apt_cache =
+        \\#!/bin/sh
+        \\cat <<'EOF'
+        \\pkg:
+        \\  Installed: (none)
+        \\  Candidate: 1.2-1
+        \\  Version table:
+        \\     1.2-1 500
+        \\        500 http://deb.debian.org/debian trixie/main amd64 Packages
+        \\EOF
+        \\
+    ;
+
+    const empty_backend = "#!/bin/sh\nexit 0\n";
+
+    fn init(allocator: std.mem.Allocator, dir: std.fs.Dir, apt_cache: []const u8, apt_get: []const u8) !FakeInstallFixture {
+        const bin_dir = try dir.realpathAlloc(allocator, ".");
+        try writeFakeBin(dir, "apt-cache", apt_cache);
+        try writeFakeBin(dir, "apt-get", apt_get);
+        try writeFakeBin(dir, "flatpak", empty_backend);
+        return .{
+            .ledger_path = try std.fs.path.join(allocator, &.{ bin_dir, "state.json" }),
+            .bin_dir = bin_dir,
+        };
+    }
+
+    fn ctx(self: *const FakeInstallFixture, allocator: std.mem.Allocator) Ctx {
+        return .{ .allocator = allocator, .ledger_path = self.ledger_path, .bin_dir = self.bin_dir };
+    }
+};
+
+test "install keeps the ledger entry of a package that succeeded before a later one failed" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    const allocator = arena.allocator();
+
+    var tmp = std.testing.tmpDir(.{});
+    defer tmp.cleanup();
+
+    const fixture = try FakeInstallFixture.init(allocator, tmp.dir, FakeInstallFixture.resolving_apt_cache,
+        \\#!/bin/sh
+        \\for arg in "$@"; do
+        \\  if [ "$arg" = "pkg-b" ]; then echo "E: broken packages" >&2; exit 100; fi
+        \\done
+        \\exit 0
+        \\
+    );
+
+    var diag: exec.Diagnostic = .{};
+    var ctx = fixture.ctx(allocator);
+    ctx.diag = &diag;
+
+    try std.testing.expectError(error.BackendFailed, install(ctx, &.{ "pkg-a", "pkg-b" }, .{}));
+
+    var state = try ledger.load(allocator, fixture.ledger_path);
+    try std.testing.expect(state.get("pkg-a") != null);
+    try std.testing.expect(state.get("pkg-b") == null);
+
+    try std.testing.expectEqualStrings("apt-get", diag.backend);
+    try std.testing.expectEqual(@as(u8, 100), diag.exit_code);
+}
+
+test "remove drops the ledger entry of each package as it goes" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    const allocator = arena.allocator();
+
+    var tmp = std.testing.tmpDir(.{});
+    defer tmp.cleanup();
+
+    const fixture = try FakeInstallFixture.init(allocator, tmp.dir, FakeInstallFixture.resolving_apt_cache,
+        \\#!/bin/sh
+        \\for arg in "$@"; do
+        \\  if [ "$arg" = "pkg-b" ]; then echo "E: broken packages" >&2; exit 100; fi
+        \\done
+        \\exit 0
+        \\
+    );
+    const ctx = fixture.ctx(allocator);
+
+    _ = try install(ctx, &.{"pkg-a"}, .{});
+    // pkg-b is in neither the ledger nor dpkg/flatpak, so the run aborts
+    // after pkg-a has already been removed for real
+    try std.testing.expectError(error.PackageNotFound, remove(ctx, &.{ "pkg-a", "pkg-b" }));
+
+    var state = try ledger.load(allocator, fixture.ledger_path);
+    try std.testing.expect(state.get("pkg-a") == null);
+}
+
+test "--yes without --allow-distrobox fails closed instead of reaching distrobox" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    const allocator = arena.allocator();
+
+    var tmp = std.testing.tmpDir(.{});
+    defer tmp.cleanup();
+    const fixture = try FakeInstallFixture.init(allocator, tmp.dir, FakeInstallFixture.empty_backend, FakeInstallFixture.empty_backend);
+
+    var ctx = fixture.ctx(allocator);
+    ctx.confirm = alwaysYes;
+
+    try std.testing.expectError(error.ConfirmationRequired, install(ctx, &.{"obscure-thing"}, .{ .yes = true }));
+}
+
+test "an interactive distrobox offer installs when accepted and reports not-found when declined" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    const allocator = arena.allocator();
+
+    var tmp = std.testing.tmpDir(.{});
+    defer tmp.cleanup();
+    const fixture = try FakeInstallFixture.init(allocator, tmp.dir, FakeInstallFixture.empty_backend, FakeInstallFixture.empty_backend);
+
+    var declining = fixture.ctx(allocator);
+    declining.confirm = alwaysNo;
+    try std.testing.expectError(error.PackageNotFound, install(declining, &.{"obscure-thing"}, .{}));
+
+    var accepting = fixture.ctx(allocator);
+    accepting.confirm = alwaysYes;
+    const result = try install(accepting, &.{"obscure-thing"}, .{});
+    try std.testing.expectEqual(ledger.Backend.distrobox, result.installed[0].backend);
+
+    var state = try ledger.load(allocator, fixture.ledger_path);
+    try std.testing.expectEqual(ledger.Backend.distrobox, state.get("obscure-thing").?.backend);
+}
+
+test "a non-interactive run with no confirmer still fails closed" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    const allocator = arena.allocator();
+
+    var tmp = std.testing.tmpDir(.{});
+    defer tmp.cleanup();
+    const fixture = try FakeInstallFixture.init(allocator, tmp.dir, FakeInstallFixture.empty_backend, FakeInstallFixture.empty_backend);
+
+    try std.testing.expectError(error.ConfirmationRequired, install(fixture.ctx(allocator), &.{"obscure-thing"}, .{}));
+}
+
+test "rebootMessage instructs a manual reboot unless the user declined" {
+    try std.testing.expectEqualStrings(manual_reboot_instruction, rebootMessage(true, false));
+    try std.testing.expectEqualStrings(manual_reboot_instruction, rebootMessage(false, true));
+    try std.testing.expectEqualStrings(reboot_later_notice, rebootMessage(false, false));
+}
 
 test "update leaves koompi_boot_pending set when apt full-upgrade fails" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
