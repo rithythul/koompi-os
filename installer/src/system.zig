@@ -4,7 +4,14 @@ const config = @import("config.zig");
 /// Never invoked for real by any test -- see the safety boundary in the
 /// Phase 3 plan: every command this module builds mutates real host or
 /// target-root state (bootstrap, bootloader, systemd, accounts).
-pub fn mmdebstrapArgv(allocator: std.mem.Allocator, packages: []const []const u8, suite: []const u8, target_root: []const u8) ![]const []const u8 {
+pub const debian_primary_mirror = "http://deb.debian.org/debian";
+
+/// mmdebstrap never reads the calling system's /etc/apt/sources.list --
+/// it builds its own sources purely from trailing mirror arguments
+/// (confirmed against mmdebstrap(1)). Passing any `extra_sources` means
+/// the implicit default mirror is gone too, so the primary Debian mirror
+/// has to be listed explicitly alongside them.
+pub fn mmdebstrapArgv(allocator: std.mem.Allocator, packages: []const []const u8, suite: []const u8, target_root: []const u8, extra_sources: []const []const u8) ![]const []const u8 {
     var argv = std.ArrayList([]const u8).init(allocator);
     errdefer argv.deinit();
     try argv.appendSlice(&.{ "mmdebstrap", "--variant=minbase" });
@@ -14,6 +21,10 @@ pub fn mmdebstrapArgv(allocator: std.mem.Allocator, packages: []const []const u8
     }
     try argv.append(suite);
     try argv.append(target_root);
+    if (extra_sources.len > 0) {
+        try argv.append(debian_primary_mirror);
+        try argv.appendSlice(extra_sources);
+    }
     return argv.toOwnedSlice();
 }
 
@@ -154,7 +165,7 @@ test "mountArgv places device before target, options after -o" {
 
 test "mmdebstrapArgv joins packages with commas and ends with suite, target" {
     const allocator = std.testing.allocator;
-    const argv = try mmdebstrapArgv(allocator, &.{ "snapper", "grub-btrfs" }, "trixie", "/mnt");
+    const argv = try mmdebstrapArgv(allocator, &.{ "snapper", "grub-btrfs" }, "trixie", "/mnt", &.{});
     defer {
         allocator.free(argv[3]);
         allocator.free(argv);
@@ -167,10 +178,19 @@ test "mmdebstrapArgv joins packages with commas and ends with suite, target" {
 
 test "mmdebstrapArgv omits --include when there are no extra packages" {
     const allocator = std.testing.allocator;
-    const argv = try mmdebstrapArgv(allocator, &.{}, "trixie", "/mnt");
+    const argv = try mmdebstrapArgv(allocator, &.{}, "trixie", "/mnt", &.{});
     defer allocator.free(argv);
     try std.testing.expectEqual(@as(usize, 4), argv.len);
     try std.testing.expectEqualStrings("trixie", argv[2]);
+}
+
+test "mmdebstrapArgv adds the primary Debian mirror alongside any extra sources" {
+    const allocator = std.testing.allocator;
+    const argv = try mmdebstrapArgv(allocator, &.{}, "trixie", "/mnt", &.{"deb [trusted=yes] file:///repo trixie main"});
+    defer allocator.free(argv);
+    try std.testing.expectEqual(@as(usize, 6), argv.len);
+    try std.testing.expectEqualStrings(debian_primary_mirror, argv[4]);
+    try std.testing.expectEqualStrings("deb [trusted=yes] file:///repo trixie main", argv[5]);
 }
 
 test "chrootArgv prefixes the command with chroot and the target root" {

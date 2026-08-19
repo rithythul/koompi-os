@@ -15,6 +15,12 @@ const base_overlay_path = "/usr/share/koompi-os/base/overlay";
 const target_root = "/mnt";
 const debian_suite = "trixie";
 
+/// The live ISO stages koompi-repo here (base/live-build/) so mmdebstrap
+/// can resolve koompi-repo-only packages (grub-btrfs,
+/// koompi-snapper-hooks, koompi-archive-keyring -- all in
+/// base/packages.list) without a live network koompi-repo server.
+const koompi_repo_source = "deb [signed-by=/usr/share/keyrings/koompi-archive-keyring.gpg] file:///usr/share/koompi-os/repo trixie main";
+
 pub const Run = *const fn (allocator: std.mem.Allocator, argv: []const []const u8, input: ?[]const u8) anyerror!exec.Result;
 
 fn realRun(allocator: std.mem.Allocator, argv: []const []const u8, input: ?[]const u8) anyerror!exec.Result {
@@ -30,6 +36,7 @@ pub const Env = struct {
     base_packages_path: []const u8 = base_packages_path,
     base_overlay_path: []const u8 = base_overlay_path,
     target_root: []const u8 = target_root,
+    koompi_repo_source: ?[]const u8 = koompi_repo_source,
     run: Run = realRun,
 };
 const edition_names = [_][]const u8{ "government", "school", "enterprise", "dev", "general" };
@@ -191,7 +198,8 @@ pub fn runInstall(allocator: std.mem.Allocator, answers: Answers, disks: []const
     try apt_packages.appendSlice(edition.base_packages);
     try apt_packages.appendSlice(edition.manifest.koompi_repo);
     try apt_packages.appendSlice(edition.manifest.debian);
-    const bootstrap_argv = try system.mmdebstrapArgv(allocator, apt_packages.items, debian_suite, env.target_root);
+    const extra_sources: []const []const u8 = if (env.koompi_repo_source) |src| &.{src} else &.{};
+    const bootstrap_argv = try system.mmdebstrapArgv(allocator, apt_packages.items, debian_suite, env.target_root, extra_sources);
     _ = try env.run(allocator, bootstrap_argv, null);
 
     // overlay before useradd, so /etc/skel is populated when `useradd -m`
