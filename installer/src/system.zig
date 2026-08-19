@@ -49,12 +49,12 @@ pub fn systemctlEnableArgv(unit: []const u8) [3][]const u8 {
 /// `useraddSudoGroupArgv` and `passwdLockRootArgv` run afterward:
 /// "sudo-user" gets full sudo and a locked root account; "separate-root"
 /// gets its own root password and no sudo group membership.
-pub fn useraddArgv(username: []const u8) [5][]const u8 {
-    return .{ "useradd", "-m", "-s", "/bin/bash", username };
+pub fn useraddArgv(username: []const u8) [6][]const u8 {
+    return .{ "useradd", "-m", "-s", "/bin/bash", "--", username };
 }
 
-pub fn useraddSudoGroupArgv(username: []const u8) [5][]const u8 {
-    return .{ "usermod", "-a", "-G", "sudo", username };
+pub fn useraddSudoGroupArgv(username: []const u8) [6][]const u8 {
+    return .{ "usermod", "-a", "-G", "sudo", "--", username };
 }
 
 pub fn passwdLockRootArgv() [3][]const u8 {
@@ -174,16 +174,24 @@ test "chrootArgv prefixes the command with chroot and the target root" {
     try std.testing.expectEqualStrings("grub-install", argv[2]);
 }
 
-test "useraddArgv creates the home dir and bash shell for the given username" {
+test "useraddArgv creates the home dir and bash shell, with -- before the username" {
     const argv = useraddArgv("koompi");
     try std.testing.expectEqualStrings("-m", argv[1]);
-    try std.testing.expectEqualStrings("koompi", argv[4]);
+    try std.testing.expectEqualStrings("--", argv[4]);
+    try std.testing.expectEqualStrings("koompi", argv[5]);
 }
 
-test "useraddSudoGroupArgv adds the sudo group via usermod" {
+test "useraddArgv guards a username that looks like a flag" {
+    const argv = useraddArgv("-rf");
+    try std.testing.expectEqualStrings("--", argv[4]);
+    try std.testing.expectEqualStrings("-rf", argv[5]);
+}
+
+test "useraddSudoGroupArgv adds the sudo group via usermod, with -- before the username" {
     const argv = useraddSudoGroupArgv("koompi");
     try std.testing.expectEqualStrings("sudo", argv[3]);
-    try std.testing.expectEqualStrings("koompi", argv[4]);
+    try std.testing.expectEqualStrings("--", argv[4]);
+    try std.testing.expectEqualStrings("koompi", argv[5]);
 }
 
 test "chpasswdStdin formats the username:password line chpasswd expects" {
