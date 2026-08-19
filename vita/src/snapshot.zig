@@ -14,19 +14,20 @@ pub fn parseSnapshotNumber(text: []const u8) !u32 {
     return std.fmt.parseInt(u32, trimmed, 10);
 }
 
-pub fn parseFirstInteger(text: []const u8) ?u32 {
+/// `snapper rollback` prints a backup-snapshot line before the
+/// rollback-target line ("Setting default subvolume to snapshot N."), so
+/// the target number is the *last* one in the output, not the first.
+pub fn parseLastInteger(text: []const u8) ?u32 {
     var i: usize = 0;
+    var result: ?u32 = null;
     while (i < text.len) : (i += 1) {
         if (!std.ascii.isDigit(text[i])) continue;
         var j = i;
         while (j < text.len and std.ascii.isDigit(text[j])) : (j += 1) {}
-        const n = std.fmt.parseInt(u32, text[i..j], 10) catch {
-            i = j;
-            continue;
-        };
-        return n;
+        if (std.fmt.parseInt(u32, text[i..j], 10)) |n| result = n else |_| {}
+        i = j;
     }
-    return null;
+    return result;
 }
 
 pub fn rollbackArgv(snapshot: ?u32, num_buf: []u8, argv_buf: *[3][]const u8) ![]const []const u8 {
@@ -86,12 +87,22 @@ test "parseSnapshotNumber rejects non-numeric output" {
     try std.testing.expectError(error.InvalidCharacter, parseSnapshotNumber("not a number"));
 }
 
-test "parseFirstInteger finds the first run of digits" {
-    try std.testing.expectEqual(@as(?u32, 45), parseFirstInteger("Creating read-only snapshot of default subvolume (Snapshot 45)."));
+test "parseLastInteger finds the only run of digits" {
+    try std.testing.expectEqual(@as(?u32, 45), parseLastInteger("Creating read-only snapshot of default subvolume (Snapshot 45)."));
 }
 
-test "parseFirstInteger returns null when there are no digits" {
-    try std.testing.expectEqual(@as(?u32, null), parseFirstInteger("no numbers here"));
+test "parseLastInteger returns null when there are no digits" {
+    try std.testing.expectEqual(@as(?u32, null), parseLastInteger("no numbers here"));
+}
+
+test "parseLastInteger picks the rollback target, not the backup snapshot that precedes it" {
+    const stdout =
+        \\Creating read-only snapshot of current system. (Snapshot 34.)
+        \\Creating read-write snapshot of snapshot 33. (Snapshot 35.)
+        \\Setting default subvolume to snapshot 35.
+        \\
+    ;
+    try std.testing.expectEqual(@as(?u32, 35), parseLastInteger(stdout));
 }
 
 test "grub-editenv set/unset/list round-trip against the real binary" {

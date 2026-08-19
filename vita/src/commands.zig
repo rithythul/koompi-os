@@ -312,7 +312,7 @@ pub fn rollback(ctx: Ctx, snapshot_num: ?u32) !output.RollbackResult {
         else => return err,
     };
 
-    const rolled_back_to = snapshot_num orelse (snapshot.parseFirstInteger(res.stdout) orelse 0);
+    const rolled_back_to = snapshot_num orelse (snapshot.parseLastInteger(res.stdout) orelse 0);
     return .{ .rolled_back_to = rolled_back_to, .reboot_required = true };
 }
 
