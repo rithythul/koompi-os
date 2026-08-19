@@ -1,0 +1,16 @@
+Source: grub-btrfs
+Section: admin
+Priority: optional
+Maintainer: KOOMPI <packages@koompi.org>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+
+Package: grub-btrfs
+Architecture: all
+Depends: ${misc:Depends}, grub2-common, btrfs-progs, inotify-tools
+Description: GRUB submenu of Btrfs snapshots, and a daemon that regenerates it
+ Not packaged in Debian's archive (see docs/ARCHITECTURE.md §4.2).
+ Vendored from upstream (github.com/Antynea/grub-btrfs) and packaged here
+ because every KOOMPI edition needs boot-into-snapshot. grub-btrfsd
+ watches /.snapshots via inotify and regenerates the GRUB snapshot
+ submenu whenever a snapshot appears or disappears.

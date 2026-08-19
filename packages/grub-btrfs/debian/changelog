@@ -1,0 +1,6 @@
+grub-btrfs (4.14-1) trixie; urgency=medium
+
+  * Vendored from upstream v4.14 (github.com/Antynea/grub-btrfs) for
+    koompi-repo; not packaged in Debian's archive.
+
+ -- KOOMPI <packages@koompi.org>  Wed, 19 Aug 2026 00:00:00 +0000

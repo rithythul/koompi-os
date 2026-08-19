@@ -1,0 +1,11 @@
+#!/usr/bin/make -f
+
+override_dh_auto_install:
+	$(MAKE) install DESTDIR=debian/grub-btrfs PREFIX=/usr GRUB_UPDATE_EXCLUDE=true
+
+override_dh_auto_build:
+
+override_dh_auto_test:
+
+%:
+	dh $@
