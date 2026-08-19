@@ -8,6 +8,7 @@ btrfs-progs
 snapper
 grub-btrfs
 koompi-snapper-hooks
+koompi-boot-success
 systemd-zram-generator
 grub-efi-amd64
 network-manager
