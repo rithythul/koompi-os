@@ -103,6 +103,7 @@ fi
 
 echo "=== boot 2: verify ==="
 common_qemu \
+    -boot order=c \
     -serial unix:"$qemu_dir/boot2.sock",server=on,wait=off \
     -monitor unix:"$qemu_dir/boot2.monitor.sock",server=on,wait=off &
 qemu2_pid=$!
