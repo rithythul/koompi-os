@@ -16,3 +16,7 @@ that already lives elsewhere in the repo.
 Autologin is enabled on `tty1` and `ttyS0` — standard live-CD posture
 (anyone with console access to a live session already has root), and
 `ttyS0` is also what `scripts/test_qemu.sh` drives headlessly.
+`bootappend-live`'s `username=user` makes live-config apply the same
+posture to SDDM (0085-sddm only autologins when a username is set on
+the kernel cmdline) instead of parking the live session behind a login
+prompt for its own undocumented default account.
