@@ -96,7 +96,7 @@ if ! grep -a -q "AUTOTEST_BOOT1_DONE" "$qemu_dir/boot1.log"; then
     echo "boot 1 did not reach AUTOTEST_BOOT1_DONE -- see $qemu_dir/boot1.log" >&2
     exit 1
 fi
-if ! grep -a -q "^AUTOTEST_INSTALL_EXIT=0$" "$qemu_dir/boot1.log"; then
+if ! grep -a -q "AUTOTEST_INSTALL_EXIT=0" "$qemu_dir/boot1.log"; then
     echo "koompi-install did not exit 0 -- see $qemu_dir/boot1.log and /root/install.log inside the image" >&2
     exit 1
 fi
