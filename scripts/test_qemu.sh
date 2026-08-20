@@ -92,11 +92,11 @@ wait "$qemu1_pid" || true
 echo "=== boot1.log tail ==="
 tail -n 40 "$qemu_dir/boot1.log" || true
 
-if ! grep -q "AUTOTEST_BOOT1_DONE" "$qemu_dir/boot1.log"; then
+if ! grep -a -q "AUTOTEST_BOOT1_DONE" "$qemu_dir/boot1.log"; then
     echo "boot 1 did not reach AUTOTEST_BOOT1_DONE -- see $qemu_dir/boot1.log" >&2
     exit 1
 fi
-if ! grep -q "^AUTOTEST_INSTALL_EXIT=0$" "$qemu_dir/boot1.log"; then
+if ! grep -a -q "^AUTOTEST_INSTALL_EXIT=0$" "$qemu_dir/boot1.log"; then
     echo "koompi-install did not exit 0 -- see $qemu_dir/boot1.log and /root/install.log inside the image" >&2
     exit 1
 fi
@@ -114,4 +114,4 @@ echo "=== boot2.log tail ==="
 tail -n 60 "$qemu_dir/boot2.log" || true
 
 echo "=== results ==="
-grep AUTOTEST_ "$qemu_dir/boot1.log" "$qemu_dir/boot2.log" || true
+grep -a AUTOTEST_ "$qemu_dir/boot1.log" "$qemu_dir/boot2.log" || true
