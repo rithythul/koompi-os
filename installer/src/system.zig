@@ -48,9 +48,10 @@ pub fn grubMkconfigArgv() [3][]const u8 {
 /// Debian's snapper package doesn't auto-create a config the way zypp
 /// does -- without this, every later `snapper -c root create` (the apt
 /// hook, `vita update`, `vita rollback`) fails with "config 'root' not
-/// found".
-pub fn snapperCreateConfigArgv() [5][]const u8 {
-    return .{ "snapper", "-c", "root", "create-config", "/" };
+/// found". --no-dbus because this runs chrooted into target_root, which
+/// has no dbus-daemon of its own to connect to.
+pub fn snapperCreateConfigArgv() [6][]const u8 {
+    return .{ "snapper", "--no-dbus", "-c", "root", "create-config", "/" };
 }
 
 pub const systemd_units = [_][]const u8{
@@ -282,7 +283,8 @@ test "systemd_units matches the fixed unit list from docs/ARCHITECTURE.md §6" {
 
 test "snapperCreateConfigArgv registers the root config snapper/vita expect" {
     const argv = snapperCreateConfigArgv();
-    try std.testing.expectEqualStrings("root", argv[2]);
-    try std.testing.expectEqualStrings("create-config", argv[3]);
-    try std.testing.expectEqualStrings("/", argv[4]);
+    try std.testing.expectEqualStrings("--no-dbus", argv[1]);
+    try std.testing.expectEqualStrings("root", argv[3]);
+    try std.testing.expectEqualStrings("create-config", argv[4]);
+    try std.testing.expectEqualStrings("/", argv[5]);
 }
