@@ -4,6 +4,7 @@
 # manifest.toml — everything here comes from Debian stable/security).
 
 koompi-archive-keyring
+linux-image-amd64
 btrfs-progs
 snapper
 grub-btrfs
