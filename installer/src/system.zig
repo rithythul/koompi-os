@@ -37,8 +37,12 @@ pub fn chrootArgv(allocator: std.mem.Allocator, target_root: []const u8, cmd: []
     return argv.toOwnedSlice();
 }
 
-pub fn grubInstallArgv() [4][]const u8 {
-    return .{ "grub-install", "--target=x86_64-efi", "--efi-directory=/boot/efi", "--bootloader-id=KOOMPI" };
+/// --force-extra-removable also drops a fallback EFI/BOOT/BOOTX64.EFI --
+/// firmware NVRAM boot-entry registration (via efibootmgr) is not
+/// guaranteed to work or persist, and efibootmgr isn't even in
+/// base/packages.list.
+pub fn grubInstallArgv() [5][]const u8 {
+    return .{ "grub-install", "--target=x86_64-efi", "--efi-directory=/boot/efi", "--bootloader-id=KOOMPI", "--force-extra-removable" };
 }
 
 pub fn grubMkconfigArgv() [3][]const u8 {
