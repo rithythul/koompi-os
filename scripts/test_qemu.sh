@@ -55,6 +55,12 @@ GETTY_EOF
 mkdir -p /mnt/etc/systemd/system/getty.target.wants
 ln -sf /lib/systemd/system/serial-getty@.service /mnt/etc/systemd/system/getty.target.wants/serial-getty@ttyS0.service
 chroot /mnt systemctl set-default graphical.target
+cat >> /mnt/etc/default/grub <<'GRUB_EOF'
+GRUB_TERMINAL="console serial"
+GRUB_SERIAL_COMMAND="serial --unit=0 --speed=115200"
+GRUB_CMDLINE_LINUX_DEFAULT="console=tty0 console=ttyS0,115200n8"
+GRUB_EOF
+chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 umount /mnt/dev/pts /mnt/dev /mnt/proc /mnt/sys
 echo "AUTOTEST_BOOT1_DONE"
 poweroff
