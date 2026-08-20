@@ -180,6 +180,23 @@ fn stageAptArchives(allocator: std.mem.Allocator, env: Env, repo_path: []const u
     }
 }
 
+/// `snapper create-config` always tries to create its own `.snapshots`
+/// subvolume and fails (errno 17, File exists) against the `@snapshots`
+/// subvolume runInstall already mounted at /.snapshots -- confirmed live
+/// in the QEMU install run. Copying Debian's own config template (its
+/// defaults are already SUBVOLUME="/" FSTYPE="btrfs") straight to
+/// /etc/snapper/configs/root registers the same config without going
+/// through subvolume creation at all.
+fn writeSnapperConfig(allocator: std.mem.Allocator, env: Env) !void {
+    const template = try targetPath(allocator, env, "usr/share/snapper/config-templates/default");
+    const dest = try targetPath(allocator, env, "etc/snapper/configs/root");
+    if (std.fs.path.dirname(dest)) |dir| try std.fs.cwd().makePath(dir);
+    std.fs.cwd().copyFile(template, std.fs.cwd(), dest, .{}) catch |err| switch (err) {
+        error.FileNotFound => return,
+        else => return err,
+    };
+}
+
 /// Steps 10-16: bootstrap, configure, and apply the edition. Against the
 /// default Env every command here partitions, formats or bootstraps for
 /// real -- only Phase 4's QEMU target runs it that way. The ordering and
@@ -264,7 +281,7 @@ pub fn runInstall(allocator: std.mem.Allocator, answers: Answers, disks: []const
     try runInTarget(allocator, env, &system.grubInstallArgv());
     try runInTarget(allocator, env, &system.grubMkconfigArgv());
 
-    try runInTarget(allocator, env, &system.snapperCreateConfigArgv());
+    try writeSnapperConfig(allocator, env);
 
     for (system.systemd_units) |unit| {
         try runInTarget(allocator, env, &system.systemctlEnableArgv(unit));
@@ -479,7 +496,7 @@ test "runInstall populates /etc/skel before it creates the account" {
     try std.testing.expect(RecordingRun.calls.items[useradd].skel_present);
 }
 
-test "runInstall registers the snapper root config before enabling the snapper timers" {
+test "runInstall registers the snapper root config from Debian's own template" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
     const allocator = arena.allocator();
@@ -488,6 +505,9 @@ test "runInstall registers the snapper root config before enabling the snapper t
     defer tmp.cleanup();
     const target = try tmp.dir.realpathAlloc(allocator, ".");
     RecordingRun.reset(allocator, target);
+
+    try tmp.dir.makePath("usr/share/snapper/config-templates");
+    try tmp.dir.writeFile(.{ .sub_path = "usr/share/snapper/config-templates/default", .data = "SUBVOLUME=\"/\"\nFSTYPE=\"btrfs\"\n" });
 
     const disks = [_]disk.BlockDevice{
         .{ .name = "sda", .size_bytes = 256000000000, .kind = "disk", .model = null },
@@ -512,9 +532,10 @@ test "runInstall registers the snapper root config before enabling the snapper t
         .run = RecordingRun.run,
     });
 
-    const create_config = RecordingRun.find("create-config").?;
-    const timeline_timer = RecordingRun.find("snapper-timeline.timer").?;
-    try std.testing.expect(create_config < timeline_timer);
+    const snapper_config = try tmp.dir.readFileAlloc(allocator, "etc/snapper/configs/root", 4096);
+    try std.testing.expectEqualStrings("SUBVOLUME=\"/\"\nFSTYPE=\"btrfs\"\n", snapper_config);
+
+    try std.testing.expect(RecordingRun.find("snapper-timeline.timer") != null);
 }
 
 test "runInstall writes the real blkid UUID into fstab and feeds chpasswd the password" {
