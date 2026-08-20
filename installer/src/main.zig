@@ -19,7 +19,8 @@ const debian_suite = "trixie";
 /// can resolve koompi-repo-only packages (grub-btrfs,
 /// koompi-snapper-hooks, koompi-archive-keyring -- all in
 /// base/packages.list) without a live network koompi-repo server.
-const koompi_repo_source = "deb [signed-by=/usr/share/keyrings/koompi-archive-keyring.gpg] file:///usr/share/koompi-os/repo trixie main";
+const koompi_repo_path = "/usr/share/koompi-os/repo";
+const koompi_repo_source = "deb [signed-by=/usr/share/keyrings/koompi-archive-keyring.gpg] file://" ++ koompi_repo_path ++ " trixie main";
 
 pub const Run = *const fn (allocator: std.mem.Allocator, argv: []const []const u8, input: ?[]const u8) anyerror!exec.Result;
 
@@ -37,6 +38,7 @@ pub const Env = struct {
     base_overlay_path: []const u8 = base_overlay_path,
     target_root: []const u8 = target_root,
     koompi_repo_source: ?[]const u8 = koompi_repo_source,
+    koompi_repo_path: ?[]const u8 = koompi_repo_path,
     run: Run = realRun,
 };
 const edition_names = [_][]const u8{ "government", "school", "enterprise", "dev", "general" };
@@ -151,6 +153,33 @@ fn runInTarget(allocator: std.mem.Allocator, env: Env, cmd: []const []const u8) 
     _ = try env.run(allocator, try system.chrootArgv(allocator, env.target_root, cmd), null);
 }
 
+/// apt stages a chrooted dpkg's package unpack as a symlink pointing at
+/// wherever it downloaded the .deb -- for a file:// source outside
+/// target_root, that symlink target only resolves from outside the
+/// chroot, so dpkg (chrooted) gets ENOENT. Pre-seeding the target's own
+/// apt cache with the same .debs makes apt reuse those instead.
+fn stageAptArchives(allocator: std.mem.Allocator, env: Env, repo_path: []const u8) !void {
+    const pool_path = try std.fs.path.join(allocator, &.{ repo_path, "pool" });
+    var pool_dir = std.fs.cwd().openDir(pool_path, .{ .iterate = true }) catch |err| switch (err) {
+        error.FileNotFound => return,
+        else => return err,
+    };
+    defer pool_dir.close();
+
+    const archives_path = try targetPath(allocator, env, "var/cache/apt/archives");
+    try std.fs.cwd().makePath(archives_path);
+    var archives_dir = try std.fs.cwd().openDir(archives_path, .{});
+    defer archives_dir.close();
+
+    var walker = try pool_dir.walk(allocator);
+    defer walker.deinit();
+    while (try walker.next()) |entry| {
+        if (entry.kind != .file) continue;
+        if (!std.mem.endsWith(u8, entry.basename, ".deb")) continue;
+        try pool_dir.copyFile(entry.path, archives_dir, entry.basename, .{});
+    }
+}
+
 /// Steps 10-16: bootstrap, configure, and apply the edition. Against the
 /// default Env every command here partitions, formats or bootstraps for
 /// real -- only Phase 4's QEMU target runs it that way. The ordering and
@@ -199,6 +228,7 @@ pub fn runInstall(allocator: std.mem.Allocator, answers: Answers, disks: []const
     try apt_packages.appendSlice(edition.manifest.koompi_repo);
     try apt_packages.appendSlice(edition.manifest.debian);
     const extra_sources: []const []const u8 = if (env.koompi_repo_source) |src| &.{src} else &.{};
+    if (env.koompi_repo_path) |repo_path| try stageAptArchives(allocator, env, repo_path);
     const bootstrap_argv = try system.mmdebstrapArgv(allocator, apt_packages.items, debian_suite, env.target_root, extra_sources);
     _ = try env.run(allocator, bootstrap_argv, null);
 
@@ -533,6 +563,50 @@ test "runInstall writes the real blkid UUID into fstab and feeds chpasswd the pa
     try std.testing.expectEqualStrings("user:hunter2\n", RecordingRun.calls.items[chpasswd].input.?);
 
     try std.testing.expect(RecordingRun.find("/dev/nvme0n1p2") != null);
+}
+
+test "runInstall seeds the target's apt archives cache from the koompi-repo pool before bootstrapping" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    const allocator = arena.allocator();
+
+    var tmp = std.testing.tmpDir(.{});
+    defer tmp.cleanup();
+    const target = try tmp.dir.realpathAlloc(allocator, ".");
+    RecordingRun.reset(allocator, target);
+
+    var repo_tmp = std.testing.tmpDir(.{});
+    defer repo_tmp.cleanup();
+    try repo_tmp.dir.makePath("pool/main/g/grub-btrfs");
+    try repo_tmp.dir.writeFile(.{ .sub_path = "pool/main/g/grub-btrfs/grub-btrfs_4.14-1_all.deb", .data = "fake\n" });
+    const repo_path = try repo_tmp.dir.realpathAlloc(allocator, ".");
+
+    const disks = [_]disk.BlockDevice{
+        .{ .name = "sda", .size_bytes = 256000000000, .kind = "disk", .model = null },
+    };
+    const answers = Answers{
+        .keymap = "us",
+        .locale = "en_US.UTF-8",
+        .timezone = "Asia/Phnom_Penh",
+        .disk_index = 0,
+        .hostname = "koompi-pc",
+        .username = "user",
+        .password = "hunter2",
+        .root_password = null,
+        .edition_index = 4,
+    };
+
+    try runInstall(allocator, answers, &disks, .{
+        .editions_root = "../editions",
+        .base_packages_path = "../base/packages.list",
+        .base_overlay_path = "../base/overlay",
+        .target_root = target,
+        .koompi_repo_path = repo_path,
+        .run = RecordingRun.run,
+    });
+
+    const staged = try tmp.dir.readFileAlloc(allocator, "var/cache/apt/archives/grub-btrfs_4.14-1_all.deb", 256);
+    try std.testing.expectEqualStrings("fake\n", staged);
 }
 
 test {
